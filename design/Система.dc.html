@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Сотри туман — система</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+body{margin:0;background:#EFEBE1;color:#1E1D1A;font-family:"Golos Text",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#D9472B;text-decoration-thickness:2px;text-underline-offset:3px}a:hover{color:#1E1D1A}
+</style>
+</helmet>
+<div style="max-width:1200px;margin:0 auto;padding:48px 32px 96px;display:flex;flex-direction:column;gap:88px">
+
+<header style="display:flex;flex-direction:column;gap:20px">
+  <div style="font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:#57524A">Стенд «Игорь Покровский» · дизайн-система v1 · 25.09.2026</div>
+  <h1 style="margin:0;font:700 clamp(48px,8vw,104px)/0.95 Unbounded,sans-serif;letter-spacing:-.02em">Сотри туман</h1>
+  <p style="margin:0;max-width:760px;font-size:22px;line-height:1.45;text-wrap:pretty">Главная идея: весь стенд — рабочий стол архитектора. Город — картонный макет, лес — войлок, туман — <b>калька</b>, которую посетитель стирает пальцем. Типовые коробки из OSM в этой системе выглядят не бедно, а честно: так Покровский и работал — двигал «коробки» по макету.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px">
+    <a href="Прототип.dc.html" style="display:flex;align-items:center;min-height:56px;padding:0 24px;background:#1E1D1A;color:#FBF8F2;text-decoration:none;border-radius:6px;font:600 18px Unbounded,sans-serif">Открыть прототип →</a>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:500 14px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em">
+      <a href="#mech">1 · Механика</a><a href="#city">2 · Город</a><a href="#landmarks">3 · Ориентиры</a><a href="#ui">4 · Интерфейс</a><a href="#files">Файлы</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 1. MECHANICS ============ -->
+<section id="mech" style="display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px"><div style="font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#D9472B">БЛОК 1</div><h2 style="margin:0;font:700 44px/1.05 Unbounded,sans-serif">Механика</h2></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Как играется</h3>
+      <p style="margin:0;font-size:20px;line-height:1.5;text-wrap:pretty">Игра называет годы. Вы проводите пальцем по кальке там, где, как вам кажется, строили в эти годы. Чем ближе к цели, тем <b>теплее след</b> под пальцем. Угадали — дома вырастают из земли и открывается карточка. Не угадали — калька мягко затягивается, архитектор подсказывает. Проиграть нельзя. В конце — ваш маршрут по настоящему городу.</p>
+      <p style="margin:0;font-size:18px;line-height:1.5;color:#57524A;text-wrap:pretty">Понятно за 5 секунд: на заставке кисть уже стирает кальку сама (демо-жест), крупная подпись «Проведите пальцем».</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Бюджет времени</h3>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:8px 24px;font-size:18px;border-top:2px solid #1E1D1A;padding-top:12px">
+        <div>Прочитать вопрос</div><div style="font-family:'IBM Plex Mono'">3–4 с</div>
+        <div>Стереть и найти</div><div style="font-family:'IBM Plex Mono'">5–20 с</div>
+        <div>Рост домов</div><div style="font-family:'IBM Plex Mono'">2 с</div>
+        <div>Карточка (коротко)</div><div style="font-family:'IBM Plex Mono'">8–12 с</div>
+        <div style="border-top:1px solid #CFC7B7;padding-top:8px;font-weight:600">Этап / 9 этапов</div><div style="border-top:1px solid #CFC7B7;padding-top:8px;font-family:'IBM Plex Mono';font-weight:600">~25 с / ~3,5 мин</div>
+      </div>
+      <p style="margin:0;font-size:18px;line-height:1.5;color:#57524A;text-wrap:pretty">Это на пределе. Поэтому карточка на стенде короткая (название, 1 факт, QR), длинный текст — только на телефоне. Любой момент — нормальная точка выхода: открытая часть города и есть результат.</p>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Разбор текущего цикла</h3>
+    <div style="display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1.3fr) minmax(0,1.6fr);border-top:2px solid #1E1D1A;font-size:18px;line-height:1.4">
+      <div style="padding:10px 12px 10px 0;font:500 13px 'IBM Plex Mono';letter-spacing:.06em;color:#57524A;border-bottom:1px solid #CFC7B7">ШАГ</div><div style="padding:10px 12px;font:500 13px 'IBM Plex Mono';letter-spacing:.06em;color:#57524A;border-bottom:1px solid #CFC7B7">ЧТО МЕШАЕТ</div><div style="padding:10px 0 10px 12px;font:500 13px 'IBM Plex Mono';letter-spacing:.06em;color:#57524A;border-bottom:1px solid #CFC7B7">ЧТО МЕНЯЕМ</div>
+      <div style="padding:12px 12px 12px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Период</div><div style="padding:12px;border-bottom:1px solid #CFC7B7">Читается как справка, диапазон лет не помещается крупно</div><div style="padding:12px 0 12px 12px;border-bottom:1px solid #CFC7B7">Год начала 120 px, конец периода строкой ниже. Под ним — <b>вопрос-задача</b>, а не описание</div>
+      <div style="padding:12px 12px 12px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Подсказка</div><div style="padding:12px;border-bottom:1px solid #CFC7B7">Три одинаковые текстовые плашки</div><div style="padding:12px 0 12px 12px;border-bottom:1px solid #CFC7B7">Лестница: 1 — ориентир (шоссе, лес, ж/д), 2 — соседство, 3 — зона пульсирует. Голос архитектора</div>
+      <div style="padding:12px 12px 12px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Стираю</div><div style="padding:12px;border-bottom:1px solid #CFC7B7">Нет обратной связи до вердикта — игрок не знает, «горячо» ли</div><div style="padding:12px 0 12px 12px;border-bottom:1px solid #CFC7B7"><b>Тёплый след:</b> кайма кисти и шкала в панели теплеют рядом с целью</div>
+      <div style="padding:12px 12px 12px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Промах</div><div style="padding:12px;border-bottom:1px solid #CFC7B7">Порог срабатывает посреди жеста — ощущается как наказание</div><div style="padding:12px 0 12px 12px;border-bottom:1px solid #CFC7B7">Проверка только при отпускании пальца. Калька затягивается 0,9 с, реплика «Здесь в те годы ещё шумел лес»</div>
+      <div style="padding:12px 12px 12px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Рост</div><div style="padding:12px;border-bottom:1px solid #CFC7B7">Всё сразу, без паузы и без акцента</div><div style="padding:12px 0 12px 12px;border-bottom:1px solid #CFC7B7">Пауза 300 мс → волна от точки касания 2 с → пины → камера отъезжает</div>
+      <div style="padding:12px 12px 12px 0;font-weight:600">Карточка</div><div style="padding:12px">Узкая колонка 30%, мелкий текст</div><div style="padding:12px 0 12px 12px">Лист 820 px поверх карты, 2 колонки, листание, QR. Найденная зона остаётся видна слева</div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Механики-кандидаты</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:16px">
+      <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#9DB080;border-radius:4px">ПРОСТО · ~1 Ч</span><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#1E1D1A;color:#FBF8F2;border-radius:4px">БЕРЁМ</span></div>
+        <div style="font:600 20px Unbounded,sans-serif">Тёплый след</div>
+        <div style="font-size:17px;line-height:1.45">heat = 1 − clamp((d − R) / 400 px). Кайма кисти от кальки к тёплому, в панели «Холодно → Горячо». Убирает ощущение «тыкаю наугад».</div>
+      </div>
+      <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#FFD98A;border-radius:4px">СРЕДНЕ · ~3 Ч</span><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#1E1D1A;color:#FBF8F2;border-radius:4px">БЕРЁМ В ЭТАП 4</span></div>
+        <div style="font:600 20px Unbounded,sans-serif">Двигаем коробки</div>
+        <div style="font-size:17px;line-height:1.45">Центральный проспект пуст. Четыре пары башен лежат на лотке — перетащите их на проспект. Любое место принимается, потом дома «прилипают» к реальным. Жест самого Покровского.</div>
+      </div>
+      <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#9DB080;border-radius:4px">ПРОСТО · ~1,5 Ч</span><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;border:1.5px solid #1E1D1A;border-radius:4px">ЭКСКУРСИЯ</span></div>
+        <div style="font:600 20px Unbounded,sans-serif">Город растёт сам</div>
+        <div style="font-size:17px;line-height:1.45">Ползунок 1960 → 2020. Дома поднимаются по <code>start_date</code> из OSM, где её нет — по году этапа своей зоны. Режим «Просто посмотреть».</div>
+      </div>
+      <div style="background:#FBF8F2;border:2px solid #CFC7B7;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#9DB080;border-radius:4px">ПРОСТО</span><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;border:1.5px solid #1E1D1A;border-radius:4px">ЕСЛИ БУДУТ ФОТО</span></div>
+        <div style="font:600 20px Unbounded,sans-serif">Было / стало</div>
+        <div style="font-size:17px;line-height:1.45">Ползунок по паре снимков с одной точки. Нужны 3–5 пар — это работа контентной команды, а не кода. Вкладка в карточке.</div>
+      </div>
+      <div style="background:#FBF8F2;border:2px solid #CFC7B7;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;background:#E4572E;color:#FBF8F2;border-radius:4px">СЛОЖНО</span><span style="font:500 13px 'IBM Plex Mono';padding:4px 8px;border:1.5px solid #1E1D1A;border-radius:4px">НЕ ДЕЛАЕМ</span></div>
+        <div style="font:600 20px Unbounded,sans-serif">Собери генплан</div>
+        <div style="font-size:17px;line-height:1.45">Пазл из зон: за 6 часов не успеть, и в пазле можно «проиграть». Генплан остаётся этапом-смотрением с тремя тап-метками.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Покровский — герой, а не справка</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:18px;line-height:1.45">
+        <div><b>Его инструмент.</b> Туман — калька, кисть — ластик, город — его макет. Это не декор, это метафора игры.</div>
+        <div><b>Его выход.</b> Этап 3 открывается карточкой «Июль 1964. Приходит Покровский» — единственная карточка без здания, с реальным фото от команды.</div>
+        <div><b>Его жест.</b> Этап 4 «Двигаем коробки»: посетитель делает то, что делал он.</div>
+        <div><b>Его голос.</b> Подсказки 1–2 — короткие реплики от первого лица, только по фактам из <code>content</code>, с подписью «И. П.». Реальные цитаты (1976, 1996) — всегда в кавычках с датой.</div>
+      </div>
+      <div style="background:#FBF8F2;border-left:0;border:2px solid #1E1D1A;border-radius:6px;padding:16px 18px;font-size:17px;line-height:1.45"><span style="font:500 13px 'IBM Plex Mono';letter-spacing:.06em;color:#D9472B">РЕДАКТОРСКОЕ ПРАВИЛО</span><br>Реплики-подсказки — реконструкция. В титрах стенда: «Подсказки написаны по мотивам интервью и воспоминаний». Не приписывать ему оценок и мнений, которых нет в источниках.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Финал и награда</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:18px;line-height:1.45">
+        <div><b>Счёт без оценки:</b> «Вы нашли город с 4 подсказками». Ноль — особый текст.</div>
+        <div><b>5 маршрутов → QR:</b> «Первый город», «Центр Покровского», «Кирпичный пятый», «Дворцы», «За рельсами». Телефон открывает маршрут-прогулку.</div>
+        <div><b>Секретная карточка «Яйцо Покровского»</b> — за игру без подсказок. Иначе видна запертой: «Сыграйте без подсказок». Это и есть повод сыграть ещё.</div>
+        <div><b>Открытка по QR:</b> иллюстрация последнего найденного ориентира + цитата 1976 «120 тысяч за 12 лет» — сохраняется на телефон.</div>
+        <div><b>«Сыграть ещё»</b>, автосброс в заставку через 60 с (на 45-й — «Вы ещё здесь?»).</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Изменения к текущей реализации</h3>
+    <ol style="margin:0;padding-left:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:10px 40px;font-size:18px;line-height:1.45">
+      <li>Туман: шейдер кальки (цвет, шум, кисть с hardness 0,55) вместо плоской заливки.</li>
+      <li>heat по расстоянию до центра зоны → цвет каймы кисти + шкала в панели.</li>
+      <li>Промах проверять на <code>pointerup</code>, не во время жеста.</li>
+      <li>Промах: refill 900 мс только вне цели; цель не затягивается.</li>
+      <li>Рост: волна от первой точки попадания, задержка 0,6 мс на метр (≤ 900 мс).</li>
+      <li>После находки: камера сдвигается на 30% ширины влево, карточка 820 px справа.</li>
+      <li>Этап 4: вставка «Двигаем коробки» до стирания проспекта.</li>
+      <li>«Флейта», КЦ, «Штыки»: заменить OSM-коробки на low-poly (раздел 3).</li>
+      <li>Год: 120 px, конец периода — 44 px строкой ниже.</li>
+      <li>Прогресс: 9 иконок этапов, этап 6 — ромб.</li>
+      <li>Заставка: авто-демо жеста стирания каждые 8 с.</li>
+      <li>Idle 60 с → заставка, предупреждение на 45 с.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 2. CITY ============ -->
+<section id="city" style="display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px"><div style="font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#D9472B">БЛОК 2</div><h2 style="margin:0;font:700 44px/1.05 Unbounded,sans-serif">Вид города</h2><p style="margin:0;max-width:760px;font-size:18px;line-height:1.5;color:#57524A">Один и тот же фрагмент (микрорайон, лес, пруд, ж/д, ориентир, «выросшие» дома, контуры неоткрытых) в трёх материалах. Кадры отрендерены тем же изометрическим правилом, что и SVG-ориентиры.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px">
+    <div style="display:flex;flex-direction:column;gap:12px;background:#FBF8F2;border:3px solid #1E1D1A;border-radius:8px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div style="font:600 20px Unbounded,sans-serif">A · Макет</div><span style="font:500 12px 'IBM Plex Mono';padding:4px 8px;background:#D9472B;color:#FBF8F2;border-radius:4px">РЕКОМЕНДУЮ</span></div>
+      <img src="svg/moodboard/diorama-maket.svg" alt="" style="width:100%;height:auto;display:block">
+      <div style="display:flex;height:20px;border-radius:3px;overflow:hidden"><div style="flex:1;background:#E6DFD0"></div><div style="flex:1;background:#FBF8F2"></div><div style="flex:1;background:#9DB080"></div><div style="flex:1;background:#A9C6CC"></div><div style="flex:1;background:#CF8C6B"></div><div style="flex:1;background:#E4572E"></div><div style="flex:1;background:#FFD98A"></div></div>
+      <div style="font-size:16px;line-height:1.45">Белый картон, войлочный лес, калька. Связан с историей о макете; типовые коробки выглядят намеренно; киноварные ориентиры читаются с 3 метров. Музейно, спокойно, без ностальгии-китча.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;background:#FBF8F2;border:1px solid #CFC7B7;border-radius:8px;padding:16px">
+      <div style="font:600 20px Unbounded,sans-serif">B · Тёплый полдень</div>
+      <img src="svg/moodboard/diorama-noon.svg" alt="" style="width:100%;height:auto;display:block">
+      <div style="display:flex;height:20px;border-radius:3px;overflow:hidden"><div style="flex:1;background:#CBD79E"></div><div style="flex:1;background:#EAD9B4"></div><div style="flex:1;background:#8BAA63"></div><div style="flex:1;background:#7DB3CA"></div><div style="flex:1;background:#DA9463"></div><div style="flex:1;background:#F08A24"></div><div style="flex:1;background:#56627A"></div></div>
+      <div style="font-size:16px;line-height:1.45">Ближе к текущей версии и к градостроительным играм: весело, узнаваемо детям. Минус: насыщенный фон спорит с ориентирами, коробки выглядят «дешёвой игрой».</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;background:#FBF8F2;border:1px solid #CFC7B7;border-radius:8px;padding:16px">
+      <div style="font:600 20px Unbounded,sans-serif">C · Открытка 1970-х</div>
+      <img src="svg/moodboard/diorama-postcard.svg" alt="" style="width:100%;height:auto;display:block">
+      <div style="display:flex;height:20px;border-radius:3px;overflow:hidden"><div style="flex:1;background:#E9DDC2"></div><div style="flex:1;background:#F7EEDD"></div><div style="flex:1;background:#6E9E8A"></div><div style="flex:1;background:#6CA9B8"></div><div style="flex:1;background:#C96B4E"></div><div style="flex:1;background:#D23F2E"></div><div style="flex:1;background:#F2C94C"></div></div>
+      <div style="font-size:16px;line-height:1.45">Выцветшая офсетная печать: тепло для жителей 40+. Минус: низкий контраст, риск ретро-китча. Лучше использовать как стиль QR-открытки, а не карты.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Материалы города · «Макет»</h3>
+    <div style="font-size:16px;color:#57524A">Полная таблица с прозрачностями — <a href="city-materials.json">city-materials.json</a>. Three.js: <code>MeshLambertMaterial</code>, <code>flatShading: true</code>, цвета — в sRGB.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:0 32px;border-top:2px solid #1E1D1A">
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#E6DFD0;border:1px solid #CFC7B7"></div><code>#E6DFD0</code><div><b>Земля</b>, подложка</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#EFE9DC;border:1px solid #CFC7B7"></div><code>#EFE9DC</code><div><b>Площадки мкр</b>, h 0,3 м</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#9DB080"></div><code>#9DB080</code><div><b>Лес</b> — плоский войлок, h 1,2 м</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#A9C6CC"></div><code>#A9C6CC</code><div><b>Вода</b>, без бликов</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#F8F5EE;border:1px solid #CFC7B7"></div><code>#F8F5EE</code><div><b>Магистраль</b>, ширина ×1,3</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#F1EDE4;border:1px solid #CFC7B7"></div><code>#F1EDE4</code><div><b>Улица</b>, проезд</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#5B574F"></div><code>#5B574F</code><div><b>Ж/д</b>, шпалы <code>#8A857C</code> / 3 м</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#F4F0E8;border:1px solid #CFC7B7"></div><code>#F4F0E8</code><div><b>Панельки 1960-х</b>, 4–5 эт.</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#E9E5DC;border:1px solid #CFC7B7"></div><code>#E9E5DC</code><div><b>9–16 эт. 1970-х</b></div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#CF8C6B"></div><code>#CF8C6B</code><div><b>Кирпичные башни</b></div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#D5D0C6"></div><code>#D5D0C6</code><div><b>Промзона</b>, гаражи</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#E3D3B5"></div><code>#E3D3B5</code><div><b>Частный сектор</b></div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#E4572E"></div><code>#E4572E</code><div><b>Ориентиры Покровского</b></div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#DAD2C1;opacity:.9"></div><code>#DAD2C1 · 90%</code><div><b>Не открыто</b>: контур h 0,5 м</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#FFD98A"></div><code>#FFD98A</code><div><b>Только что выросло</b>: 2,4 с → цвет типа за 1,6 с</div></div>
+      <div style="display:grid;grid-template-columns:44px 96px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #CFC7B7;font-size:16px"><div style="height:32px;border-radius:4px;background:#5E5242;opacity:.35"></div><code>#5E5242 · 35%</code><div><b>Рёбра</b> зданий, EdgesGeometry 30°</div></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Свет</h3>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:10px 20px;font-size:17px;line-height:1.4;border-top:2px solid #1E1D1A;padding-top:12px">
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">ВРЕМЯ</div><div>Утро ~10:30, свет мастерской у окна</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">СОЛНЦЕ</div><div>DirectionalLight <code>#FFF4E2</code>, 2,2; азимут 215°, высота 38°. Фасады к зрителю светлые, тени уходят вправо-вверх экрана и не закрывают передний план</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">НЕБО</div><div>HemisphereLight небо <code>#FFF8EC</code> / земля <code>#CFC6B2</code>, 0,9</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">ТЕНИ</div><div>PCFSoft, radius 4, map 2048, тёплые <code>#6F604C</code> 28% — мягкие, как под лампой</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">ФОН</div><div>Стол <code>#D9D2C2</code> с виньеткой к <code>#CFC7B5</code>. Край карты — срез картона 6–10 м, <code>#D4CBB8</code></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Туман = калька</h3>
+      <div style="position:relative;border-radius:6px;overflow:hidden;border:1px solid #CFC7B7">
+        <img src="svg/moodboard/diorama-maket.svg" alt="" style="width:100%;height:auto;display:block">
+        <div style="position:absolute;inset:0;background:rgba(246,243,236,.74);-webkit-mask-image:radial-gradient(circle at 62% 58%,transparent 0,transparent 12%,#000 22%);mask-image:radial-gradient(circle at 62% 58%,transparent 0,transparent 12%,#000 22%)"></div>
+        <div style="position:absolute;left:62%;top:58%;width:30%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 0 3px rgba(228,87,46,.35),0 0 40px 10px rgba(255,217,138,.45)"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:10px 20px;font-size:17px;line-height:1.4">
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">ЦВЕТ</div><div><code>#F6F3EC</code>, 68% (подбирать на планшете: 0,6–0,8) — сквозь кальку читаются лес, вода, дороги, ж/д; дома под ней не рендерятся</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">ФАКТУРА</div><div>Шум fbm ±4% яркости + редкие волокна, тайл 512 px. Не облака — бумага</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">КИСТЬ</div><div>R 64 px (при 1280), 55% ядро, дальше линейный спад. Кайма: <code>#FFD98A</code>→<code>#E4572E</code> × heat</div>
+        <div style="font:500 14px 'IBM Plex Mono';color:#57524A">ВОЗВРАТ</div><div>900 мс ease-in-out, от краёв пятна к центру; цель не затягивается</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Анимации</h3>
+    <div style="display:grid;grid-template-columns:minmax(150px,1fr) minmax(90px,.5fr) minmax(0,.9fr) minmax(0,2fr);border-top:2px solid #1E1D1A;font-size:16px;line-height:1.4">
+      <div style="padding:8px 8px 8px 0;font:500 13px 'IBM Plex Mono';color:#57524A;border-bottom:1px solid #CFC7B7">СОБЫТИЕ</div><div style="padding:8px;font:500 13px 'IBM Plex Mono';color:#57524A;border-bottom:1px solid #CFC7B7">ДЛИТ.</div><div style="padding:8px;font:500 13px 'IBM Plex Mono';color:#57524A;border-bottom:1px solid #CFC7B7">EASING</div><div style="padding:8px 0 8px 8px;font:500 13px 'IBM Plex Mono';color:#57524A;border-bottom:1px solid #CFC7B7">ПОСЛЕДОВАТЕЛЬНОСТЬ</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">1 · Дочистка зоны</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">700 мс</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">ease-out</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">Сразу при ≥ 35%. Круг от точки касания до края зоны</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">2 · Рост домов</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">1200 мс / дом</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">.34,1.56,.64,1</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">Пауза 300 мс. scaleZ 0→1 от земли, задержка 0,6 мс/м от точки касания (≤ 900). Вся волна ≤ 2,1 с. Цвет <code>#FFD98A</code></div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">3 · Подсветка зоны</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">3000 мс</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">linear</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">Заливка тёплым 22% → 0; контур 2 px остаётся до конца игры</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">4 · Пины</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">420 мс</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">.34,1.56,.64,1</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">После роста. Падение с 24 px + scale 0→1, шаг 120 мс</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">5 · Камера + карточка</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">700 + 420 мс</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">.65,0,.35,1</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">Сдвиг карты влево на 30%, затем лист выезжает на 40 px + fade</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Пульс подсказки</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">1600 мс ∞</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">sine</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">После 3-й подсказки. Кольцо scale .92↔1.04, opacity .35↔.8</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600;border-bottom:1px solid #CFC7B7">Тёплый след</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">600 мс</div><div style="padding:10px 8px;font-family:'IBM Plex Mono';border-bottom:1px solid #CFC7B7">ease-out</div><div style="padding:10px 0 10px 8px;border-bottom:1px solid #CFC7B7">Свечение под пальцем, alpha = heat × 0,35, гаснет за 600 мс</div>
+      <div style="padding:10px 8px 10px 0;font-weight:600">Дыхание кальки</div><div style="padding:10px 8px;font-family:'IBM Plex Mono'">6 с ∞</div><div style="padding:10px 8px;font-family:'IBM Plex Mono'">sine</div><div style="padding:10px 0 10px 8px">Только заставка: opacity .70↔.80</div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Маркеры</h3>
+    <p style="margin:0;font-size:17px;line-height:1.45;color:#57524A;max-width:760px">Булавка макета: головка 50 px, игла, тень на картоне. Пин — это HTML/спрайт поверх Three.js, всегда смотрит в камеру, тач-зона 64 px.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img src="svg/markers/pin-landmark.svg" alt="" style="height:92px"><div style="font:500 13px 'IBM Plex Mono'">ОРИЕНТИР</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img src="svg/markers/pin-found.svg" alt="" style="height:92px"><div style="font:500 13px 'IBM Plex Mono'">ПРОСМОТРЕН</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img src="svg/markers/pin-locked.svg" alt="" style="height:92px"><div style="font:500 13px 'IBM Plex Mono'">ЕЩЁ НЕ ОТКРЫТ</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img src="svg/markers/pin-secret.svg" alt="" style="height:92px"><div style="font:500 13px 'IBM Plex Mono'">СЕКРЕТ</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img src="svg/markers/zone-hint.svg" alt="" style="height:92px"><div style="font:500 13px 'IBM Plex Mono'">ЗОНА-ПОДСКАЗКА</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><img src="svg/markers/zone-found.svg" alt="" style="height:92px"><div style="font:500 13px 'IBM Plex Mono'">ЗОНА НАЙДЕНА</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. LANDMARKS ============ -->
+<section id="landmarks" style="display:flex;flex-direction:column;gap:40px">
+  <div style="display:flex;flex-direction:column;gap:8px"><div style="font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#D9472B">БЛОК 3</div><h2 style="margin:0;font:700 44px/1.05 Unbounded,sans-serif">Дома-ориентиры</h2><p style="margin:0;max-width:760px;font-size:18px;line-height:1.5;color:#57524A">Изометрия 30°, свет и материалы как у города. Формы упрощены до уровня макета — сверить с фото перед печатью. Генератор: <code>tools/iso-gen.js</code> + <code>tools/scenes.js</code>, можно менять и перегенерировать.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:16px">
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/fleyta-360.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Дом-«Флейта», корп. 360</b><code style="font-size:13px;color:#57524A">fleyta-360.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/kc-zelenograd.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">КЦ «Зеленоград»</b><code style="font-size:13px;color:#57524A">kc-zelenograd.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/vulykh-towers.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Башни Вулыха</b><code style="font-size:13px;color:#57524A">vulykh-towers.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/towers-central.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Парные башни Центрального пр-та</b><code style="font-size:13px;color:#57524A">towers-central.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/shtyki.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Мемориал «Штыки»</b><code style="font-size:13px;color:#57524A">shtyki.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/dvorets-kolumba.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Дворец творчества, пл. Колумба</b><code style="font-size:13px;color:#57524A">dvorets-kolumba.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/electron.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Кинотеатр «Электрон»</b><code style="font-size:13px;color:#57524A">electron.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/korp-118.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Корпус 118</b><code style="font-size:13px;color:#57524A">korp-118.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/hram-sergiya.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Храм Сергия Радонежского</b><code style="font-size:13px;color:#57524A">hram-sergiya.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px"><img src="svg/buildings/arkhitektor.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Скульптура «Архитектор»</b><code style="font-size:13px;color:#57524A">arkhitektor.svg</code></figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:8px;background:#FBF8F2;border-radius:6px;padding:12px;border:2px dashed #E4572E"><img src="svg/buildings/egg-pokrovskogo.svg" alt="" style="width:100%;aspect-ratio:4/3;object-fit:contain"><figcaption style="display:flex;flex-direction:column;gap:2px"><b style="font-size:17px">Секрет: «Яйцо Покровского»</b><code style="font-size:13px;color:#57524A">egg-pokrovskogo.svg</code></figcaption></figure>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h3 style="margin:0;font:600 24px Unbounded,sans-serif">Пропорции для low-poly</h3>
+    <p style="margin:0;font-size:16px;color:#57524A;max-width:760px">Метры, ось X — вдоль главного фасада. Числа из <code>objects.json</code> отмечены ●, остальное — оценка, сверить с OSM-контуром и фото ○.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px">
+      <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px;font-size:16px;line-height:1.45">
+        <div style="font:600 20px Unbounded,sans-serif">«Флейта»</div>
+        <div>● Длина 516; 9 жилых + технический; 4 подъезда; на опорах</div>
+        <div>○ Ось — полилиния OSM-контура; глубина 12–13</div>
+        <div>○ Опоры: 1 этаж 3,3; в low-poly пары колонн 1,2×1,2 каждые 12 м (≈ 43 пары)</div>
+        <div>○ Корпус: 9 × 2,9 = 26,2 + техэтаж 2,2 → верх ≈ 31,7</div>
+        <div>○ Лоджии: текстура-полосы, шаг 6 м по горизонтали, 2,9 по вертикали; галереи — на противоположном фасаде</div>
+        <div>○ 4 машинных помещения лифтов 6×7×2,6 над подъездами</div>
+        <div style="color:#57524A">≈ 200 треугольников без колонн</div>
+      </div>
+      <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px;font-size:16px;line-height:1.45">
+        <div style="font:600 20px Unbounded,sans-serif">КЦ «Зеленоград»</div>
+        <div>● Модуль — равносторонний треугольник, сторона 9 м; треугольный стеклянный купол над атриумом</div>
+        <div>○ Сетка треугольников 9 м; контур OSM снэпнуть к сетке</div>
+        <div>○ Стилобат h 4, основной объём h 16 (≈ 20 от земли)</div>
+        <div>○ Купол: треугольная пирамида, сторона 3 модуля (27), высота 8–10, стекло <code>#BCD2D4</code> 70%</div>
+        <div>○ Рёбра фасада — каждые 9 м (модуль)</div>
+        <div>○ «Яйцо»: цилиндр Ø 6 у края атриума, виден только в секретной карточке</div>
+      </div>
+      <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:10px;font-size:16px;line-height:1.45">
+        <div style="font:600 20px Unbounded,sans-serif">«Штыки»</div>
+        <div>● Обелиск 42 из трёх штыков; курган 27 м</div>
+        <div>○ Проверить: 27 — высота или диаметр кургана. Если высота — усечённый конус 16 сегментов, R низа ≈ 2,5 × высоты</div>
+        <div>○ Штык: трёхгранная пирамида, основание — треугольник со стороной ≈ 2,5, центры на R 2,6 от оси</div>
+        <div>○ Острия сходятся к R 0,5, штыки чуть наклонены внутрь</div>
+        <div>○ Верх кургана — площадка 10×10, h 0,6</div>
+        <div>○ Цвет штыков <code>#D2CFC7</code>, курган — войлок <code>#9DB080</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. UI ============ -->
+<section id="ui" style="display:flex;flex-direction:column;gap:32px">
+  <div style="display:flex;flex-direction:column;gap:8px"><div style="font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#D9472B">БЛОК 4</div><h2 style="margin:0;font:700 44px/1.05 Unbounded,sans-serif">Интерфейс</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="font:700 120px/0.9 Unbounded,sans-serif;color:#D9472B;letter-spacing:-.03em">1964</div>
+      <div style="font:600 44px/1 Unbounded,sans-serif;color:#D9472B">—1967</div>
+      <div style="font:700 34px/1.1 Unbounded,sans-serif">Приходит архитектор</div>
+      <div style="font-size:22px;line-height:1.4">Основной текст 22 px, Golos Text</div>
+      <div style="font:500 20px 'IBM Plex Mono';letter-spacing:.06em">ПОДПИСЬ 20 PX · MONO</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap"><div style="height:64px;padding:0 28px;display:flex;align-items:center;background:#1E1D1A;color:#FBF8F2;border-radius:6px;font:600 20px Unbounded">Играть</div><div style="height:64px;padding:0 28px;display:flex;align-items:center;border:2px solid #1E1D1A;border-radius:6px;font:600 20px Unbounded">Ещё подсказка</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:17px;line-height:1.5">
+      <div><b>Сетка.</b> Карта 69% / панель 396 px на 1280. На 2560×1600 всё ×2 через <code>--u</code>; панель не шире 31%.</div>
+      <div><b>Тач.</b> Кнопки 64–72 px, минимум 56; между целями ≥ 16 px. Состояние «нажато» — сдвиг 2 px и тень пропадает. Hover не используется.</div>
+      <div><b>Текст.</b> Всё ≥ 20 px, год 120 px (начало) + 44 px (конец). Контраст основного текста ≥ 7:1.</div>
+      <div><b>Шрифты.</b> Оставляем Unbounded / Golos Text / IBM Plex Mono — у всех полная кириллица, характер «чертёжный» сочетается с макетом.</div>
+      <div><b>Токены</b> — <a href="tokens.css">tokens.css</a>. Материалы — <a href="city-materials.json">city-materials.json</a>.</div>
+      <div style="display:flex;flex-direction:column;gap:8px"><b>Иконки этапов и прогресс</b><div style="display:flex;gap:6px;flex-wrap:wrap"><img src="svg/stages/stage-1.svg" alt="" style="width:44px"><img src="svg/stages/stage-2.svg" alt="" style="width:44px"><img src="svg/stages/stage-3.svg" alt="" style="width:44px"><img src="svg/stages/stage-4.svg" alt="" style="width:44px"><img src="svg/stages/stage-5.svg" alt="" style="width:44px"><img src="svg/stages/stage-6.svg" alt="" style="width:44px"><img src="svg/stages/stage-7.svg" alt="" style="width:44px"><img src="svg/stages/stage-8.svg" alt="" style="width:44px"><img src="svg/stages/stage-9.svg" alt="" style="width:44px"></div><img src="svg/ui/progress-9-stage3.svg" alt="" style="width:346px;max-width:100%"></div>
+    </div>
+  </div>
+</section>
+
+<section id="files" style="display:flex;flex-direction:column;gap:16px">
+  <h2 style="margin:0;font:700 32px Unbounded,sans-serif">Файлы</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;font:500 15px/1.6 'IBM Plex Mono',monospace">
+    <div><a href="Прототип.dc.html">Прототип.dc.html</a> — экраны 1280×800 + мобильная</div>
+    <div><a href="tokens.css">tokens.css</a> — CSS-переменные UI</div>
+    <div><a href="city-materials.json">city-materials.json</a> — материалы, свет, туман</div>
+    <div>svg/buildings/ — 10 ориентиров + секрет</div>
+    <div>svg/markers/ — пины и зоны</div>
+    <div>svg/stages/ — 9 иконок этапов</div>
+    <div>svg/ui/ — прогресс, жест</div>
+    <div>svg/moodboard/ — 3 направления</div>
+    <div>tools/ — генератор изометрии</div>
+  </div>
+</section>
+</div>
+</x-dc>
+</body>
+</html>

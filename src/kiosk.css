@@ -1,0 +1,954 @@
+/* Киоск «Сотри туман». Токены и размеры — из design/tokens.css и docs/design-handoff.md.
+   Все размеры в px макета 1280×800 через --u. Светлая тема, без hover. */
+
+:root {
+  --u: clamp(1px, min(100vw / 1280, 100dvh / 800), 2px);
+
+  --paper: #efebe1;
+  --paper-2: #f7f4ed;
+  --paper-3: #fbf8f2;
+  --board: #e6dfd0;
+  --table: #d9d2c2;
+  --ink: #1e1d1a;
+  --ink-2: #57524a;
+  --rule: #cfc7b7;
+  --accent: #d9472b;
+  --accent-map: #e4572e;
+  --warm: #ffd98a;
+  --miss: #fff1cf;
+  --felt: #9db080;
+  --disabled: #a9a294;
+
+  --f-display: "Unbounded", system-ui, sans-serif;
+  --f-text: "Golos Text", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-grow: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--table);
+  color: var(--ink);
+  font: 400 calc(21 * var(--u)) / 1.38 var(--f-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+body:not(.mobile) {
+  overflow: hidden;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ——— Сетка ——— */
+
+#app {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr calc(396 * var(--u));
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body.mobile #app {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+.map-area {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 45%, var(--table) 55%, #cfc7b5 100%);
+}
+
+.map-frame {
+  position: absolute;
+  inset: 0;
+  transition: transform 700ms var(--ease-inout);
+}
+
+.city-canvas,
+.map-overlay,
+.fog,
+.glow,
+.pin-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fog {
+  touch-action: none;
+  transition: opacity 600ms;
+}
+
+.glow {
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+[data-screen="attract"] .fog {
+  animation: breathe 6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.86; }
+}
+
+[data-screen="genplan"] .fog,
+[data-screen="final"] .fog,
+[data-screen="excursion"] .fog {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.map-overlay {
+  pointer-events: none;
+}
+
+/* Пульс зоны-подсказки */
+.pulse {
+  fill: var(--accent-map);
+  fill-opacity: 0.1;
+  stroke: var(--accent-map);
+  stroke-width: 3;
+  animation: zpulse 1.6s ease-in-out infinite;
+}
+
+@keyframes zpulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+}
+
+/* Найденная зона: тёплая вспышка 22% → 0 за 3 с, контур остаётся */
+.zone-found {
+  fill: var(--warm);
+  fill-opacity: 0;
+  stroke: var(--ink);
+  stroke-width: 2;
+  animation: found-flash 3s linear;
+}
+
+@keyframes found-flash {
+  from { fill-opacity: 0.22; }
+  to { fill-opacity: 0; }
+}
+
+.plan-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1.6s ease-out forwards;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Пины: HTML-кнопки 64×92, остриё в точке */
+.pin-layer {
+  pointer-events: none;
+}
+
+.pin {
+  position: absolute;
+  width: calc(64 * var(--u));
+  height: calc(92 * var(--u));
+  margin: calc(-92 * var(--u)) 0 0 calc(-32 * var(--u));
+  padding: 0;
+  border: 0;
+  background: none;
+  transform-origin: 50% 100%;
+  transform: translateY(calc(-24 * var(--u))) scale(0);
+  transition: transform 420ms var(--ease-grow);
+  pointer-events: none;
+}
+
+.pin.in {
+  transform: none;
+}
+
+.pin.tappable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.pin img {
+  display: block;
+  width: calc(40 * var(--u));
+  height: calc(58 * var(--u));
+  margin: calc(34 * var(--u)) auto 0;
+}
+
+/* Плашки на карте: заставка, промах, генплан */
+.map-note {
+  position: absolute;
+  left: calc(28 * var(--u));
+  bottom: calc(28 * var(--u));
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  max-width: calc(560 * var(--u));
+  padding: calc(10 * var(--u)) calc(20 * var(--u)) calc(10 * var(--u)) calc(12 * var(--u));
+  background: var(--paper-3);
+  border: 2px solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  font: 600 calc(20 * var(--u)) / 1.25 var(--f-display);
+  pointer-events: none;
+  animation: note-in 320ms var(--ease-out);
+}
+
+.map-note img {
+  width: calc(72 * var(--u));
+}
+
+.map-note.miss {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(4 * var(--u));
+  padding: calc(14 * var(--u)) calc(20 * var(--u));
+  background: var(--miss);
+  box-shadow: 0 10px 30px rgba(60, 50, 35, 0.18);
+}
+
+.map-note.miss b {
+  font: 600 calc(22 * var(--u)) / 1.2 var(--f-display);
+}
+
+.map-note.miss span {
+  font: 400 calc(20 * var(--u)) / 1.35 var(--f-text);
+}
+
+.map-note.scan {
+  top: calc(28 * var(--u));
+  bottom: auto;
+  font: 500 calc(16 * var(--u)) var(--f-mono);
+  border: 1.5px dashed var(--ink);
+  padding: calc(8 * var(--u)) calc(12 * var(--u));
+}
+
+.map-note.idle {
+  left: 50%;
+  bottom: 50%;
+  transform: translate(-50%, 50%);
+  flex-direction: column;
+  padding: calc(24 * var(--u)) calc(32 * var(--u));
+  pointer-events: auto;
+  background: var(--miss);
+}
+
+@keyframes note-in {
+  from { opacity: 0; transform: translateY(calc(12 * var(--u))); }
+}
+
+.hatch {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(135deg, rgba(30, 29, 26, 0.07) 0 2px, transparent 2px 14px);
+  pointer-events: none;
+}
+
+/* ——— Панель ——— */
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+  padding: calc(28 * var(--u));
+  border-left: 2px solid var(--ink);
+  background: var(--paper);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.spacer {
+  flex: 1;
+  min-height: 0;
+}
+
+/* середина панели ужимается и прокручивается — низ (кнопка, прогресс) виден всегда */
+.flex-mid {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.panel > * {
+  flex-shrink: 0;
+}
+
+.panel > .flex-mid,
+.panel > .spacer {
+  flex-shrink: 1;
+}
+
+.mono,
+.eyebrow {
+  font: 500 calc(20 * var(--u)) / 1.3 var(--f-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+.mono.accent {
+  color: var(--accent);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--f-display);
+}
+
+.attract h1 {
+  font: 700 calc(72 * var(--u)) / 0.98 var(--f-display);
+  letter-spacing: -0.02em;
+  margin-top: calc(8 * var(--u));
+}
+
+.lead {
+  margin: 0;
+  font-size: calc(22 * var(--u));
+  line-height: 1.4;
+}
+
+.years {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4 * var(--u));
+  color: var(--accent);
+  font-family: var(--f-display);
+}
+
+.years .from {
+  font: 700 calc(96 * var(--u)) / 0.9 var(--f-display);
+  letter-spacing: -0.05em;
+}
+
+.years .to {
+  font: 600 calc(34 * var(--u)) / 1 var(--f-display);
+  letter-spacing: -0.02em;
+}
+
+.stage-title {
+  font: 700 calc(30 * var(--u)) / 1.1 var(--f-display);
+}
+
+.question {
+  margin: 0;
+  font-size: calc(21 * var(--u));
+  line-height: 1.35;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+  padding: calc(14 * var(--u)) calc(16 * var(--u));
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  font-size: calc(20 * var(--u));
+  line-height: 1.38;
+}
+
+.box p {
+  margin: 0;
+}
+
+.box .by {
+  align-self: flex-end;
+}
+
+.box.new {
+  animation: note-in 320ms var(--ease-out);
+}
+
+/* Шкала «тепло/холодно» */
+.heat {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--u));
+}
+
+.heat-bar {
+  flex: 1;
+  display: flex;
+  gap: calc(4 * var(--u));
+}
+
+.heat-bar i {
+  flex: 1;
+  height: calc(14 * var(--u));
+  border-radius: calc(3 * var(--u));
+  background: #ddd5c5;
+  transition: background 300ms;
+}
+
+.heat-label {
+  min-width: calc(118 * var(--u));
+  text-align: right;
+  font: 600 calc(20 * var(--u)) var(--f-display);
+}
+
+/* Кнопки */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: calc(64 * var(--u));
+  padding: 0 calc(20 * var(--u));
+  border: 2px solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  background: var(--paper-3);
+  color: var(--ink);
+  font: 600 calc(20 * var(--u)) var(--f-display);
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--ink);
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), opacity 180ms;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.btn.primary {
+  background: var(--ink);
+  color: var(--paper-3);
+}
+
+.btn.big {
+  min-height: calc(72 * var(--u));
+  font-size: calc(24 * var(--u));
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.btn.primary:disabled {
+  opacity: 1;
+  background: var(--disabled);
+  border-color: var(--disabled);
+  box-shadow: none;
+}
+
+/* Прогресс: 9 иконок этапов */
+.progress {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress .cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(4 * var(--u));
+  width: calc(34 * var(--u));
+}
+
+.progress img {
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  object-fit: contain;
+}
+
+.progress .bar {
+  width: calc(22 * var(--u));
+  height: calc(4 * var(--u));
+  border-radius: 2px;
+}
+
+.progress .done .bar {
+  background: var(--ink);
+}
+
+.progress .current .bar {
+  background: var(--accent);
+}
+
+.progress .future {
+  opacity: 0.32;
+}
+
+/* ——— Лист-карточка находки ——— */
+
+.sheet {
+  position: absolute;
+  top: calc(24 * var(--u));
+  right: calc(24 * var(--u));
+  bottom: calc(24 * var(--u));
+  z-index: 5;
+  width: calc(820 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 * var(--u));
+  padding: calc(28 * var(--u)) calc(32 * var(--u));
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: calc(8 * var(--u));
+  box-shadow: 0 24px 60px rgba(60, 50, 35, 0.28);
+  animation: sheet-in 420ms var(--ease-out);
+}
+
+@keyframes sheet-in {
+  from { opacity: 0; transform: translateX(calc(40 * var(--u))); }
+}
+
+.sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dots {
+  display: flex;
+  gap: calc(8 * var(--u));
+}
+
+.dots i {
+  width: calc(14 * var(--u));
+  height: calc(14 * var(--u));
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.dots i.on {
+  background: var(--ink);
+}
+
+.sheet-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: calc(320 * var(--u)) 1fr;
+  gap: calc(32 * var(--u));
+}
+
+.sheet-media {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+}
+
+.media {
+  position: relative;
+  height: calc(300 * var(--u));
+  border-radius: calc(6 * var(--u));
+  overflow: hidden;
+  background: var(--board);
+  display: grid;
+  place-items: center;
+}
+
+.media img.illu {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: calc(12 * var(--u));
+}
+
+.media img.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+}
+
+.media.ph {
+  background: repeating-linear-gradient(135deg, var(--board) 0 10px, #efe9dc 10px 20px);
+}
+
+.media .cap {
+  position: absolute;
+  left: calc(10 * var(--u));
+  bottom: calc(8 * var(--u));
+  right: calc(10 * var(--u));
+  font: 500 calc(16 * var(--u)) / 1.3 var(--f-mono);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.qr-row {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  font-size: calc(20 * var(--u));
+  line-height: 1.3;
+}
+
+.qr-slot {
+  flex-shrink: 0;
+  width: calc(132 * var(--u));
+  height: calc(132 * var(--u));
+  border: 2px solid var(--ink);
+  background: var(--paper-3);
+  display: grid;
+  place-items: center;
+}
+
+.qr-slot canvas {
+  width: 92% !important;
+  height: 92% !important;
+}
+
+.sheet-text {
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.sheet-text h3 {
+  font: 700 calc(32 * var(--u)) / 1.1 var(--f-display);
+}
+
+.sheet-text p {
+  margin: 0;
+  font-size: calc(20 * var(--u));
+  line-height: 1.42;
+}
+
+.sheet-text .authors {
+  color: var(--ink-2);
+  line-height: 1.3;
+}
+
+.sheet-text .box {
+  background: var(--paper-3);
+}
+
+.sheet-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: calc(16 * var(--u));
+}
+
+.sheet-foot .btn {
+  min-width: calc(160 * var(--u));
+}
+
+.sheet-foot .btn.primary {
+  min-width: calc(240 * var(--u));
+}
+
+/* ——— Финал ——— */
+
+.final h2 {
+  font: 700 calc(34 * var(--u)) / 1.05 var(--f-display);
+}
+
+.score {
+  display: flex;
+  align-items: baseline;
+  gap: calc(14 * var(--u));
+  font-size: calc(21 * var(--u));
+  line-height: 1.3;
+}
+
+.score b {
+  font: 700 calc(80 * var(--u)) / 0.9 var(--f-display);
+  color: var(--accent);
+}
+
+.routes {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+}
+
+.route {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: calc(56 * var(--u));
+  padding: 0 calc(16 * var(--u));
+  border: 2px solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  background: var(--paper-3);
+  cursor: pointer;
+  text-align: left;
+}
+
+.route b {
+  font: 600 calc(18 * var(--u)) / 1.15 var(--f-display);
+}
+
+.route span {
+  font: 500 calc(18 * var(--u)) var(--f-mono);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.secret {
+  display: flex;
+  align-items: center;
+  gap: calc(12 * var(--u));
+  padding: calc(8 * var(--u)) calc(12 * var(--u));
+  border: 2px dashed var(--accent-map);
+  border-radius: calc(6 * var(--u));
+  background: var(--paper-2);
+  font-size: calc(20 * var(--u));
+  line-height: 1.25;
+  text-align: left;
+}
+
+.secret img {
+  width: calc(64 * var(--u));
+  height: calc(56 * var(--u));
+  object-fit: contain;
+  opacity: 0.35;
+}
+
+.secret.open {
+  border-style: solid;
+  cursor: pointer;
+}
+
+.secret.open img {
+  opacity: 1;
+}
+
+/* Модалка маршрута */
+.modal {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  background: rgba(239, 235, 225, 0.55);
+  animation: note-in 320ms var(--ease-out);
+}
+
+.modal-card {
+  width: calc(600 * var(--u));
+  display: grid;
+  grid-template-columns: 1fr calc(220 * var(--u));
+  gap: calc(28 * var(--u));
+  padding: calc(32 * var(--u));
+  background: var(--paper-3);
+  border: 2px solid var(--ink);
+  border-radius: calc(8 * var(--u));
+}
+
+.modal-card h3 {
+  font: 700 calc(30 * var(--u)) / 1.1 var(--f-display);
+  margin: calc(6 * var(--u)) 0 calc(12 * var(--u));
+}
+
+.modal-card ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(6 * var(--u));
+  font-size: calc(20 * var(--u));
+  line-height: 1.3;
+}
+
+.modal-card li {
+  display: flex;
+  gap: calc(8 * var(--u));
+}
+
+.modal-card li i {
+  font: 500 calc(20 * var(--u)) var(--f-mono);
+  font-style: normal;
+  color: var(--accent);
+  min-width: calc(24 * var(--u));
+}
+
+.modal-side {
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+  font-size: calc(20 * var(--u));
+  line-height: 1.3;
+}
+
+.modal-side .qr-slot {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.modal-side .btn {
+  min-height: calc(56 * var(--u));
+  font-size: calc(18 * var(--u));
+}
+
+/* Экскурсия */
+.slider {
+  width: 100%;
+  height: calc(64 * var(--u));
+  accent-color: var(--accent);
+}
+
+.years .from.small {
+  font-size: calc(96 * var(--u));
+}
+
+/* ——— Этап 4 «Двигаем коробки» (design-handoff §1.11) ——— */
+
+[data-screen="maket"] .fog {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.maket {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background:
+    linear-gradient(rgba(94, 82, 66, 0.07) 1px, transparent 1px) 0 0 / calc(40 * var(--u)) calc(40 * var(--u)),
+    linear-gradient(90deg, rgba(94, 82, 66, 0.07) 1px, transparent 1px) 0 0 / calc(40 * var(--u)) calc(40 * var(--u)),
+    var(--board);
+  touch-action: none;
+  animation: note-in 420ms var(--ease-out);
+}
+
+.maket > * {
+  position: absolute;
+}
+
+.mk-felt {
+  background: var(--felt);
+  border-radius: 45% 55% 50% 40%;
+  box-shadow: 0 3px 0 #869c6c;
+}
+
+.mk-pond {
+  background: #a9c6cc;
+  border-radius: 50%;
+}
+
+.mk-block {
+  background: #fbf8f2;
+  border: 1.5px solid #5e5242;
+  box-shadow: calc(6 * var(--u)) calc(6 * var(--u)) 0 rgba(94, 82, 66, 0.25);
+}
+
+.mk-label,
+.mk-avenue span,
+.mk-tray span {
+  margin: 0;
+  font: 500 calc(15 * var(--u)) var(--f-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.mk-avenue {
+  background: #f8f5ee;
+  border-block: 1.5px solid #cfc7b7;
+  display: flex;
+  align-items: center;
+  padding-left: calc(16 * var(--u));
+}
+
+.mk-slot {
+  border: 3px dashed #5e5242;
+  border-radius: calc(4 * var(--u));
+  transition: opacity 300ms;
+}
+
+.mk-slot.full {
+  opacity: 0;
+}
+
+.mk-tray {
+  background: var(--table);
+  border-top: 2px solid var(--ink);
+  padding: calc(12 * var(--u)) calc(16 * var(--u));
+}
+
+.mk-box {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12%;
+  cursor: grab;
+  touch-action: none;
+  transition: left 350ms var(--ease-out), top 350ms var(--ease-out), transform 150ms;
+}
+
+.mk-box i {
+  width: 34%;
+  aspect-ratio: 1;
+  background: #fbf8f2;
+  border: 1.5px solid #5e5242;
+  box-shadow: calc(5 * var(--u)) calc(-5 * var(--u)) 0 #d9d2c2, calc(5 * var(--u)) calc(-5 * var(--u)) 0 1.5px #5e5242;
+}
+
+.mk-box.grab {
+  z-index: 5;
+  transition: none;
+}
+
+.mk-box.placed i {
+  background: #fff;
+}
+
+/* Активный пин (карточка открыта) */
+.pin.in.active {
+  transform: scale(1.25);
+  z-index: 2;
+}
+
+/* Метка тепла над пальцем */
+.heat-chip {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, calc(-100% - 64 * var(--u)));
+  padding: calc(6 * var(--u)) calc(14 * var(--u));
+  border: 2px solid var(--ink);
+  border-radius: calc(20 * var(--u));
+  font: 600 calc(20 * var(--u)) var(--f-display);
+  pointer-events: none;
+  white-space: nowrap;
+  transition: background 300ms;
+}
+
+.map-note.rule {
+  background: var(--paper-3);
+}

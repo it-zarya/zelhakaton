@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Сотри туман — прототип</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+body{margin:0;background:#D9D2C2;color:#1E1D1A;font-family:"Golos Text",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+a{color:#D9472B}a:hover{color:#1E1D1A}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+@keyframes zpulse{0%,100%{transform:scale(.92);opacity:.35}50%{transform:scale(1.04);opacity:.85}}
+</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column">
+  <div style="flex:none;display:flex;align-items:center;gap:6px;padding:10px 16px;flex-wrap:wrap">
+    <a href="Система.dc.html" style="font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.04em;text-decoration:none;margin-right:8px">← СИСТЕМА</a>
+    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="9">
+      <button onClick="{{ c.go }}" style="height:32px;padding:0 12px;border:1.5px solid #1E1D1A;border-radius:16px;background:{{ c.bg }};color:{{ c.fg }};font:500 13px 'IBM Plex Mono',monospace">{{ c.label }}</button>
+    </sc-for>
+  </div>
+
+  <div style="flex:1;display:flex;justify-content:center;align-items:flex-start;padding:0 16px 16px">
+    <div style="width:{{ stageW }}px;height:{{ stageH }}px;position:relative;box-shadow:0 20px 60px rgba(60,50,35,.25);border-radius:6px;overflow:hidden">
+    <div style="width:1280px;height:800px;position:absolute;left:0;top:0;transform-origin:0 0;transform:{{ stageT }};background:#EFEBE1;overflow:hidden">
+
+      <!-- MAP -->
+      <div style="position:absolute;left:0;top:0;width:884px;height:800px;overflow:hidden;background:#E6DFD0">
+        <div style="position:absolute;left:0;top:0;width:884px;height:800px;transform:{{ panT }};transition:transform .7s cubic-bezier(.65,0,.35,1)">
+          <img src="assets/ref-stage.png" alt="" style="position:absolute;left:0;top:0;width:1280px;height:800px;filter:brightness(.7) contrast(2.6) saturate(.6) sepia(.1);pointer-events:none">
+          <img ref="{{ revealRef }}" src="assets/ref-city-nofog.png" alt="" style="position:absolute;left:0;top:0;width:1280px;height:800px;filter:saturate(.55) sepia(.1) brightness(1.03);clip-path:{{ revealClip }};pointer-events:none">
+          <div ref="{{ fogWrapRef }}" style="position:absolute;inset:0;opacity:{{ fogOp }};transition:opacity .6s">
+            <canvas ref="{{ fogRef }}" width="884" height="800" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}" onPointerCancel="{{ onUp }}" style="position:absolute;left:0;top:0;width:884px;height:800px;touch-action:none;cursor:crosshair"></canvas>
+            <canvas ref="{{ glowRef }}" width="884" height="800" style="position:absolute;left:0;top:0;width:884px;height:800px;pointer-events:none;mix-blend-mode:multiply"></canvas>
+          </div>
+          {{ pulse }}
+          <sc-if value="{{ showFoundRing }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:380px;top:68px;width:336px;height:336px;border-radius:50%;border:2.5px solid #1E1D1A;pointer-events:none"></div>
+          </sc-if>
+          <sc-for list="{{ markers }}" as="m" hint-placeholder-count="0">
+            <button onClick="{{ m.tap }}" style="position:absolute;left:{{ m.left }}px;top:{{ m.top }}px;width:64px;height:92px;padding:0;border:0;background:none;transform-origin:50% 100%;transform:{{ m.t }};transition:transform .42s cubic-bezier(.34,1.56,.64,1) {{ m.delay }}ms">
+              <img src="{{ m.src }}" alt="" style="width:40px;height:58px;display:block;margin:34px auto 0">
+            </button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isAttract }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:28px;bottom:28px;display:flex;align-items:center;gap:14px;background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:10px 20px 10px 12px;pointer-events:none">
+            <img src="svg/ui/icon-finger-swipe.svg" alt="" style="width:72px">
+            <div style="font:600 20px Unbounded,sans-serif">Проведите пальцем по кальке</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ missed }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:28px;bottom:28px;max-width:560px;display:flex;flex-direction:column;gap:4px;background:#FFF1CF;border:2px solid #1E1D1A;border-radius:6px;padding:14px 20px;pointer-events:none;box-shadow:0 10px 30px rgba(60,50,35,.18)">
+            <div style="font:600 22px Unbounded,sans-serif">Здесь в те годы ещё шумел лес</div>
+            <div style="font-size:20px;line-height:1.35">Калька вернулась. Новая подсказка — справа.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(30,29,26,.07) 0 2px,transparent 2px 14px);pointer-events:none"></div>
+          <div style="position:absolute;left:28px;top:28px;font:500 16px 'IBM Plex Mono',monospace;background:#FBF8F2;padding:8px 12px;border:1.5px dashed #1E1D1A">СКАН ГЕНПЛАНА 1971 · ЛИНИИ ПОВЕРХ КАРТЫ, 60%</div>
+          <sc-for list="{{ genTags }}" as="g" hint-placeholder-count="3">
+            <button onClick="{{ g.tap }}" style="position:absolute;left:{{ g.x }}px;top:{{ g.y }}px;height:56px;padding:0 20px;border:2px solid #1E1D1A;border-radius:28px;background:{{ g.bg }};color:{{ g.fg }};font:600 20px Unbounded,sans-serif">{{ g.label }}</button>
+          </sc-for>
+        </sc-if>
+
+        <sc-if value="{{ isTour }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:28px;right:28px;bottom:24px;background:#FBF8F2;border:2px solid #1E1D1A;border-radius:8px;padding:14px 32px 12px">
+            <div ref="{{ trackRef }}" onPointerDown="{{ onTrackDown }}" onPointerMove="{{ onTrackMove }}" onPointerUp="{{ onTrackUp }}" style="position:relative;height:64px;touch-action:none;cursor:pointer">
+              <div style="position:absolute;left:0;right:0;top:29px;height:6px;border-radius:3px;background:#CFC7B7"></div>
+              <div style="position:absolute;left:0;top:29px;height:6px;border-radius:3px;background:#D9472B;width:{{ yearPct }}%"></div>
+              <div style="position:absolute;top:0;left:{{ yearPct }}%;width:64px;height:64px;margin-left:-32px;border-radius:50%;background:#D9472B;border:4px solid #FBF8F2;box-shadow:0 0 0 2px #1E1D1A;box-sizing:border-box"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font:500 20px 'IBM Plex Mono',monospace;margin-top:4px"><span>1960</span><span>1970</span><span>1980</span><span>1990</span><span>2000</span><span>2010</span><span>2020</span></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isMaket }}" hint-placeholder-val="{{ false }}">
+          <div ref="{{ boardRef }}" style="position:absolute;inset:0;background:#E6DFD0;background-image:linear-gradient(rgba(94,82,66,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(94,82,66,.07) 1px,transparent 1px);background-size:40px 40px;touch-action:none">
+            <div style="position:absolute;left:-40px;top:-30px;width:360px;height:220px;background:#9DB080;border-radius:48% 52% 60% 40% / 50% 45% 55% 50%"></div>
+            <div style="position:absolute;left:640px;top:-60px;width:300px;height:230px;background:#9DB080;border-radius:60% 40% 50% 50% / 40% 55% 45% 60%"></div>
+            <div style="position:absolute;left:380px;top:60px;width:180px;height:70px;background:#A9C6CC;border-radius:50%"></div>
+            <div style="position:absolute;left:60px;top:214px;display:flex;gap:18px"><div style="width:120px;height:26px;background:#FBF8F2;box-shadow:0 6px 0 #D5D0C6"></div><div style="width:120px;height:26px;background:#FBF8F2;box-shadow:0 6px 0 #D5D0C6"></div><div style="width:120px;height:26px;background:#FBF8F2;box-shadow:0 6px 0 #D5D0C6"></div></div>
+            <div style="position:absolute;left:60px;top:176px;font:500 18px 'IBM Plex Mono',monospace;color:#57524A">ДЕВЯТИЭТАЖКИ — В ГЛУБИНЕ 4-ГО МКР</div>
+            <div style="position:absolute;left:0;right:0;top:398px;height:56px;background:#F8F5EE;border-top:2px solid #D5D0C6;border-bottom:2px solid #D5D0C6;display:flex;align-items:center;padding-left:28px;font:500 20px 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#57524A">ЦЕНТРАЛЬНЫЙ ПРОСПЕКТ</div>
+            <sc-for list="{{ slots }}" as="s" hint-placeholder-count="4">
+              <div style="position:absolute;left:{{ s.x }}px;top:{{ s.y }}px;width:130px;height:84px;border:3px dashed {{ s.c }};border-radius:6px;box-sizing:border-box"></div>
+            </sc-for>
+            <div style="position:absolute;left:0;right:0;top:600px;bottom:0;background:#D9D2C2;border-top:2px solid #CFC7B7"></div>
+            <div style="position:absolute;left:28px;top:616px;font:500 20px 'IBM Plex Mono',monospace;color:#57524A">ЛОТОК · ПАРНЫЕ 17-ЭТАЖНЫЕ БАШНИ</div>
+            <sc-for list="{{ boxes }}" as="b" hint-placeholder-count="4">
+              <div onPointerDown="{{ b.down }}" style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:130px;height:84px;display:flex;align-items:center;justify-content:center;gap:14px;cursor:grab;touch-action:none;transform:{{ b.t }};transition:{{ b.tr }};z-index:{{ b.z }}">
+                <div style="width:44px;height:44px;background:#FBF8F2;border:1.5px solid #5E5242;box-shadow:6px 16px 0 -1px #D5D0C6,10px 26px 14px rgba(94,82,66,.25)"></div>
+                <div style="width:44px;height:44px;background:#FBF8F2;border:1.5px solid #5E5242;box-shadow:6px 16px 0 -1px #D5D0C6,10px 26px 14px rgba(94,82,66,.25)"></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ routeOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(239,235,225,.55);display:flex;align-items:center;justify-content:center">
+            <div style="width:600px;background:#FBF8F2;border:2px solid #1E1D1A;border-radius:8px;padding:32px;display:grid;grid-template-columns:1fr 220px;gap:28px;box-shadow:0 20px 50px rgba(60,50,35,.25)">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">МАРШРУТ</div>
+                <div style="font:700 30px/1.1 Unbounded,sans-serif">{{ route.name }}</div>
+                <sc-for list="{{ route.points }}" as="p" hint-placeholder-count="4">
+                  <div style="display:flex;gap:12px;font-size:20px;line-height:1.3"><span style="font-family:'IBM Plex Mono';color:#D9472B;min-width:24px">{{ p.n }}</span><span>{{ p.name }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch">
+                <div style="aspect-ratio:1;border:2px solid #1E1D1A;background:repeating-linear-gradient(45deg,#EFEBE1 0 6px,#FBF8F2 6px 12px);display:flex;align-items:center;justify-content:center;font:500 20px 'IBM Plex Mono'">QR</div>
+                <div style="font-size:20px;line-height:1.3">Наведите камеру телефона</div>
+                <button onClick="{{ closeRoute }}" style="height:56px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;font:600 18px Unbounded,sans-serif">Закрыть</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- PANEL -->
+      <div style="position:absolute;left:884px;top:0;width:396px;height:800px;box-sizing:border-box;border-left:2px solid #1E1D1A;padding:28px;display:flex;flex-direction:column;gap:16px;background:#EFEBE1">
+
+        <sc-if value="{{ isAttract }}" hint-placeholder-val="{{ true }}">
+          <div style="font:500 20px/1.3 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#57524A">ИГОРЬ ПОКРОВСКИЙ · ГЛАВНЫЙ АРХИТЕКТОР ЗЕЛЕНОГРАДА 1964–2002</div>
+          <div style="font:700 72px/0.98 Unbounded,sans-serif;letter-spacing:-.02em;margin-top:8px">Сотри туман</div>
+          <div style="font-size:22px;line-height:1.4;text-wrap:pretty">Город, которого не было на картах, появлялся из леса шаг за шагом. Сотрите кальку там, где, по-вашему, его строили.</div>
+          <div style="flex:1"></div>
+          <button onClick="{{ goStage }}" style="height:72px;border:0;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 24px Unbounded,sans-serif">Играть</button>
+          <button onClick="{{ goTour }}" style="height:64px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;font:600 20px Unbounded,sans-serif">Просто посмотреть</button>
+          <div style="font:500 20px/1.3 'IBM Plex Mono',monospace;color:#57524A">9 ЭТАПОВ · ~3 МИНУТЫ</div>
+        </sc-if>
+
+        <sc-if value="{{ isStage }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:4px;color:#D9472B"><div style="font:700 112px/0.9 Unbounded,sans-serif;letter-spacing:-.05em">1964</div><div style="font:600 40px/1 Unbounded,sans-serif;letter-spacing:-.02em">—1967</div></div>
+          <div style="font:700 30px/1.1 Unbounded,sans-serif">Приходит архитектор</div>
+          <div style="font-size:21px;line-height:1.35;text-wrap:pretty">Первые кварталы уже стоят у шоссе. Куда город шагнул дальше?</div>
+          <div style="background:#F7F4ED;border:2px solid #1E1D1A;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">ПОДСКАЗКА {{ hint }} ИЗ 3</div>
+            <div style="font-size:20px;line-height:1.38;text-wrap:pretty">{{ hintText }}</div>
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B;align-self:flex-end">— И. П.</div>
+          </div>
+          <div style="flex:1"></div>
+          <sc-if value="{{ heatOn }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="display:flex;gap:4px;flex:1"><sc-for list="{{ heatSegs }}" as="h" hint-placeholder-count="5"><div style="flex:1;height:14px;border-radius:3px;background:{{ h.bg }};transition:background .3s"></div></sc-for></div>
+              <div style="font:600 20px Unbounded,sans-serif;min-width:118px;text-align:right">{{ heatLabel }}</div>
+            </div>
+          </sc-if>
+          <button onClick="{{ moreHint }}" style="height:64px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;font:600 20px Unbounded,sans-serif;opacity:{{ hintBtnOp }}">Ещё подсказка</button>
+        </sc-if>
+
+        <sc-if value="{{ isMaket }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 20px 'IBM Plex Mono',monospace;letter-spacing:.04em">ЭТАП 4 ИЗ 9</div>
+          <div style="display:flex;flex-direction:column;gap:4px;color:#D9472B"><div style="font:700 112px/0.9 Unbounded,sans-serif;letter-spacing:-.05em">1970</div><div style="font:600 40px/1 Unbounded,sans-serif;letter-spacing:-.02em">—1972</div></div>
+          <div style="font:700 30px/1.1 Unbounded,sans-serif">Двигаем коробки</div>
+          <div style="font-size:21px;line-height:1.38;text-wrap:pretty">Проспект хотели застроить обычными девятиэтажками. Покровский предложил подождать — и нашёл проект парных 17-этажных башен. Поставьте их вдоль проспекта.</div>
+          <sc-if value="{{ maketDone }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#F7F4ED;border:2px solid #1E1D1A;border-radius:6px;padding:12px 16px;font-size:20px;line-height:1.38">К визиту Никсона в мае 1972 года башни сдали досрочно. Визит отменили.</div>
+          </sc-if>
+          <div style="flex:1"></div>
+          <div style="font:500 20px 'IBM Plex Mono',monospace">ПОСТАВЛЕНО {{ placedCount }} ИЗ 4</div>
+          <button onClick="{{ goGen }}" style="height:64px;border:0;border-radius:6px;background:{{ maketBtnBg }};color:#FBF8F2;font:600 20px Unbounded,sans-serif">Дальше</button>
+        </sc-if>
+
+        <sc-if value="{{ isGen }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 20px 'IBM Plex Mono',monospace;letter-spacing:.04em">ЭТАП 6 ИЗ 9 · ОСОБЫЙ</div>
+          <div style="font:700 112px/0.9 Unbounded,sans-serif;letter-spacing:-.05em;color:#D9472B">1971</div>
+          <div style="font:700 30px/1.1 Unbounded,sans-serif">Город целиком</div>
+          <div style="font-size:21px;line-height:1.38;text-wrap:pretty">{{ genText }}</div>
+          <div style="flex:1"></div>
+          <div style="border-top:2px solid #1E1D1A;padding-top:14px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:21px;line-height:1.38;font-style:italic">«…построить город такого размера. А это фактически областной город: 120 тысяч за 12 лет».</div>
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">И. ПОКРОВСКИЙ, 1976</div>
+          </div>
+          <button onClick="{{ goFinal }}" style="height:64px;border:0;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 20px Unbounded,sans-serif">Дальше</button>
+        </sc-if>
+
+        <sc-if value="{{ isFinal }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 20px 'IBM Plex Mono',monospace;letter-spacing:.04em">9 ИЗ 9 ЭТАПОВ</div>
+          <div style="font:700 34px/1.05 Unbounded,sans-serif">Город найден</div>
+          <div style="display:flex;align-items:baseline;gap:14px"><div style="font:700 80px/0.9 Unbounded,sans-serif;color:#D9472B">{{ hintsN }}</div><div style="font-size:21px;line-height:1.3">{{ hintsWord }}</div></div>
+          <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">ВОЗЬМИТЕ МАРШРУТ С СОБОЙ</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ routes }}" as="r" hint-placeholder-count="5">
+              <button onClick="{{ r.open }}" style="height:56px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:600 18px Unbounded,sans-serif"><span>{{ r.name }}</span><span style="font:500 18px 'IBM Plex Mono';color:#57524A">{{ r.count }} →</span></button>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;border:2px {{ secretBorder }} #E4572E;border-radius:6px;padding:8px 12px;background:#F7F4ED">
+            <img src="svg/buildings/egg-pokrovskogo.svg" alt="" style="width:64px;height:56px;object-fit:contain;opacity:{{ secretOp }}">
+            <div style="font-size:20px;line-height:1.25">{{ secretText }}</div>
+          </div>
+          <div style="flex:1"></div>
+          <button onClick="{{ goAttract }}" style="height:64px;border:0;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 20px Unbounded,sans-serif">Сыграть ещё</button>
+        </sc-if>
+
+        <sc-if value="{{ isTour }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 20px 'IBM Plex Mono',monospace;letter-spacing:.04em">ЭКСКУРСИЯ</div>
+          <div style="font:700 112px/0.9 Unbounded,sans-serif;letter-spacing:-.05em;color:#D9472B">{{ year }}</div>
+          <sc-if value="{{ tourHasSel }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#E6DFD0;border-radius:6px;height:170px;display:flex;align-items:center;justify-content:center"><img src="{{ tourSel.img }}" alt="" style="max-width:92%;max-height:150px"></div>
+            <div style="font:700 26px/1.15 Unbounded,sans-serif">{{ tourSel.n }}</div>
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">{{ tourSel.y }}</div>
+          </sc-if>
+          <sc-if value="{{ tourNoSel }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:21px;line-height:1.38">Двигайте ползунок — город растёт. Коснитесь булавки, чтобы узнать о здании.</div>
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A;margin-top:8px">ПОЯВИЛОСЬ</div>
+            <sc-for list="{{ tourList }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.tap }}" style="min-height:56px;display:flex;align-items:center;gap:14px;border:0;border-bottom:1px solid #CFC7B7;background:none;padding:4px 0;text-align:left"><span style="font:500 20px 'IBM Plex Mono';color:#D9472B;min-width:52px">{{ t.y }}</span><span style="font-size:20px;line-height:1.25">{{ t.n }}</span></button>
+            </sc-for>
+          </sc-if>
+          <div style="flex:1"></div>
+          <button onClick="{{ goStage }}" style="height:64px;border:0;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 20px Unbounded,sans-serif">Играть</button>
+        </sc-if>
+
+        <sc-if value="{{ showProgress }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:4px;justify-content:space-between">
+            <sc-for list="{{ progress }}" as="p" hint-placeholder-count="9">
+              <div style="width:34px;height:40px;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:{{ p.op }}"><img src="{{ p.src }}" alt="" style="width:32px;height:32px;object-fit:contain"><div style="width:22px;height:4px;border-radius:2px;background:{{ p.bar }}"></div></div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- FOUND CARD -->
+      <sc-if value="{{ isFound }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:24px;top:24px;bottom:24px;width:820px;box-sizing:border-box;background:#F7F4ED;border:2px solid #1E1D1A;border-radius:8px;padding:28px 32px;display:flex;flex-direction:column;gap:20px;box-shadow:0 24px 60px rgba(60,50,35,.28);opacity:{{ cardOp }};transform:{{ cardT }};transition:opacity .42s cubic-bezier(.22,1,.36,1),transform .42s cubic-bezier(.22,1,.36,1)">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font:500 20px 'IBM Plex Mono',monospace;letter-spacing:.04em">ЭТАП 3 · {{ pageN }} ИЗ 3</div>
+            <div style="display:flex;gap:8px"><sc-for list="{{ dots }}" as="d" hint-placeholder-count="3"><div style="width:14px;height:14px;border-radius:50%;border:2px solid #1E1D1A;background:{{ d.bg }}"></div></sc-for></div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:320px 1fr;gap:32px;min-height:0">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-if value="{{ p0 }}" hint-placeholder-val="{{ true }}">
+                <div style="height:300px;border-radius:6px;background:repeating-linear-gradient(135deg,#E6DFD0 0 10px,#EFE9DC 10px 20px);display:flex;align-items:flex-end;padding:14px;box-sizing:border-box;font:500 16px/1.35 'IBM Plex Mono',monospace;color:#57524A">ФОТО: И. ПОКРОВСКИЙ, 1960-е · ПОДБЕРЁТ КОМАНДА</div>
+              </sc-if>
+              <sc-if value="{{ p1 }}" hint-placeholder-val="{{ false }}">
+                <div style="height:300px;border-radius:6px;background:#E6DFD0;display:flex;align-items:center;justify-content:center"><img src="svg/buildings/fleyta-360.svg" alt="" style="width:100%"></div>
+              </sc-if>
+              <sc-if value="{{ p2 }}" hint-placeholder-val="{{ false }}">
+                <div style="height:300px;border-radius:6px;background:repeating-linear-gradient(135deg,#E6DFD0 0 10px,#EFE9DC 10px 20px);display:flex;align-items:flex-end;padding:14px;box-sizing:border-box;font:500 16px/1.35 'IBM Plex Mono',monospace;color:#57524A">АРХИВНОЕ ФОТО КОРП. 701 / 707</div>
+              </sc-if>
+              <div style="display:flex;gap:16px;align-items:center">
+                <div style="width:132px;height:132px;flex:none;border:2px solid #1E1D1A;background:repeating-linear-gradient(45deg,#EFEBE1 0 6px,#FBF8F2 6px 12px);display:flex;align-items:center;justify-content:center;font:500 18px 'IBM Plex Mono'">QR</div>
+                <div style="font-size:20px;line-height:1.3">Вся история и маршрут — в вашем телефоне</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+              <sc-if value="{{ p0 }}" hint-placeholder-val="{{ true }}">
+                <div style="font:700 32px/1.1 Unbounded,sans-serif">Июль 1964. Приходит Покровский</div>
+                <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">ГЛАВНЫЙ АРХИТЕКТОР 1964–2002</div>
+                <div style="font-size:20px;line-height:1.42;text-wrap:pretty">Город уже строится по типовым проектам — изменить сами дома почти нельзя. Зато можно решить, где и как они встанут. Этим Покровский и займётся на следующие 38 лет.</div>
+                <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px"><div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">НЕОЧЕВИДНЫЙ ФАКТ</div><div style="font-size:20px;line-height:1.38">Он с увлечением двигал «коробки» будущих зданий по макету, чтобы они лучше вписались в ландшафт.</div></div>
+              </sc-if>
+              <sc-if value="{{ p1 }}" hint-placeholder-val="{{ false }}">
+                <div style="font:700 32px/1.1 Unbounded,sans-serif">Дом-«Флейта»</div>
+                <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">КОРП. 360 · 1967–1970</div>
+                <div style="font-size:20px;line-height:1.3;color:#57524A">Ф. Новиков (гл. арх.), И. Покровский, Г. Саевич</div>
+                <div style="font-size:20px;line-height:1.42;text-wrap:pretty">Жилой дом длиной 516 метров на опорах: 9 этажей и технический, 632 квартиры. Жильё в городе строили только по типовым проектам — «Флейта» единственное исключение.</div>
+                <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px"><div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">ГОРОДСКАЯ ЛЕГЕНДА</div><div style="font-size:20px;line-height:1.38">Иностранцы будто бы сказали: «Русские кладут небоскрёбы на бок». Первоисточник не найден.</div></div>
+              </sc-if>
+              <sc-if value="{{ p2 }}" hint-placeholder-val="{{ false }}">
+                <div style="font:700 32px/1.1 Unbounded,sans-serif">Корпуса 701 и 707</div>
+                <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">7-Й МКР · 1967</div>
+                <div style="font-size:20px;line-height:1.42;text-wrap:pretty">Два типовых дома: девятиэтажный 701 и двенадцатиэтажный 707. Город из одинаковых проектов становился разным благодаря расстановке домов по рельефу.</div>
+                <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px"><div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">НЕОЧЕВИДНЫЙ ФАКТ</div><div style="font-size:20px;line-height:1.38">Около 90% зданий Зеленограда — типовые. Своеобразие создавала композиция, а не фасады.</div></div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;justify-content:flex-end">
+            <button onClick="{{ prevPage }}" style="height:64px;min-width:160px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;font:600 20px Unbounded,sans-serif;opacity:{{ prevOp }}">← Назад</button>
+            <button onClick="{{ nextPage }}" style="height:64px;min-width:240px;border:0;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 20px Unbounded,sans-serif">{{ nextLabel }}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- MOBILE -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:#D9D2C2;display:flex;align-items:center;justify-content:center;gap:56px">
+          <div style="width:351px;height:760px;flex:none;position:relative"><div style="position:absolute;left:0;top:0;transform-origin:0 0;width:390px;height:844px;transform:scale(.9);background:#EFEBE1;border-radius:36px;border:10px solid #1E1D1A;overflow:hidden;display:flex;flex-direction:column">
+            <div style="height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.04em;border-bottom:1.5px solid #1E1D1A"><span>СОТРИ ТУМАН</span><span style="color:#D9472B">ТОЧКА 2 / 4</span></div>
+            <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+              <div style="background:#E6DFD0;padding:16px 8px"><img src="svg/buildings/fleyta-360.svg" alt="" style="width:100%;display:block"></div>
+              <div style="padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px">
+                <div style="font:500 12px 'IBM Plex Mono',monospace;letter-spacing:.04em;color:#57524A">МАРШРУТ «ЦЕНТР ПОКРОВСКОГО»</div>
+                <div style="font:700 30px/1.05 Unbounded,sans-serif">Дом-«Флейта»</div>
+                <div style="font:500 14px 'IBM Plex Mono',monospace;color:#D9472B">КОРП. 360 · 1967–1970</div>
+                <div style="font-size:17px;line-height:1.5">В 1960-е жилые дома в Зеленограде можно было строить только по типовым проектам. Единственным исключением стала «Флейта».</div>
+                <div style="font-size:17px;line-height:1.5">Длина дома — 516 метров, в нём 9 жилых этажей и технический, четыре подъезда и 632 квартиры. Дом поднят на опоры. Название придумал Феликс Новиков: форма и конструкция напомнили ему музыкальный инструмент.</div>
+                <div style="background:#FBF8F2;border:1.5px solid #1E1D1A;border-radius:6px;padding:12px 14px;font-size:16px;line-height:1.45"><b>Сейчас здесь</b> — экспозиция Музея Зеленограда.</div>
+                <div style="height:150px;border-radius:6px;background:repeating-linear-gradient(135deg,#E6DFD0 0 8px,#EFE9DC 8px 16px);display:flex;align-items:flex-end;padding:10px;box-sizing:border-box;font:500 12px 'IBM Plex Mono';color:#57524A">СХЕМА МАРШРУТА · ТАЙЛЫ КАРТЫ</div>
+                <div style="display:flex;flex-direction:column">
+                  <div style="display:flex;gap:12px;align-items:center;min-height:48px;border-bottom:1px solid #CFC7B7;font-size:16px;color:#57524A"><span style="width:28px;height:28px;border-radius:50%;background:#1E1D1A;color:#FBF8F2;display:flex;align-items:center;justify-content:center;font:500 13px 'IBM Plex Mono'">1</span>КЦ «Зеленоград»</div>
+                  <div style="display:flex;gap:12px;align-items:center;min-height:48px;border-bottom:1px solid #CFC7B7;font-size:16px;font-weight:600"><span style="width:28px;height:28px;border-radius:50%;background:#D9472B;color:#FBF8F2;display:flex;align-items:center;justify-content:center;font:500 13px 'IBM Plex Mono'">2</span>Дом-«Флейта» · вы здесь</div>
+                  <div style="display:flex;gap:12px;align-items:center;min-height:48px;border-bottom:1px solid #CFC7B7;font-size:16px"><span style="width:28px;height:28px;border-radius:50%;border:2px solid #1E1D1A;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:500 13px 'IBM Plex Mono'">3</span>Центральный проспект</div>
+                  <div style="display:flex;gap:12px;align-items:center;min-height:48px;font-size:16px"><span style="width:28px;height:28px;border-radius:50%;border:2px solid #1E1D1A;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:500 13px 'IBM Plex Mono'">4</span>Корпуса 701 и 707</div>
+                </div>
+                <div style="height:52px;border-radius:6px;background:#1E1D1A;color:#FBF8F2;display:flex;align-items:center;justify-content:center;font:600 15px Unbounded,sans-serif">Дальше: Центральный проспект →</div>
+                <div style="height:52px;border-radius:6px;border:2px solid #1E1D1A;display:flex;align-items:center;justify-content:center;font:600 15px Unbounded,sans-serif">Открыть в картах</div>
+              </div>
+            </div>
+          </div>
+          </div>
+          <div style="max-width:420px;display:flex;flex-direction:column;gap:14px">
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">/m/object/fleyta · 390×844</div>
+            <div style="font:700 34px/1.1 Unbounded,sans-serif">Страница по QR</div>
+            <div style="font-size:20px;line-height:1.45">Открывается без установки. Сверху — иллюстрация из той же системы, ниже полный текст из <code>qrText</code>, затем маршрут с текущей точкой и кнопкой к следующей.</div>
+            <div style="font-size:20px;line-height:1.45">На телефоне шрифты 16–17 px: читают в руке, а не стоя в метре.</div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;hintsUsed&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:4,&quot;min&quot;:0,&quot;max&quot;:27,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Финал&quot;},&quot;heatFeedback&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Механика&quot;},&quot;fogOpacity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.68,&quot;min&quot;:0.5,&quot;max&quot;:0.92,&quot;step&quot;:0.02,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Туман&quot;}}">
+const T = { x: 548, y: 236, R: 120 };
+const LM = [
+  { id: 'korp-118', n: 'Корпус 118', y: 1961, x: 430, yy: 150, img: 'svg/buildings/korp-118.svg' },
+  { id: 'electron', n: 'Кинотеатр «Электрон»', y: 1965, x: 470, yy: 196, img: 'svg/buildings/electron.svg' },
+  { id: 'fleyta', n: 'Дом-«Флейта»', y: 1967, x: 532, yy: 236, img: 'svg/buildings/fleyta-360.svg' },
+  { id: 'vulykh', n: 'Башни Вулыха', y: 1968, x: 660, yy: 214, img: 'svg/buildings/vulykh-towers.svg' },
+  { id: 'towers', n: 'Башни Центрального проспекта', y: 1972, x: 612, yy: 304, img: 'svg/buildings/towers-central.svg' },
+  { id: 'shtyki', n: 'Мемориал «Штыки»', y: 1974, x: 560, yy: 84, img: 'svg/buildings/shtyki.svg' },
+  { id: 'kc', n: 'КЦ «Зеленоград»', y: 1983, x: 582, yy: 250, img: 'svg/buildings/kc-zelenograd.svg' },
+  { id: 'kolumba', n: 'Дворец творчества', y: 1989, x: 378, yy: 404, img: 'svg/buildings/dvorets-kolumba.svg' },
+  { id: 'hram', n: 'Храм Сергия Радонежского', y: 1999, x: 236, yy: 604, img: 'svg/buildings/hram-sergiya.svg' },
+  { id: 'arch', n: 'Скульптура «Архитектор»', y: 2009, x: 300, yy: 668, img: 'svg/buildings/arkhitektor.svg' },
+];
+const HINTS = [
+  'Первые кварталы стоят на севере, у шоссе. Я веду город на юг — туда, где будет его центр.',
+  'Здесь поднимется дом длиной 516 метров. Ищите у вытянутого пруда.',
+  'Я отметил место на карте. Сотрите кальку в круге.',
+];
+const ROUTES = [
+  { name: 'Первый город', points: ['Корпус 118', 'Школа № 842', 'Поликлиника № 152', 'Кинотеатр «Электрон»', 'Мемориал «Штыки»'] },
+  { name: 'Центр Покровского', points: ['КЦ «Зеленоград»', 'Дом-«Флейта» и музей', 'Центральный проспект', 'Корпуса 701 и 707'] },
+  { name: 'Кирпичный пятый', points: ['Башни Вулыха', 'Центральный проспект', 'Площадь Юности'] },
+  { name: 'Дворцы', points: ['Дворец творчества, пл. Колумба', 'КЦ «Зеленоград»', 'Музей во «Флейте»'] },
+  { name: 'За рельсами', points: ['14–16-й микрорайоны', 'Храм Сергия Радонежского', 'Скульптура «Архитектор»'] },
+];
+const GEN = [
+  { label: 'Лес', x: 120, y: 300, text: 'Лес не вырубали, а впускали в город: он разделяет микрорайоны и держит всю композицию.' },
+  { label: 'Центр', x: 470, y: 150, text: 'Около 90% домов — типовые. Характер городу давали расстановка домов и уникальные здания центра.' },
+  { label: 'Железная дорога', x: 360, y: 470, text: 'Октябрьская дорога режет город надвое. Спрятать её в тоннель не получилось: сложно и дорого.' },
+];
+const SLOTS = [{ x: 90, y: 300 }, { x: 290, y: 300 }, { x: 490, y: 300 }, { x: 690, y: 300 }];
+const TRAY = [{ x: 90, y: 668 }, { x: 290, y: 668 }, { x: 490, y: 668 }, { x: 690, y: 668 }];
+const SCREENS = [['attract', 'Заставка'], ['stage', 'Этап'], ['miss', 'Промах'], ['found', 'Находка'], ['maket', 'Макет · этап 4'], ['genplan', 'Генплан'], ['final', 'Финал'], ['tour', 'Экскурсия'], ['mobile', 'Телефон по QR']];
+
+class Component extends DCLogic {
+  state = { screen: 'attract', view: 'attract', vw: 1200, vh: 800, hint: 1, missed: false, found: false, heat: 0, pan: false, cardIn: false, page: 0, markersIn: false, boxPos: TRAY.map(p => ({ ...p })), placed: [null, null, null, null], drag: null, route: null, year: 1975, tourSel: null, genSel: null };
+  fogRef = React.createRef(); glowRef = React.createRef(); revealRef = React.createRef(); fogWrapRef = React.createRef(); trackRef = React.createRef(); boardRef = React.createRef();
+  timers = [];
+
+  componentDidMount() {
+    this.onResize = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight });
+    window.addEventListener('resize', this.onResize); this.onResize();
+    this.ro = new ResizeObserver(this.onResize); this.ro.observe(document.documentElement);
+    requestAnimationFrame(this.onResize); setTimeout(this.onResize, 300);
+    this.makeGrain(); this.drawFog(); this.startBreath();
+    this.check = setInterval(() => this.checkHit(), 300);
+    this.demoT = setInterval(() => this.demo(), 7000);
+    const g = () => { const c = this.glowRef.current; if (c) { const x = c.getContext('2d'); x.globalCompositeOperation = 'destination-out'; x.fillStyle = 'rgba(0,0,0,0.07)'; x.fillRect(0, 0, 884, 800); x.globalCompositeOperation = 'source-over'; } this.raf = requestAnimationFrame(g); };
+    g();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); this.ro && this.ro.disconnect(); clearInterval(this.check); clearInterval(this.demoT); cancelAnimationFrame(this.raf); this.clearTimers(); }
+  clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+
+  get ctx() { const c = this.fogRef.current; return c && c.getContext('2d'); }
+  makeGrain() {
+    const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'); const d = x.createImageData(256, 256);
+    let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < d.data.length; i += 4) { const v = r(); const dark = v < 0.5; d.data[i] = dark ? 120 : 255; d.data[i + 1] = dark ? 108 : 255; d.data[i + 2] = dark ? 90 : 252; d.data[i + 3] = Math.floor(r() * 22); }
+    x.putImageData(d, 0, 0);
+    x.strokeStyle = 'rgba(255,255,255,.5)'; x.lineWidth = 0.8;
+    for (let i = 0; i < 14; i++) { x.beginPath(); const a = r() * 256, b = r() * 256; x.moveTo(a, b); x.quadraticCurveTo(a + r() * 60 - 30, b + r() * 60 - 30, a + r() * 80 - 40, b + r() * 80 - 40); x.stroke(); }
+    this.grain = c;
+  }
+  drawFog() {
+    const x = this.ctx; if (!x) return; const op = this.props.fogOpacity ?? 0.68;
+    x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, 884, 800);
+    x.fillStyle = `rgba(246,243,236,${op})`; x.fillRect(0, 0, 884, 800);
+    if (this.grain) { x.fillStyle = x.createPattern(this.grain, 'repeat'); x.fillRect(0, 0, 884, 800); }
+  }
+  erase(px, py, r = 64) {
+    const x = this.ctx; x.globalCompositeOperation = 'destination-out';
+    const g = x.createRadialGradient(px, py, r * 0.55, px, py, r); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill(); x.globalCompositeOperation = 'source-over';
+  }
+  strokeTo(p) {
+    const l = this.last;
+    if (l) { const d = Math.hypot(p.x - l.x, p.y - l.y); const n = Math.max(1, Math.ceil(d / 12)); for (let i = 1; i <= n; i++) this.erase(l.x + (p.x - l.x) * i / n, l.y + (p.y - l.y) * i / n); }
+    else this.erase(p.x, p.y);
+    this.last = p;
+    const heat = Math.max(0, Math.min(1, 1 - (Math.hypot(p.x - T.x, p.y - T.y) - T.R) / 420));
+    if (this.state.screen === 'stage' && (this.props.heatFeedback ?? true)) {
+      const gx = this.glowRef.current.getContext('2d'); const g = gx.createRadialGradient(p.x, p.y, 20, p.x, p.y, 70);
+      g.addColorStop(0, 'rgba(255,217,138,0)'); g.addColorStop(0.75, `rgba(255,190,110,${0.5 * heat})`); g.addColorStop(1, 'rgba(228,87,46,0)');
+      gx.fillStyle = g; gx.beginPath(); gx.arc(p.x, p.y, 70, 0, 7); gx.fill();
+    }
+    if (Math.round(heat * 4) !== Math.round(this.state.heat * 4)) this.setState({ heat });
+  }
+  pt(e) { const r = this.fogRef.current.getBoundingClientRect(); return { x: (e.clientX - r.left) * 884 / r.width, y: (e.clientY - r.top) * 800 / r.height }; }
+  interactive() { const s = this.state.screen; return (s === 'attract' || s === 'stage') && !this.state.found; }
+
+  onDown = e => { if (!this.interactive()) return; e.currentTarget.setPointerCapture(e.pointerId); this.drawing = true; this.last = null; this.demoing = false; this.strokeTo(this.pt(e)); if (this.state.missed) this.setState({ missed: false }); };
+  onMove = e => { if (this.drawing) this.strokeTo(this.pt(e)); };
+  onUp = () => {
+    if (!this.drawing) return; this.drawing = false; this.last = null;
+    if (this.state.screen === 'stage' && !this.state.found) { this.checkHit(); if (!this.state.found) this.checkMiss(); }
+    if (this.state.screen === 'attract') { clearTimeout(this.refillT); this.refillT = setTimeout(() => this.refill(), 1600); }
+  };
+
+  cleared(x0, y0, w, h, step, inside) {
+    const d = this.ctx.getImageData(x0, y0, w, h).data; let hit = 0, tot = 0;
+    for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) { const X = x0 + x, Y = y0 + y; const inZ = Math.hypot(X - T.x, Y - T.y) < T.R; if (inZ !== inside) continue; tot++; if (d[(y * w + x) * 4 + 3] < 70) hit++; }
+    return { hit, tot };
+  }
+  checkHit() {
+    if (this.state.screen !== 'stage' || this.state.found || !this.ctx) return;
+    const r = this.cleared(T.x - T.R, T.y - T.R, T.R * 2, T.R * 2, 6, true);
+    if (r.tot && r.hit / r.tot >= 0.35) this.foundZone(this.last || T);
+  }
+  checkMiss() { const r = this.cleared(0, 0, 884, 800, 12, false); if (r.hit * 144 > 40000) this.miss(); }
+  miss() { this.setState(s => ({ missed: true, hint: Math.min(3, s.hint + 1) })); this.refill(); }
+  refill() {
+    const t0 = performance.now(); const x = this.ctx;
+    const step = () => { if (this.drawing) return; const k = (performance.now() - t0) / 900; x.fillStyle = 'rgba(246,243,236,0.09)'; x.fillRect(0, 0, 884, 800); if (k < 1) requestAnimationFrame(step); else this.drawFog(); };
+    step();
+  }
+  demo() {
+    if (this.state.screen !== 'attract' || this.drawing) return;
+    const t0 = performance.now(); this.last = null; this.demoing = true;
+    const step = () => { if (!this.demoing || this.state.screen !== 'attract') return; const k = Math.min(1, (performance.now() - t0) / 1300); this.strokeTo({ x: 200 + k * 460, y: 520 - k * 120 + Math.sin(k * 7) * 40 }); if (k < 1) requestAnimationFrame(step); else { this.last = null; this.demoing = false; clearTimeout(this.refillT); this.refillT = setTimeout(() => this.refill(), 1400); } };
+    step();
+  }
+  startBreath() { const el = this.fogWrapRef.current; if (!el) return; this.breath && this.breath.cancel(); this.breath = el.animate([{ opacity: 1 }, { opacity: 0.86 }, { opacity: 1 }], { duration: 6000, iterations: Infinity, easing: 'ease-in-out' }); }
+  stopBreath() { this.breath && this.breath.cancel(); this.breath = null; }
+
+  foundZone(p) {
+    this.drawing = false; this.setState({ found: true, missed: false });
+    const x0 = p.x, y0 = p.y, t0 = performance.now();
+    const clear = () => { const k = Math.min(1, (performance.now() - t0) / 700); const e = 1 - Math.pow(1 - k, 3); const c = this.ctx; c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(T.x, T.y, T.R * 1.4 * e, 0, 7); c.fill(); c.globalCompositeOperation = 'source-over'; if (k < 1) requestAnimationFrame(clear); };
+    clear();
+    const el = this.revealRef.current; this.revealAnim && this.revealAnim.cancel();
+    const R = T.R * 1.4, warm = 'sepia(.9) saturate(2.4) brightness(1.08)', base = 'saturate(.55) sepia(.1) brightness(1.03)';
+    this.revealAnim = el.animate([
+      { clipPath: `circle(0px at ${x0}px ${y0}px)`, filter: warm },
+      { clipPath: `circle(${R}px at ${T.x}px ${T.y}px)`, filter: warm, offset: 0.5 },
+      { clipPath: `circle(${R}px at ${T.x}px ${T.y}px)`, filter: base },
+    ], { duration: 3600, delay: 300, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+    this.later(() => this.setState({ markersIn: true }), 2300);
+    this.later(() => this.setState({ screen: 'found', view: 'found', pan: true, page: 0 }), 3200);
+    this.later(() => this.setState({ cardIn: true }), 3300);
+  }
+
+  go(name) {
+    this.clearTimers(); this.drawing = false; this.demoing = false; clearTimeout(this.refillT);
+    this.revealAnim && this.revealAnim.cancel(); this.revealAnim = null;
+    const base = { view: name, missed: false, found: false, pan: false, cardIn: false, page: 0, markersIn: false, route: null, tourSel: null, genSel: null, heat: 0, hint: 1 };
+    this.drawFog();
+    if (name === 'attract') { this.setState({ ...base, screen: 'attract' }); this.startBreath(); return; }
+    this.stopBreath();
+    if (name === 'stage') return this.setState({ ...base, screen: 'stage' });
+    if (name === 'miss') { this.setState({ ...base, screen: 'stage', missed: true, hint: 2 }); return; }
+    if (name === 'found') { this.erase(T.x, T.y, T.R * 1.5); this.setState({ ...base, screen: 'found', found: true, pan: true, markersIn: true }); this.later(() => this.setState({ cardIn: true }), 60); return; }
+    if (name === 'maket') return this.setState({ ...base, screen: 'maket', boxPos: TRAY.map(p => ({ ...p })), placed: [null, null, null, null] });
+    if (name === 'genplan') { this.setState({ ...base, screen: 'genplan' }); return; }
+    if (name === 'final') { this.setState({ ...base, screen: 'final' }); this.later(() => this.setState({ markersIn: true }), 80); return; }
+    if (name === 'tour') { this.setState({ ...base, screen: 'tour', markersIn: true, year: 1975 }); return; }
+    if (name === 'mobile') this.setState({ ...base, screen: 'mobile' });
+  }
+
+  boxDown(i, e) {
+    const b = this.boardRef.current; if (!b) return; e.preventDefault();
+    const r = b.getBoundingClientRect(), k = r.width / 884; const p = this.state.boxPos[i];
+    const dx = (e.clientX - r.left) / k - p.x, dy = (e.clientY - r.top) / k - p.y;
+    const placed = this.state.placed.slice(); placed[i] = null; this.setState({ drag: i, placed });
+    const mv = ev => { const bp = this.state.boxPos.slice(); bp[i] = { x: (ev.clientX - r.left) / k - dx, y: (ev.clientY - r.top) / k - dy }; this.setState({ boxPos: bp }); };
+    const up = () => {
+      window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up);
+      const p2 = this.state.boxPos[i]; let best = -1, bd = 1e9;
+      SLOTS.forEach((s, j) => { if (this.state.placed.includes(j)) return; const d = Math.hypot(s.x - p2.x, s.y - p2.y); if (d < bd) { bd = d; best = j; } });
+      const bp = this.state.boxPos.slice(); const pl = this.state.placed.slice();
+      if (best >= 0 && bd < 160) { bp[i] = { ...SLOTS[best] }; pl[i] = best; } else bp[i] = { ...TRAY[i] };
+      this.setState({ boxPos: bp, placed: pl, drag: null });
+    };
+    window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up);
+  }
+
+  setYear(e) { const r = this.trackRef.current.getBoundingClientRect(); const k = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); this.setState({ year: Math.round(1960 + k * 60), tourSel: null }); }
+  onTrackDown = e => { e.currentTarget.setPointerCapture(e.pointerId); this.tracking = true; this.setYear(e); };
+  onTrackMove = e => { if (this.tracking) this.setYear(e); };
+  onTrackUp = () => { this.tracking = false; };
+
+  renderVals() {
+    const s = this.state, sc = s.screen;
+    const scale = Math.max(0.3, Math.min((s.vw - 32) / 1280, (s.vh - 104) / 800, 1.6));
+    const hintsN = this.props.hintsUsed ?? 4;
+    const plural = n => (n % 10 === 1 && n % 100 !== 11) ? 'подсказка' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'подсказки' : 'подсказок';
+    const heatOn = this.props.heatFeedback ?? true;
+    const cur = { stage: 2, found: 2, maket: 3, genplan: 5, final: 9 }[sc];
+    let markers = [];
+    if (sc === 'found') markers = LM.filter(m => m.id === 'fleyta' || m.id === 'kc').map((m, i) => ({ ...m, on: s.markersIn, i, src: 'svg/markers/pin-landmark.svg' }));
+    if (sc === 'stage' && s.found) markers = LM.filter(m => m.id === 'fleyta' || m.id === 'kc').map((m, i) => ({ ...m, on: s.markersIn, i, src: 'svg/markers/pin-landmark.svg' }));
+    if (sc === 'final') markers = LM.map((m, i) => ({ ...m, on: s.markersIn, i, src: 'svg/markers/pin-landmark.svg' }));
+    if (sc === 'tour') markers = LM.map((m, i) => ({ ...m, on: m.y <= s.year, i: 0, src: s.tourSel && s.tourSel.id === m.id ? 'svg/markers/pin-found.svg' : 'svg/markers/pin-landmark.svg' }));
+    const tourR = 40 + (s.year - 1960) / 60 * 900;
+    const revealClip = (sc === 'genplan' || sc === 'final') ? 'none' : sc === 'tour' ? `circle(${tourR}px at 520px 220px)` : (sc === 'found' || s.found) ? `circle(${T.R * 1.4}px at ${T.x}px ${T.y}px)` : 'circle(0px at 0px 0px)';
+    const placedCount = s.placed.filter(v => v !== null).length;
+    const route = s.route !== null ? { name: ROUTES[s.route].name, points: ROUTES[s.route].points.map((n, i) => ({ n: i + 1, name: n })) } : { name: '', points: [] };
+    return {
+      stageW: Math.round(1280 * scale), stageH: Math.round(800 * scale), stageT: `scale(${scale})`,
+      chips: SCREENS.map(([id, label]) => ({ label, go: () => this.go(id), bg: s.view === id ? '#1E1D1A' : '#EFEBE1', fg: s.view === id ? '#FBF8F2' : '#1E1D1A' })),
+      isAttract: sc === 'attract', isStage: sc === 'stage', isFound: sc === 'found', isMaket: sc === 'maket', isGen: sc === 'genplan', isFinal: sc === 'final', isTour: sc === 'tour', isMobile: sc === 'mobile',
+      panT: s.pan ? 'translateX(-300px)' : 'translateX(0px)',
+      revealClip, revealRef: this.revealRef, fogRef: this.fogRef, glowRef: this.glowRef, fogWrapRef: this.fogWrapRef, trackRef: this.trackRef, boardRef: this.boardRef,
+      fogOp: (sc === 'attract' || sc === 'stage' || sc === 'found') ? 1 : 0,
+      onDown: this.onDown, onMove: this.onMove, onUp: this.onUp,
+      pulse: (sc === 'stage' && s.hint === 3 && !s.found) ? React.createElement('div', { style: { position: 'absolute', left: T.x - T.R, top: T.y - T.R, width: T.R * 2, height: T.R * 2, borderRadius: '50%', border: '3px solid #E4572E', background: 'rgba(228,87,46,.10)', animation: 'zpulse 1.6s ease-in-out infinite', pointerEvents: 'none', boxSizing: 'border-box' } }) : null,
+      showFoundRing: sc === 'found',
+      markers: markers.map(m => ({ left: m.x - 32, top: m.yy - 92, src: m.src, delay: m.i * 120, t: m.on ? 'translateY(0px) scale(1)' : 'translateY(-24px) scale(0)', tap: () => { if (sc === 'tour') this.setState({ tourSel: m }); } })),
+      goStage: () => this.go('stage'), goTour: () => this.go('tour'), goGen: () => { if (placedCount === 4) this.go('genplan'); }, goFinal: () => this.go('final'), goAttract: () => this.go('attract'),
+      hint: s.hint, hintText: HINTS[s.hint - 1], missed: s.missed, heatOn,
+      heatSegs: [0, 1, 2, 3, 4].map(i => ({ bg: s.heat * 5 > i + 0.2 ? ['#FFE7A8', '#FFD98A', '#F7B267', '#EE8A4E', '#E4572E'][i] : '#DDD5C5' })),
+      heatLabel: s.heat < 0.25 ? 'Холодно' : s.heat < 0.7 ? 'Теплее' : 'Горячо',
+      moreHint: () => this.setState(st => ({ hint: Math.min(3, st.hint + 1) })), hintBtnOp: s.hint >= 3 ? 0.4 : 1,
+      showProgress: ['stage', 'maket', 'genplan'].includes(sc),
+      progress: Array.from({ length: 9 }, (_, i) => ({ src: `svg/stages/stage-${i + 1}.svg`, op: i <= cur ? 1 : 0.32, bar: i < cur ? '#1E1D1A' : i === cur ? '#D9472B' : 'transparent' })),
+      pageN: s.page + 1, p0: s.page === 0, p1: s.page === 1, p2: s.page === 2,
+      dots: [0, 1, 2].map(i => ({ bg: i === s.page ? '#1E1D1A' : 'transparent' })),
+      prevPage: () => this.setState(st => ({ page: Math.max(0, st.page - 1) })), prevOp: s.page === 0 ? 0.35 : 1,
+      nextPage: () => { if (s.page < 2) this.setState({ page: s.page + 1 }); else this.go('maket'); },
+      nextLabel: s.page < 2 ? 'Дальше →' : 'К этапу 4 →',
+      cardOp: s.cardIn ? 1 : 0, cardT: s.cardIn ? 'translateX(0px)' : 'translateX(40px)',
+      slots: SLOTS.map((p, j) => ({ ...p, c: s.placed.includes(j) ? 'transparent' : '#5E5242' })),
+      boxes: s.boxPos.map((p, i) => ({ x: p.x, y: p.y, down: e => this.boxDown(i, e), t: s.drag === i ? 'scale(1.08)' : 'scale(1)', tr: s.drag === i ? 'transform .15s' : 'left .35s cubic-bezier(.22,1,.36,1), top .35s cubic-bezier(.22,1,.36,1), transform .2s', z: s.drag === i ? 5 : 1 })),
+      placedCount, maketDone: placedCount === 4, maketBtnBg: placedCount === 4 ? '#1E1D1A' : '#A9A294',
+      genTags: GEN.map((g, i) => ({ ...g, tap: () => this.setState({ genSel: i }), bg: s.genSel === i ? '#1E1D1A' : '#FBF8F2', fg: s.genSel === i ? '#FBF8F2' : '#1E1D1A' })),
+      genText: s.genSel === null ? 'Генплан застройки принят в 1971 году. Коснитесь меток на карте. В 1975-м — Госпремия СССР за архитектурные комплексы Зеленограда.' : GEN[s.genSel].text,
+      hintsN, hintsWord: hintsN === 0 ? 'подсказок — вы открыли секрет' : `${plural(hintsN)} за 9 этапов`,
+      routes: ROUTES.map((r, i) => ({ name: r.name, count: r.points.length, open: () => this.setState({ route: i }) })),
+      routeOpen: s.route !== null, route, closeRoute: () => this.setState({ route: null }),
+      secretText: hintsN === 0 ? 'Секретная карточка «Яйцо Покровского» открыта' : 'Сыграйте без подсказок — откроется секретная карточка',
+      secretOp: hintsN === 0 ? 1 : 0.35, secretBorder: hintsN === 0 ? 'solid' : 'dashed',
+      year: s.year, yearPct: (s.year - 1960) / 60 * 100,
+      onTrackDown: this.onTrackDown, onTrackMove: this.onTrackMove, onTrackUp: this.onTrackUp,
+      tourHasSel: !!s.tourSel, tourNoSel: !s.tourSel, tourSel: s.tourSel || { n: '', y: '', img: '' },
+      tourList: LM.filter(m => m.y <= s.year).slice(-4).reverse().map(m => ({ ...m, tap: () => this.setState({ tourSel: m }) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

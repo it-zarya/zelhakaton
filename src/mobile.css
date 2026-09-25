@@ -1,0 +1,94 @@
+/* Мобильная страница по QR. Общие токены — в kiosk.css */
+:root {
+  --line: rgba(30, 29, 26, 0.18);
+  --muted: #57524a;
+  --green: #2e6a4f;
+  --signal: #d9472b;
+  --font-head: var(--f-display);
+  --font-body: var(--f-text);
+  --font-mono: var(--f-mono);
+}
+
+body.mobile { background: var(--paper); }
+
+body.mobile h1, body.mobile h2 { font-family: var(--f-display); font-weight: 600; line-height: 1.12; margin: 0 0 .4em; }
+body.mobile .eyebrow, body.mobile .meta { font: 500 12px var(--f-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 .6em; }
+body.mobile .btn { display: flex; min-height: 48px; margin-top: 12px; font-size: 15px; }
+body.mobile .legend { color: var(--signal); font: 500 12px var(--f-mono); text-transform: uppercase; }
+body.mobile .authors { color: var(--muted); font-size: 14px; }
+
+/* ——— Мобильная страница по QR ——— */
+
+body.mobile {
+  font-size: 17px;
+}
+
+.m-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+.m-page h1 {
+  font-size: 26px;
+}
+
+.m-page h2 {
+  font-size: 20px;
+}
+
+.m-page figure {
+  margin: 0 0 12px;
+}
+
+.m-page img {
+  width: 100%;
+  filter: grayscale(1);
+}
+
+.m-page figcaption {
+  font: 500 12px var(--font-mono);
+  color: var(--muted);
+}
+
+.m-stops {
+  padding: 0;
+  list-style: none;
+}
+
+.m-stops details {
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+}
+
+.m-stops summary {
+  font: 600 17px var(--font-head);
+  cursor: pointer;
+}
+
+.num {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--signal);
+  color: var(--paper);
+  font: 600 14px var(--font-mono);
+}
+
+.walk {
+  font: 500 12px var(--font-mono);
+  color: var(--muted);
+}
+
+.m-sources a {
+  color: var(--green);
+}
+
+.m-foot {
+  margin-top: 32px;
+  font: 500 12px var(--font-mono);
+  color: var(--muted);
+}
