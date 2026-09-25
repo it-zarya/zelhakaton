@@ -62,3 +62,7 @@
 | hram-sergiya-3.jpg | Строящаяся часовня во имя Сергия Радонежского, май 1997 | Фото А. В. Карандеева / Музей Зеленограда | zelenograd.ru/story/igor-pokrovskiy-i-ego-hramy/ |
 | hram-sergiya-4.jpg | Храм Сергия Радонежского (современное фото, переведено в ч/б) | arhangelhram.ru | zelenograd.ru/story/igor-pokrovskiy-i-ego-hramy/ |
 | hram-sergiya-5.jpg | Иконостас храма Сергия Радонежского, Рождество 2021 (переведено в ч/б) | vk.com/arhangelhramzelenograd | zelenograd.ru/story/igor-pokrovskiy-i-ego-hramy/ |
+| ats-3-1.jpg | Вид на 3-й микрорайон, 1972 (верхняя половина коллажа «было–стало», переведено в ч/б) | «Зеленоград 20 век» (ok.ru) / netall.ru | netall.ru/culture/photo/1166235.html (201020_009) |
+| vysotki-4-1.jpg | Вид на Центральный проспект (старый кадр коллажа, ч/б) | «Зеленоград 20 век» (ok.ru) / netall.ru | netall.ru/culture/photo/1166235.html (201020_003) |
+| vysotki-4-2.jpg | Вид на Центральный проспект и площадь Юности (старый кадр коллажа) | «Зеленоград 20 век» (ok.ru) / netall.ru | netall.ru/culture/photo/1166235.html (201020_004) |
+| vysotki-4-3.jpg | Центральный проспект (старый кадр коллажа) | «Зеленоград 20 век» (ok.ru) / netall.ru | netall.ru/culture/photo/1166235.html (201020_018) |
