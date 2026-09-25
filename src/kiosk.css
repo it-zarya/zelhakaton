@@ -2,7 +2,7 @@
    Все размеры в px макета 1280×800 через --u. Светлая тема, без hover. */
 
 :root {
-  --u: clamp(1px, min(100vw / 1280, 100dvh / 800), 2px);
+  --u: clamp(0.5px, min(100vw / 1280, 100dvh / 800), 2px); /* на маленьких окнах всё уменьшается, а не обрезается */
 
   --paper: #efebe1;
   --paper-2: #f7f4ed;
@@ -64,7 +64,7 @@ button {
 #app {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr calc(396 * var(--u));
+  grid-template-columns: 1fr calc(440 * var(--u));
   height: 100vh;
   height: 100dvh;
   overflow: hidden;

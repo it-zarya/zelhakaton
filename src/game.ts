@@ -122,7 +122,7 @@ export class Game {
     this.fog.startDemo(5000, 10000);
     this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">Проведите пальцем по карте`);
     this.panel.innerHTML = `
-      <p class="eyebrow">Игорь Покровский · главный архитектор Зеленограда 1964–2002</p>
+      <p class="eyebrow">Игорь Покровский · главный архитектор Зеленограда <span style="white-space:nowrap">1964–2002</span></p>
       <h1 class="attract-title">Зеленоград Покровского<span>от проекта до&nbsp;реализации</span></h1>
       <div class="spacer"></div>
       <p class="cta"><b>Постройте город вместе с Покровским.</b> Найдите на карте, где и когда вырастал Зеленоград — от первого дома 1961 года до новых кварталов.</p>
@@ -686,7 +686,7 @@ function yearsHtml(years: string): string {
 
 /** px на единицу макета 1280×800 (как --u в CSS) */
 function unit(): number {
-  return Math.min(2, Math.max(1, Math.min(innerWidth / 1280, innerHeight / 800)));
+  return Math.min(2, Math.max(0.5, Math.min(innerWidth / 1280, innerHeight / 800)));
 }
 
 function base(): string {

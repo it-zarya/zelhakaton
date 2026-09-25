@@ -62,7 +62,7 @@ export class Fog {
     this.canvas.width = Math.round(r.width * this.dpr);
     this.canvas.height = Math.round(r.height * this.dpr);
     this.scale = this.canvas.width / this.vbW;
-    this.brushCss = 64 * Math.min(2, Math.max(1, window.innerWidth / 1280)); // 64 px макета 1280×800
+    this.brushCss = 64 * Math.min(2, Math.max(0.5, Math.min(window.innerWidth / 1280, window.innerHeight / 800))); // 64 px макета 1280×800
     this.grain = this.makeGrain();
     if (this.glow) {
       this.glow.canvas.width = this.canvas.width;
