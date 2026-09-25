@@ -195,6 +195,7 @@ export class City3D {
 
   /** Подсветить пин объекта (карточка которого открыта) */
   highlight(id: string | null) {
+    this.pinLayer.classList.toggle("focus", id !== null); // остальные пины приглушаются
     this.pinLayer.querySelectorAll<HTMLElement>(".pin").forEach((p) => p.classList.toggle("active", p.dataset.id === id));
   }
 
@@ -452,7 +453,8 @@ export class City3D {
         b.style.left = `${sx.toFixed(1)}px`;
         b.style.top = `${sy.toFixed(1)}px`;
         b.style.transitionDelay = stagger ? `${80 + i * 120}ms` : "0ms";
-        b.innerHTML = `<img src="${base}svg/markers/pin-${pin}.svg" alt="">`;
+        const short = o.name.split(" — ")[0]; // «Корпус 118 — первый жилой дом» → «Корпус 118»
+        b.innerHTML = `<i class="pin-ring"></i><img src="${base}svg/markers/pin-${pin}.svg" alt=""><span class="pin-label">${short.replace(/[&<>"]/g, "")}</span>`;
         b.addEventListener("click", () => tappable && this.onMarkerTap?.(o.id));
         return b;
       }),

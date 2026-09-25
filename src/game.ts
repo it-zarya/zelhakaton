@@ -409,6 +409,7 @@ export class Game {
           }
           sheet.remove();
           this.map.pan(0);
+          this.map.highlight(null);
           if (!isLastStage) this.startStage(this.stageIdx + 1);
           else void this.toFinal();
         },

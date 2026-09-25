@@ -1103,10 +1103,58 @@ h3 {
   background: var(--accent);
 }
 
-/* Активный пин (карточка открыта) */
+/* Активный пин (карточка открыта): крупнее, кольцо, подпись; остальные приглушены */
+.pin-layer.focus .pin.in:not(.active) {
+  transform: scale(0.8);
+  opacity: 0.45;
+}
+
 .pin.in.active {
-  transform: scale(1.25);
-  z-index: 2;
+  transform: scale(1.35);
+  z-index: 3;
+}
+
+.pin {
+  transition: transform 420ms var(--ease-grow), opacity 300ms;
+}
+
+.pin-ring {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(-10 * var(--u));
+  width: calc(44 * var(--u));
+  height: calc(20 * var(--u));
+  margin-left: calc(-22 * var(--u));
+  border: 3px solid var(--accent-map);
+  border-radius: 50%;
+  animation: pin-ring 1.4s ease-out infinite;
+}
+
+@keyframes pin-ring {
+  from { transform: scale(0.4); opacity: 1; }
+  to { transform: scale(1.4); opacity: 0; }
+}
+
+.pin-label {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 26 * var(--u));
+  transform: translateX(-50%) scale(0.74); /* компенсирует scale(1.35) пина */
+  transform-origin: 50% 100%;
+  padding: calc(4 * var(--u)) calc(12 * var(--u));
+  border: 2px solid var(--ink);
+  border-radius: calc(16 * var(--u));
+  background: var(--paper-3);
+  font: 600 calc(18 * var(--u)) var(--f-display);
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(60, 50, 35, 0.2);
+}
+
+.pin.active .pin-ring,
+.pin.active .pin-label {
+  display: block;
 }
 
 /* Метка тепла над пальцем */
