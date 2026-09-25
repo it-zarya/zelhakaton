@@ -239,6 +239,13 @@ export class Fog {
     window.setTimeout(() => this.demoOn && !this.drawing && this.regrow(), 1400);
   }
 
+  /** Открыть зону сразу, не трогая остальные штрихи (часть многоместного этапа найдена) */
+  openZone(id: string) {
+    this.open.add(id);
+    this.openMask = this.rasterize([...this.open]);
+    this.cut([id], 1);
+  }
+
   /** Снять туман целиком */
   clearAll(ms = 900): Promise<void> {
     return this.animate(ms, (k) => {

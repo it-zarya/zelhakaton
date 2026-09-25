@@ -51,6 +51,7 @@ export class Game {
   private idleReset = 0;
   private timers: number[] = [];
   private maket: Maket | null = null;
+  private partFound = new Set<string>(); // найденные зоны многоместного этапа
   private objects: Map<string, MapObject>;
   private c: Content;
   private map: City3D;
@@ -177,6 +178,7 @@ export class Game {
   // ——— Этап ———
 
   private startStage(i: number) {
+    this.partFound.clear();
     this.stageIdx = i;
     this.hintIdx = 0;
     this.heatLit = -1;
@@ -211,6 +213,7 @@ export class Game {
     this.panel.innerHTML = `
       ${yearsHtml(s.years)}
       <h2 class="stage-title">${esc(s.title)}</h2>
+      ${s.zones.length > 1 ? `<p class="mono accent" data-parts>Найдено ${this.partFound.size} из ${s.zones.length} мест</p>` : ""}
       <div class="flex-mid">
         <p class="question">${esc(s.intro)}</p>
         <div class="box ${newHint ? "new" : ""}">
@@ -229,7 +232,7 @@ export class Game {
     if (this.hintIdx >= 2) return;
     this.hintIdx++;
     this.hintsUsed++;
-    if (this.hintIdx === 2) this.map.pulse(this.stage.zones);
+    if (this.hintIdx === 2) this.map.pulse(this.stage.zones.filter((z) => !this.partFound.has(z)));
     this.renderStage(true);
   }
 
@@ -275,6 +278,17 @@ export class Game {
   private check(strokeEnded: boolean) {
     if (this.screen !== "stage" || this.busy) return;
     const cov = this.fog.measure();
+    const zones = this.stage.zones;
+    if (zones.length > 1) {
+      // многоместный этап: каждое найденное место отмечаем сразу
+      zones.forEach((id, k) => {
+        if (cov.each[k] >= SUCCESS_AT && !this.partFound.has(id)) this.foundPart(id);
+      });
+      if (this.partFound.size === zones.length) {
+        this.chip(0, 0, null);
+        return void this.success();
+      }
+    }
     if (cov.target >= SUCCESS_AT && cov.each.every((v) => v >= EACH_AT)) {
       this.chip(0, 0, null);
       return void this.success();
@@ -289,12 +303,32 @@ export class Game {
     }
   }
 
+  /** Одно из нескольких мест найдено: зона открывается и растёт, остальные ищем дальше */
+  private foundPart(id: string) {
+    this.partFound.add(id);
+    this.fog.openZone(id);
+    this.open.add(id);
+    this.map.setOpenZones(this.open);
+    this.map.markFound([id]);
+    this.reveal.set(this.open, this.stage.zones);
+    // пульс подсказки — только на ещё не найденных местах
+    if (this.hintIdx === 2) this.map.pulse(this.stage.zones.filter((z) => !this.partFound.has(z)));
+    const left = this.stage.zones.length - this.partFound.size;
+    const counter = this.panel.querySelector("[data-parts]");
+    if (counter) counter.textContent = `Найдено ${this.partFound.size} из ${this.stage.zones.length} мест`;
+    if (left > 0)
+      this.note(
+        `<div><b>Одно место найдено!</b><span>Осталось ещё ${left === 1 ? "одно" : left} — смотрите подсказку справа.</span></div>`,
+        "prompt found-part",
+      );
+  }
+
   private async miss() {
     if (this.hintIdx < 2) {
       this.hintIdx++;
       this.hintsUsed++;
     }
-    if (this.hintIdx === 2) this.map.pulse(this.stage.zones);
+    if (this.hintIdx === 2) this.map.pulse(this.stage.zones.filter((z) => !this.partFound.has(z)));
     this.renderStage(true);
     this.note(`<b>Мимо: здесь в те годы ещё шумел лес</b><span>Туман вернулся. Новая подсказка ${this.hintIdx + 1} из 3 — справа.</span>`, "miss");
     await this.fog.regrow(900);
