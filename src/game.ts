@@ -217,7 +217,6 @@ export class Game {
       <h2 class="stage-title">${esc(s.title)}</h2>
       ${s.zones.length > 1 ? `<p class="mono accent" data-parts>Найдено ${this.partFound.size} из ${s.zones.length} мест</p>` : ""}
       <div class="flex-mid">
-        <p class="question">${esc(s.intro)}</p>
         <div class="box ${newHint ? "new" : ""}">
           <p class="mono">Подсказка ${this.hintIdx + 1} из 3</p>
           <p>${esc(s.hints[this.hintIdx])}</p>
@@ -539,11 +538,9 @@ export class Game {
     const o = s.objectIds.map((id) => this.objects.get(id)).find(Boolean);
     if (o) this.found.push(o.id);
     this.panel.innerHTML = `
-      <p class="mono">Этап ${this.stageIdx + 1} из ${this.c.stages.length} · особый</p>
       ${yearsHtml(s.years)}
       <h2 class="stage-title">${esc(s.title)}</h2>
       <div class="flex-mid">
-        <p class="question">${esc(s.intro)}</p>
         <div class="box"><p class="mono accent">Интересный факт</p><p>${esc(s.hiddenFact)}</p></div>
       </div>
       <button class="btn primary" data-act="next">Дальше</button>
@@ -576,7 +573,6 @@ export class Game {
     const n = this.hintsUsed;
     const egg = this.objects.get("egg");
     this.panel.innerHTML = `
-      <p class="mono">${this.c.stages.length} из ${this.c.stages.length} этапов</p>
       <h2 class="final-title">Город найден</h2>
       <div class="score"><b>${n}</b><span>${n === 0 ? "подсказок — вы открыли секрет" : `${plural(n, "подсказка", "подсказки", "подсказок").split(" ")[1]} за ${this.c.stages.length} этапов`}</span></div>
       <p class="mono">Возьмите маршрут с собой</p>

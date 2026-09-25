@@ -70,7 +70,7 @@ const SIZE: Record<Kind, Record<string, [number, number]>> = {
 const CYCLE: Record<Kind, string[]> = { tower: ["front", "east", "back", "west"], nine: ["along", "across"], boul: ["along", "across"] };
 
 const MSG: Record<string, string> = {
-  start: "Возьмите дом из лотка и перетащите на макет. Касание поворачивает дом — в лотке и на макете.",
+  start: "Проспект хотели застроить обычными девятиэтажками. Расставьте 12 домов, как решили бы вы: перетащите дом из лотка на макет, касание поворачивает. В конце сравним с Покровским.",
   road: "Проспект — магистраль. На проезжей части не строят.",
   forest: "Лес — часть города. Дома вписывают в ландшафт, а не ставят поверх него.",
   water: "Пруд оставляем: дома вписывают в ландшафт.",
@@ -551,7 +551,6 @@ export class Maket {
         ${years}
         <h2 class="stage-title">Двигаем коробки</h2>
         <div class="flex-mid">
-          <p class="question">Проспект хотели застроить обычными девятиэтажками. Расставьте 12 домов, как решили бы вы, — в конце сравним с Покровским.</p>
           <div class="box mk3-msg" style="background:${MSG_BG[this.msgKind]}">${esc(this.msg)}</div>
           ${this.hints > 0 ? `<div class="box"><p class="mono">Подсказка ${this.hints} из 3</p><p>${esc(HINTS[this.hints - 1])}</p></div>` : ""}
         </div>

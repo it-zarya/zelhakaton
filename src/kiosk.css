@@ -64,7 +64,7 @@ button {
 #app {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr calc(440 * var(--u));
+  grid-template-columns: minmax(0, 1fr) calc(520 * var(--u));
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
@@ -1330,4 +1330,14 @@ h3 {
   -webkit-mask-image: linear-gradient(#000 calc(100% - 28 * var(--u)), transparent);
   mask-image: linear-gradient(#000 calc(100% - 28 * var(--u)), transparent);
   padding-bottom: calc(24 * var(--u));
+}
+
+/* Панель шире (520u) — крупнее заголовок и текст подсказки */
+.stage-title {
+  font-size: calc(30 * var(--u));
+}
+
+.question,
+.box {
+  font-size: calc(21 * var(--u));
 }
