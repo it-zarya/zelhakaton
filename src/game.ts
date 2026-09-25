@@ -114,17 +114,16 @@ export class Game {
     this.reset();
     this.screen = "attract";
     this.root.dataset.screen = "attract";
-    this.map.setOpenZones(this.map.zonePaths.keys()); // под калькой — весь город
+    this.map.setOpenZones(this.map.zonePaths.keys()); // под туманом — весь город
     this.map.setOthers(true);
     this.fog.enabled = true;
     this.fog.startDemo(5000, 10000);
-    this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">Проведите пальцем по кальке`);
+    this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">Проведите пальцем по карте`);
     this.panel.innerHTML = `
       <p class="eyebrow">Игорь Покровский · главный архитектор Зеленограда 1964–2002</p>
-      <h1 class="attract-title">Сотри туман</h1>
-      <p class="lead">Город, которого не было на картах, появлялся из леса шаг за шагом. Сотрите кальку там, где, по-вашему, его строили.</p>
+      <h1 class="attract-title">Зеленоград Покровского<span>от проекта до&nbsp;реализации</span></h1>
       <div class="spacer"></div>
-      <button class="btn primary big" data-act="play">Играть</button>
+      <button class="btn primary big" data-act="play">Начать</button>
       <button class="btn" data-act="tour">Просто посмотреть</button>
       <p class="mono">${this.c.stages.length} этапов · ~3 минуты</p>`;
     this.panel.querySelector(".attract-title")!.parentElement!.classList.add("attract");
@@ -203,7 +202,7 @@ export class Game {
     // В начале каждого этапа — приглашение стирать (исчезает при первом касании карты)
     const rule = i === 0 ? " Над пальцем подскажет: холодно или горячо. Мимо — туман вернётся." : "";
     this.note(
-      `<img class="swipe" src="${base()}svg/ui/icon-finger-swipe.svg" alt=""><div><b>Этап ${i + 1} · ${esc(s.years)}. Проведите пальцем по кальке</b><span>там, где, по-вашему, строили в эти годы.${rule}</span></div>`,
+      `<img class="swipe" src="${base()}svg/ui/icon-finger-swipe.svg" alt=""><div><b>Этап ${i + 1} · ${esc(s.years)}. Проведите пальцем по карте</b><span>там, где, по-вашему, строили в эти годы.${rule}</span></div>`,
       "prompt",
     );
   }
@@ -544,7 +543,7 @@ export class Game {
       </div>
       ${egg ? `<button class="secret ${perfect ? "open" : ""}" data-act="egg"><img src="${base()}svg/buildings/egg-pokrovskogo.svg" alt=""><span>${perfect ? "Секретная карточка «Яйцо Покровского» открыта" : "Сыграйте без подсказок — откроется секретная карточка"}</span></button>` : ""}
       <div class="spacer"></div>
-      <button class="btn primary" data-act="again">Сыграть ещё</button>`;
+      <button class="btn primary" data-act="again">Начать заново</button>`;
     this.panel.classList.add("final");
     this.panel.querySelectorAll<HTMLButtonElement>("[data-route]").forEach((b) =>
       b.addEventListener("click", () => this.routeModal(this.c.routes.find((r) => r.id === b.dataset.route)!)),
@@ -589,7 +588,7 @@ export class Game {
       <p class="question">Двигайте ползунок — город вырастет по годам. Нажмите на пин, чтобы узнать о здании.</p>
       <div class="info"></div>
       <div class="spacer"></div>
-      <button class="btn primary" data-act="play">Играть</button>
+      <button class="btn primary" data-act="play">Начать</button>
       <button class="btn" data-act="back">← На главную</button>`;
     const slider = this.panel.querySelector<HTMLInputElement>(".slider")!;
     const info = this.panel.querySelector<HTMLElement>(".info")!;
