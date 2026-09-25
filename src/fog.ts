@@ -206,26 +206,37 @@ export class Fog {
     }, false).then(() => void (this.last = null));
   }
 
-  /** Периодическое авто-демо: штрих, затем калька возвращается */
-  startDemo(every = 7000) {
+  /** Периодическое авто-демо: штрих, затем калька возвращается. Интервал — случайный в [minMs, maxMs] */
+  startDemo(minMs = 5000, maxMs = 10000) {
     this.stopDemo();
+    this.demoOn = true;
     const run = async () => {
-      if (!this.drawing) {
-        const r = this.canvas.getBoundingClientRect();
-        const pts = Array.from({ length: 40 }, (_, i) => {
-          const k = i / 39;
-          return { x: r.width * (0.22 + k * 0.5), y: r.height * (0.65 - k * 0.15) + Math.sin(7 * k) * r.height * 0.05 };
-        });
-        await this.demoStroke(pts);
-        window.setTimeout(() => !this.drawing && this.regrow(), 1400);
+      try {
+        await this.demoOnce();
+      } finally {
+        // следующее — даже если это демо упало, но только пока демо не выключили
+        if (this.demoOn) this.demoTimer = window.setTimeout(run, minMs + Math.random() * (maxMs - minMs));
       }
-      this.demoTimer = window.setTimeout(run, every);
     };
     this.demoTimer = window.setTimeout(run, 1500);
   }
 
   stopDemo() {
+    this.demoOn = false;
     clearTimeout(this.demoTimer);
+  }
+
+  private demoOn = false;
+
+  private async demoOnce() {
+    if (this.drawing || !this.demoOn) return;
+    const r = this.canvas.getBoundingClientRect();
+    const pts = Array.from({ length: 40 }, (_, i) => {
+      const k = i / 39;
+      return { x: r.width * (0.22 + k * 0.5), y: r.height * (0.65 - k * 0.15) + Math.sin(7 * k) * r.height * 0.05 };
+    });
+    await this.demoStroke(pts);
+    window.setTimeout(() => this.demoOn && !this.drawing && this.regrow(), 1400);
   }
 
   /** Снять туман целиком */
@@ -250,13 +261,22 @@ export class Fog {
     keep.width = holes.width;
     keep.height = holes.height;
     const kx = keep.getContext("2d")!;
-    kx.drawImage(holes, 0, 0);
-    kx.globalCompositeOperation = "destination-in";
-    kx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
-    kx.fillStyle = "#000";
+    const target = new Path2D();
+    let hasTarget = false;
     for (const id of this.targetIds) {
       const p = this.paths.get(id);
-      if (p) kx.fill(p);
+      if (p) {
+        target.addPath(p);
+        hasTarget = true;
+      }
+    }
+    // без цели (заставка) ничего не сохраняем; с целью — только дырки внутри неё (одной фигурой, иначе destination-in даст пересечение)
+    if (hasTarget) {
+      kx.drawImage(holes, 0, 0);
+      kx.globalCompositeOperation = "destination-in";
+      kx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
+      kx.fillStyle = "#000";
+      kx.fill(target);
     }
     this.regrowing = true;
     await this.animate(ms, (k) => {
@@ -444,7 +464,8 @@ export class Fog {
     return new Promise((resolve) => {
       const t0 = performance.now();
       const tick = (t: number) => {
-        const k = Math.min(1, (t - t0) / ms);
+        // метка rAF бывает чуть раньше t0 — прогресс не должен уходить в минус
+        const k = Math.min(1, Math.max(0, (t - t0) / ms));
         frame(inout === "out" ? easeOut(k) : inout ? easeInOut(k) : k);
         if (k < 1) requestAnimationFrame(tick);
         else resolve();

@@ -116,7 +116,7 @@ export class Game {
     this.map.setOpenZones(this.map.zonePaths.keys()); // под калькой — весь город
     this.map.setOthers(true);
     this.fog.enabled = true;
-    this.fog.startDemo(7000);
+    this.fog.startDemo(5000, 10000);
     this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">Проведите пальцем по кальке`);
     this.panel.innerHTML = `
       <p class="eyebrow">Игорь Покровский · главный архитектор Зеленограда 1964–2002</p>
