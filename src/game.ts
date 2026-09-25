@@ -371,6 +371,7 @@ export class Game {
       this.screen = "found";
       this.root.dataset.screen = "found";
       this.showSheet(true);
+      this.kickIdle(); // таймер «для чтения» — с момента появления карточки
     });
   }
 
@@ -480,6 +481,7 @@ export class Game {
     this.reveal.stop();
     this.screen = "maket";
     this.root.dataset.screen = "maket";
+    this.kickIdle();
     this.fog.enabled = false;
     const s = this.stage;
     const [from, to] = s.years.split(/\s*[–—-]\s*/);
@@ -565,6 +567,7 @@ export class Game {
       <div class="spacer"></div>
       <button class="btn primary" data-act="again">Начать заново</button>`;
     this.panel.classList.add("final");
+    this.kickIdle();
     this.panel.querySelectorAll<HTMLButtonElement>("[data-route]").forEach((b) =>
       b.addEventListener("click", () => this.routeModal(this.c.routes.find((r) => r.id === b.dataset.route)!)),
     );
