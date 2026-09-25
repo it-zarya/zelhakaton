@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -82 100 114" width="224" height="255" stroke-linejoin="round">
+<path d="M10.83 -12.77L20.72 -15.63L31.98 -9.13L-0.93 9.87L-10.83 12.73L-22.08 6.23Z" fill="#6f604c" fill-opacity="0.18"/>
+<path d="M10.83 -39.75L20.35 -34.25L3.9 -24.75L-5.63 -30.25Z" fill="#f4f0e8" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M20.35 -7.25L3.9 2.25L3.9 -24.75L20.35 -34.25Z" fill="#cfc8bc" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M3.9 2.25L-5.63 -3.25L-5.63 -30.25L3.9 -24.75Z" fill="#e4dfd6" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-5.63 -6.05L3.9 -0.55" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -10.05L3.9 -0.55" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -8.85L3.9 -3.35" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -12.85L3.9 -3.35" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -11.65L3.9 -6.15" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -15.65L3.9 -6.15" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -14.45L3.9 -8.95" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -18.45L3.9 -8.95" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -17.25L3.9 -11.75" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -21.25L3.9 -11.75" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -20.05L3.9 -14.55" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -24.05L3.9 -14.55" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -22.85L3.9 -17.35" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -26.85L3.9 -17.35" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -25.65L3.9 -20.15" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -29.65L3.9 -20.15" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-5.63 -28.45L3.9 -22.95" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M20.35 -32.45L3.9 -22.95" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-1.52 -0.88L-1.52 -27.88" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M2.6 1.5L2.6 -25.5" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M16.24 -4.88L16.24 -31.88" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M12.12 -2.5L12.12 -29.5" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M8.01 -0.13L8.01 -27.13" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M-3.9 -29.25L5.63 -23.75L-10.83 -14.25L-20.35 -19.75Z" fill="#f4f0e8" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M5.63 3.25L-10.83 12.75L-10.83 -14.25L5.63 -23.75Z" fill="#cfc8bc" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-10.83 12.75L-20.35 7.25L-20.35 -19.75L-10.83 -14.25Z" fill="#e4dfd6" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-20.35 4.45L-10.83 9.95" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 0.45L-10.83 9.95" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 1.65L-10.83 7.15" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -2.35L-10.83 7.15" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -1.15L-10.83 4.35" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -5.15L-10.83 4.35" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -3.95L-10.83 1.55" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -7.95L-10.83 1.55" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -6.75L-10.83 -1.25" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -10.75L-10.83 -1.25" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -9.55L-10.83 -4.05" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -13.55L-10.83 -4.05" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -12.35L-10.83 -6.85" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -16.35L-10.83 -6.85" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -15.15L-10.83 -9.65" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -19.15L-10.83 -9.65" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-20.35 -17.95L-10.83 -12.45" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M5.63 -21.95L-10.83 -12.45" stroke="#dfd9cf" stroke-width="0.24" fill="none"/>
+<path d="M-16.24 9.63L-16.24 -17.38" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M-12.12 12L-12.12 -15" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M1.52 5.63L1.52 -21.38" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M-2.6 8L-2.6 -19" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M-6.71 10.38L-6.71 -16.63" stroke="#e7e2d8" stroke-width="0.24" fill="none"/>
+<path d="M8.23 -37.25L12.56 -34.75L7.36 -31.75L3.03 -34.25Z" fill="#f4f0e8" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M12.56 -32.75L7.36 -29.75L7.36 -31.75L12.56 -34.75Z" fill="#cfc8bc" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M7.36 -29.75L3.03 -32.25L3.03 -34.25L7.36 -31.75Z" fill="#e4dfd6" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-7.36 -26.25L-3.03 -23.75L-8.23 -20.75L-12.56 -23.25Z" fill="#f4f0e8" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-3.03 -21.75L-8.23 -18.75L-8.23 -20.75L-3.03 -23.75Z" fill="#cfc8bc" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-8.23 -18.75L-12.56 -21.25L-12.56 -23.25L-8.23 -20.75Z" fill="#e4dfd6" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+</svg>

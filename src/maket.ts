@@ -12,6 +12,7 @@ interface Piece {
   o: string;
   c: number | null;
   r: number | null;
+  v?: string; // вариант фасада девятиэтажки (tools/stage4/nine-variants.cjs)
 }
 
 const L = {
@@ -98,7 +99,7 @@ const INIT = (): Piece[] =>
       ["b1", "boul", "across"], ["b2", "boul", "along"], ["b3", "boul", "across"],
       ["t1", "tower", "east"], ["t2", "tower", "back"], ["t3", "tower", "west"], ["t4", "tower", "back"],
     ] as [string, Kind, string][]
-  ).map(([id, type, o]) => ({ id, type, o, c: null, r: null }));
+  ).map(([id, type, o], i) => ({ id, type, o, c: null, r: null, v: type === "nine" ? "abcde"[i] : undefined }));
 
 /** Схема «как у Покровского» — условна, позиции по OSM */
 const SOLUTION: Record<string, [number, number, string]> = {
@@ -186,7 +187,7 @@ export class Maket {
   }
 
   private src(p: Piece) {
-    const f = p.type === "tower" ? `towers-${p.o}` : p.type === "nine" ? `nine-${p.o}` : `boulevard-${p.o}`;
+    const f = p.type === "tower" ? `towers-${p.o}` : p.type === "nine" ? `nine-${p.v ?? "a"}-${p.o}` : `boulevard-${p.o}`;
     return `${this.base}svg/stage4v3/${f}.svg`;
   }
 
@@ -197,8 +198,16 @@ export class Maket {
     const [x, y] = toWorld(pt[0], pt[1] + 34);
     const c = Math.round(x / L.G - w / 2);
     const r = Math.round(y / L.G - h / 2);
-    const inside = c >= 0 && r >= 0 && c + w <= L.COLS && r + h <= L.ROWS && pt[1] < 600;
-    return { c, r, w, h, inside };
+    let rr = r;
+    let cc = c;
+    // «магнит»: полоса бульвара (север) и полоса башен (юг) ровно в глубину дома — попасть пальцем точно почти невозможно
+    const band = p.type === "boul" && h === 3 ? 11 : p.type === "tower" && h === 3 ? 6 : -1;
+    if (band >= 0 && Math.abs(r - band) <= 2) {
+      rr = band;
+      cc = Math.max(0, Math.min(L.COLS - w, c));
+    }
+    const inside = cc >= 0 && rr >= 0 && cc + w <= L.COLS && rr + h <= L.ROWS && pt[1] < 600;
+    return { c: cc, r: rr, w, h, inside };
   }
 
   private check(p: Piece, c: number, r: number, o: string): string | null {
