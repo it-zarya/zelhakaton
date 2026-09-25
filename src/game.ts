@@ -4,6 +4,7 @@
 import type { City3D } from "./city3d";
 import type { Fog } from "./fog";
 import { Maket } from "./maket";
+import type { ColorReveal } from "./reveal";
 import { qrCanvas, objectUrl, routeUrl } from "./qr";
 import type { Content, MapObject, Route, Stage } from "./types";
 import { esc } from "./util";
@@ -57,8 +58,18 @@ export class Game {
   private panel: HTMLElement;
   private root: HTMLElement;
   private mapArea: HTMLElement;
+  private reveal: ColorReveal;
 
-  constructor(c: Content, map: City3D, fog: Fog, panel: HTMLElement, root: HTMLElement, mapArea: HTMLElement) {
+  constructor(
+    c: Content,
+    map: City3D,
+    fog: Fog,
+    panel: HTMLElement,
+    root: HTMLElement,
+    mapArea: HTMLElement,
+    reveal: ColorReveal,
+  ) {
+    this.reveal = reveal;
     this.c = c;
     this.map = map;
     this.fog = fog;
@@ -125,6 +136,7 @@ export class Game {
     this.fog.stopDemo();
     this.maket?.destroy();
     this.maket = null;
+    this.reveal.stop();
     this.root.querySelectorAll(".sheet, .modal").forEach((el) => el.remove());
     this.note(null);
     this.mapArea.querySelector(".hatch")?.remove();
@@ -182,6 +194,9 @@ export class Game {
     this.root.dataset.screen = "stage";
     this.fog.setTarget(s.zones);
     this.fog.enabled = true;
+    // ч/б город: цвет проступает только в цели под стёртым туманом и в найденных зонах
+    this.reveal.set(this.open, s.zones);
+    this.reveal.start();
     this.renderStage();
     if (i === 0) this.note(`<b>Сотрите кальку там, где, по-вашему, строили</b><span>Над пальцем подскажет: холодно или горячо. Мимо — туман вернётся.</span>`, "miss rule");
   }
@@ -296,6 +311,7 @@ export class Game {
       s.zones.forEach((z) => this.open.add(z));
       this.map.setOpenZones(this.open);
       this.map.markFound(s.zones);
+      this.reveal.set(this.open, []);
     });
     const objs = s.objectIds.map((id) => this.objects.get(id)).filter((o): o is MapObject => !!o);
     this.found.push(...objs.map((o) => o.id));
@@ -401,6 +417,7 @@ export class Game {
   // ——— Этап 4: «Двигаем коробки» ———
 
   private showMaket() {
+    this.reveal.stop();
     this.screen = "maket";
     this.root.dataset.screen = "maket";
     this.fog.enabled = false;
@@ -441,6 +458,7 @@ export class Game {
   // ——— Генплан (этап 6) ———
 
   private showGenplan() {
+    this.reveal.stop();
     this.screen = "genplan";
     this.root.dataset.screen = "genplan";
     this.fog.enabled = false;
@@ -478,6 +496,7 @@ export class Game {
   // ——— Финал ———
 
   private async toFinal() {
+    this.reveal.stop();
     this.screen = "final";
     this.root.dataset.screen = "final";
     this.fog.enabled = false;

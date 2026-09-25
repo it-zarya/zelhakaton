@@ -89,6 +89,7 @@ body.mobile #app {
 }
 
 .city-canvas,
+.color-layer,
 .map-overlay,
 .fog,
 .glow,
@@ -961,4 +962,18 @@ h3 {
 /* Пока открыт лист находки, панель этапа под ним пустая (не просвечивает год) */
 [data-screen="found"] .panel > * {
   visibility: hidden;
+}
+
+/* Ч/б город на этапе поиска и на листе находки; цвет даёт .color-layer (src/reveal.ts) */
+.city-canvas {
+  transition: filter 700ms var(--ease-out);
+}
+
+[data-screen="stage"] .city-canvas,
+[data-screen="found"] .city-canvas {
+  filter: grayscale(1) contrast(0.92) brightness(1.04);
+}
+
+.color-layer {
+  pointer-events: none;
 }

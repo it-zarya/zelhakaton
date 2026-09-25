@@ -15,6 +15,7 @@ import routes from "./data/routes.json";
 import { Fog } from "./fog";
 import { Game } from "./game";
 import { City3D } from "./city3d";
+import { ColorReveal } from "./reveal";
 import { isMobileRoute, renderMobile } from "./mobile";
 import type { Content, ZonesFile } from "./types";
 
@@ -38,8 +39,11 @@ async function boot() {
   const fog = new Fog(canvas, map.viewBox, map.zonePaths);
   fog.attachGlow(app.querySelector<HTMLCanvasElement>(".glow")!);
   fog.resize();
+  const reveal = new ColorReveal(map.canvas, canvas);
+  map.canvas.after(reveal.canvas); // над ч/б городом, под туманом
+  reveal.setPaths(map.zonePaths);
 
-  const game = new Game(content, map, fog, panel, app, area);
+  const game = new Game(content, map, fog, panel, app, area, reveal);
   game.toAttract();
   // Отладка: ?nofog — город без тумана; ?stage=N — сразу на этап N
   const q = new URLSearchParams(location.search);
@@ -56,6 +60,7 @@ async function boot() {
     t = window.setTimeout(() => {
       map.fit(area);
       fog.setShapes(map.viewBox, map.zonePaths);
+      reveal.setPaths(map.zonePaths);
       fog.resize(); // туман перерисуется с учётом открытых зон
     }, 150);
   });

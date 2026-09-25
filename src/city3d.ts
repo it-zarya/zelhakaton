@@ -82,7 +82,7 @@ export class City3D {
     this.frame = frame;
     this.zonesFile = zones;
     this.focus = objects.map((o) => this.mapPoint(o));
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); // кадр копирует ColorReveal
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -112,6 +112,10 @@ export class City3D {
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
+  }
+
+  get canvas(): HTMLCanvasElement {
+    return this.renderer.domElement;
   }
 
   /** Подогнать камеру под контейнер и пересчитать экранные контуры зон */
