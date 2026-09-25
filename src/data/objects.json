@@ -11,6 +11,28 @@
     "zone": "mkr-01",
     "lat": 56.006443,
     "lon": 37.204761,
+    "photos": [
+      {
+        "src": "photos/korp-118-1.jpg",
+        "caption": "Корпус 118 — первый жилой дом Зеленограда",
+        "credit": "Фото из фонда Музея Зеленограда"
+      },
+      {
+        "src": "photos/korp-118-2.jpg",
+        "caption": "Строительство корпусов 122 (на переднем плане) и 118",
+        "credit": "pastvu.com"
+      },
+      {
+        "src": "photos/korp-118-3.jpg",
+        "caption": "Строительство домов в 1-м микрорайоне",
+        "credit": "pastvu.com"
+      },
+      {
+        "src": "photos/korp-118-4.jpg",
+        "caption": "Строительство первых домов в 1-м микрорайоне",
+        "credit": "Фото из фонда Музея Зеленограда"
+      }
+    ],
     "sources": [
       "https://www.netall.ru/history/1961/firsthouse/",
       "https://www.zelenograd.ru/story/arhitektor-pokrovskiy-1/"

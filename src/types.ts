@@ -46,6 +46,8 @@ export interface MapObject {
   lat?: number; // для точки на карте; нет — ставим в центроид зоны
   lon?: number;
   photo?: string | null; // путь в public/photos/, заполнит команда
+  /** Галерея: несколько фото (листаются касанием). Если есть — важнее photo */
+  photos?: { src: string; caption: string; credit: string }[];
   credit?: string; // автор/источник фото
   sources: string[]; // URL источников фактов
   legend?: boolean; // текст содержит городскую легенду — пометить на экране

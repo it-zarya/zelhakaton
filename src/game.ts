@@ -14,8 +14,9 @@ const EACH_AT = 0.4; // и каждая из нескольких целевых
 const WRONG_AT = 0.057; // на отпускании: мимо стёрто > 5,7% карты (≈40 000 px² макета) и цель < 15% → промах
 const HEAT_FEEDBACK = true;
 const HEAT_RANGE = 420; // px макета: дальше этого от края цели — «холодно»
-const IDLE_WARN_MS = 45_000;
-const IDLE_MS = 60_000;
+const IDLE_WARN_MS = 90_000; // «Вы ещё здесь?»
+const IDLE_MS = 120_000; // сброс на заставку
+const READING_X = 2; // на карточке, финале и в мини-игре читают дольше — таймеры вдвое длиннее
 const HEAT_COLORS = ["#FFE7A8", "#FFD98A", "#F7B267", "#EE8A4E", "#E4572E"];
 
 /** Иллюстрации зданий из design/svg/buildings */
@@ -422,7 +423,14 @@ export class Game {
     const el = document.createElement("section");
     el.className = "sheet";
     const illu = ILLUSTRATION[o.id];
-    const media = o.photo
+    const gal = o.photos ?? [];
+    const media = gal.length
+      ? `<div class="media gallery" data-gallery>
+          <img class="photo" src="${base()}${esc(gal[0].src)}" alt="">
+          <div class="gal-cap"><b>${esc(gal[0].caption)}</b><span>${esc(gal[0].credit)}</span></div>
+          ${gal.length > 1 ? `<div class="gal-dots">${gal.map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>` : ""}
+        </div>`
+      : o.photo
       ? `<div class="media"><img class="photo" src="${base()}${esc(o.photo)}" alt="">${o.credit ? `<span class="cap">${esc(o.credit)}</span>` : ""}</div>`
       : illu
         ? `<div class="media"><img class="illu" src="${base()}svg/buildings/${illu}.svg" alt=""></div>`
@@ -451,6 +459,18 @@ export class Game {
         <button class="btn primary" data-act="next">${esc(opt.next)}</button>
       </div>`;
     void qrCanvas(objectUrl(o.id), 240).then((c) => el.querySelector("[data-qr]")?.replaceChildren(c));
+    // галерея: касание по фото — следующее
+    const g = el.querySelector<HTMLElement>("[data-gallery]");
+    if (g && gal.length > 1) {
+      let i = 0;
+      g.addEventListener("click", () => {
+        i = (i + 1) % gal.length;
+        g.querySelector<HTMLImageElement>("img")!.src = `${base()}${gal[i].src}`;
+        g.querySelector(".gal-cap b")!.textContent = gal[i].caption;
+        g.querySelector(".gal-cap span")!.textContent = gal[i].credit;
+        g.querySelectorAll(".gal-dots i").forEach((d, k) => d.classList.toggle("on", k === i));
+      });
+    }
     return el;
   }
 
@@ -625,13 +645,14 @@ export class Game {
     clearTimeout(this.idleReset);
     this.mapArea.querySelector(".map-note.idle")?.remove();
     if (this.screen === "attract") return;
+    const k = this.screen === "found" || this.screen === "final" || this.screen === "maket" ? READING_X : 1;
     this.idleWarn = window.setTimeout(() => {
       const n = document.createElement("div");
       n.className = "map-note idle";
       n.innerHTML = `<b>Вы ещё здесь?</b><button class="btn primary">Я здесь</button>`;
       this.mapArea.append(n);
-    }, IDLE_WARN_MS);
-    this.idleReset = window.setTimeout(() => this.toAttract(), IDLE_MS);
+    }, IDLE_WARN_MS * k);
+    this.idleReset = window.setTimeout(() => this.toAttract(), IDLE_MS * k);
   }
 }
 

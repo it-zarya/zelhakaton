@@ -55,7 +55,15 @@ function objectHtml(o: MapObject, full: boolean): string {
     o.lat != null ? `<a class="btn ghost" href="https://yandex.ru/maps/?pt=${o.lon},${o.lat}&z=16&l=map" target="_blank" rel="noopener">Открыть на карте</a>` : "";
   return `
     <article class="m-object">
-      ${o.photo ? `<figure><img src="${import.meta.env.BASE_URL}${esc(o.photo)}" alt="${esc(o.name)}">${o.credit ? `<figcaption>${esc(o.credit)}</figcaption>` : ""}</figure>` : ""}
+      ${
+        o.photos?.length
+          ? o.photos
+              .map((p) => `<figure><img src="${import.meta.env.BASE_URL}${esc(p.src)}" alt="${esc(p.caption)}"><figcaption>${esc(p.caption)} · ${esc(p.credit)}</figcaption></figure>`)
+              .join("")
+          : o.photo
+            ? `<figure><img src="${import.meta.env.BASE_URL}${esc(o.photo)}" alt="${esc(o.name)}">${o.credit ? `<figcaption>${esc(o.credit)}</figcaption>` : ""}</figure>`
+            : ""
+      }
       ${full ? `<h1>${esc(o.qrTitle)}</h1><p class="eyebrow">${esc(o.name)}</p>` : `<h2>${esc(o.qrTitle)}</h2>`}
       <p class="meta">${esc(o.address)} · ${esc(o.year)}</p>
       ${o.authors ? `<p class="authors">${esc(o.authors)}</p>` : ""}

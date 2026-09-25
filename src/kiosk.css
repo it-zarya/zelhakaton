@@ -1197,3 +1197,53 @@ h3 {
   color: #5e7f45;
   font-weight: 700;
 }
+
+/* Галерея фото в карточке */
+.media.gallery {
+  cursor: pointer;
+  background: #1e1d1a;
+}
+
+.media.gallery img.photo {
+  object-fit: contain;
+}
+
+.gal-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: calc(22 * var(--u)) calc(10 * var(--u)) calc(8 * var(--u));
+  background: linear-gradient(transparent, rgba(30, 29, 26, 0.85));
+  color: var(--paper-3);
+  font-size: calc(15 * var(--u));
+  line-height: 1.25;
+}
+
+.gal-cap span {
+  font: 500 calc(13 * var(--u)) var(--f-mono);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.gal-dots {
+  position: absolute;
+  top: calc(10 * var(--u));
+  right: calc(10 * var(--u));
+  display: flex;
+  gap: calc(6 * var(--u));
+}
+
+.gal-dots i {
+  width: calc(10 * var(--u));
+  height: calc(10 * var(--u));
+  border: 1.5px solid var(--paper-3);
+  border-radius: 50%;
+}
+
+.gal-dots i.on {
+  background: var(--paper-3);
+}
