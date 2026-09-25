@@ -52,6 +52,12 @@ const toWorld = (px: number, py: number): [number, number] => {
   return [(u / COS + 2 * v) / 2, (2 * v - u / COS) / 2];
 };
 const zoneOf = (r: number) => (r <= 5 ? "depth" : r <= 8 ? "south" : r <= 10 ? "road" : "north");
+/** Существующие дома 4-го мкр — отдельные спрайты (tools/stage4/board-split.cjs), чтобы сортировались по глубине */
+const EXISTING: [number, number, number, number][] = [
+  [8, 0, 6, 2],
+  [14, 2, 2, 4],
+  [20, 4, 5, 2],
+];
 const HOME: Record<Kind, string> = { nine: "depth", boul: "north", tower: "south" };
 const SIZE: Record<Kind, Record<string, [number, number]>> = {
   tower: { front: [6, 3], back: [6, 3], east: [3, 6], west: [3, 6] },
@@ -66,7 +72,9 @@ const MSG: Record<string, string> = {
   forest: "Лес — часть города. Дома вписывают в ландшафт, а не ставят поверх него.",
   water: "Пруд оставляем: дома вписывают в ландшафт.",
   house: "Здесь уже стоят дома 4-го микрорайона.",
-  busy: "Здесь уже стоит дом.",
+  busy_nine: "Здесь уже стоит дом.",
+  busy_tower: "Здесь уже стоят башни.",
+  busy_boul: "Здесь уже бульвар.",
   cross_tower: "Пара башен выходит на проспект целиком. Коснитесь, чтобы повернуть.",
   cross_nine: "Дом залезает на соседний участок. Попробуйте повернуть его касанием.",
   cross_boul: "Бульвар тянется вдоль проспекта. Коснитесь, чтобы повернуть.",
@@ -86,7 +94,7 @@ const MSG: Record<string, string> = {
   done: "Все 12 домов на макете. Сравним с Покровским?",
 };
 const HINTS = [
-  "Проспект — магистраль. Северная сторона — прогулочный бульвар, южная — башни с магазинами внизу.",
+  "Север на макете — ближе к вам. Ближняя сторона проспекта — прогулочный бульвар, дальняя (южная) — башни с магазинами внизу.",
   "Девятиэтажкам — место в глубине микрорайона, между лесом, прудом и старыми домами. Три из пяти встанут только повёрнутыми.",
   "Пока вы держите дом, его зона подсвечена зелёным.",
 ];
@@ -224,12 +232,12 @@ export class Maket {
     if (kinds.has("W")) return "water";
     if (kinds.has("H")) return "house";
     if (kinds.has("F")) return "forest";
-    const occ = this.pieces.some((q) => {
+    const occ = this.pieces.find((q) => {
       if (q.id === p.id || q.c === null || q.r === null) return false;
       const [qw, qh] = SIZE[q.type][q.o];
       return c < q.c + qw && q.c < c + w && r < q.r + qh && q.r < r + h;
     });
-    if (occ) return "busy";
+    if (occ) return "busy_" + occ.type; // что именно мешает: дом, башни или бульвар
     if (zones.size > 1) return "cross_" + p.type;
     const z = [...zones][0];
     if (z !== HOME[p.type]) return `${z}_${p.type}`;
@@ -314,7 +322,7 @@ export class Maket {
     this.drag = null;
     if (!sn.inside) return;
     const err = this.check(p, sn.c, sn.r, p.o);
-    if (err === "busy") return this.say("busy");
+    if (err?.startsWith("busy_")) return this.say(err);
     if (err) {
       this.rej = { id, c: sn.c, r: sn.r };
       this.rejections++;
@@ -368,6 +376,14 @@ export class Maket {
           <div class="mk3-hit" data-piece="${p.id}"></div></div>`;
       })
       .join("");
+    const existing = EXISTING.map(([c, r, w, h], i) => {
+      const [x, y] = toPx((c + w / 2) * L.G, (r + h / 2) * L.G);
+      return `<div class="mk3-sprite" style="left:${x - L.ax}px;top:${y - L.ay}px;z-index:${Math.round(y)};background-image:url('${this.base}svg/stage4v3/existing-${i + 1}.svg')"></div>`;
+    }).join("");
+    const side = (col: number, row: number, text: string) => {
+      const [x, y] = toPx(col * L.G, row * L.G);
+      return `<div class="mk3-side" style="left:${x}px;top:${y}px">${text}</div>`;
+    };
     let rej = "";
     if (this.rej) {
       const p = this.pieces.find((x) => x.id === this.rej!.id)!;
@@ -396,7 +412,8 @@ export class Maket {
       <div class="mk3-board"></div>
       <div class="mk3-compass"><div class="dial"><i></i><span>С</span></div><div>СЕВЕР —<br>К ЗРИТЕЛЮ</div></div>
       <svg class="mk3-svg" data-foot></svg>
-      ${sprites}${rej}${badges}
+      ${existing}${sprites}${rej}${badges}
+      ${side(L.COLS + 0.4, 12.5, "Север · бульвар")}${side(L.COLS + 0.4, 7.5, "Юг · башни")}
       <div class="mk3-ghost" data-ghost></div>
       <div class="mk3-tray">
         <div class="mk3-tray-head"><span>Лоток · касание поворачивает</span><span>На макете ${placed.length} из 12</span></div>

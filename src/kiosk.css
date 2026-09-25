@@ -861,7 +861,7 @@ h3 {
   top: 0;
   width: 884px;
   height: 600px;
-  background: url("/svg/stage4v3/board.svg") 0 0 / 884px 600px no-repeat;
+  background: url("/svg/stage4v3/board-empty.svg") 0 0 / 884px 600px no-repeat;
   pointer-events: none;
 }
 
@@ -913,6 +913,21 @@ h3 {
   top: 34px;
   font: 600 16px var(--f-display);
   color: var(--accent);
+}
+
+.mk3-side {
+  position: absolute;
+  z-index: 850;
+  transform: translate(8px, -50%);
+  padding: 4px 10px;
+  border: 1.5px solid var(--ink);
+  border-radius: 14px;
+  background: var(--paper-3);
+  font: 500 15px var(--f-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .mk3-sprite,

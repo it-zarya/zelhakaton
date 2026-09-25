@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -82 100 114" width="224" height="255" stroke-linejoin="round">
+<path d="M6.93 -10.52L12.06 -12L23.32 -5.5L-1.8 9L-6.93 10.48L-18.19 3.98Z" fill="#6f604c" fill-opacity="0.18"/>
+<path d="M6.93 -24.5L18.19 -18L-6.93 -3.5L-18.19 -10Z" fill="#e9e5dc" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M18.19 -4L-6.93 10.5L-6.93 -3.5L18.19 -18Z" fill="#c7c0b4" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-6.93 10.5L-18.19 4L-18.19 -10L-6.93 -3.5Z" fill="#dbd5cb" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-18.19 1.2L-6.93 7.7" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M18.19 -6.8L-6.93 7.7" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M-18.19 -1.6L-6.93 4.9" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M18.19 -9.6L-6.93 4.9" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M-18.19 -4.4L-6.93 2.1" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M18.19 -12.4L-6.93 2.1" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M-18.19 -7.2L-6.93 -0.7" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M18.19 -15.2L-6.93 -0.7" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+</svg>

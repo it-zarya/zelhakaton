@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -82 100 114" width="224" height="255" stroke-linejoin="round">
+<path d="M-13.86 -14.52L-8.73 -16L30.24 6.5L18.99 13L13.86 14.48L-25.11 -8.02Z" fill="#6f604c" fill-opacity="0.18"/>
+<path d="M-13.86 -28.5L25.11 -6L13.86 0.5L-25.11 -22Z" fill="#e9e5dc" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M25.11 8L13.86 14.5L13.86 0.5L25.11 -6Z" fill="#c7c0b4" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M13.86 14.5L-25.11 -8L-25.11 -22L13.86 0.5Z" fill="#dbd5cb" stroke="#5E5242" stroke-opacity="0.42" stroke-width="0.4"/>
+<path d="M-25.11 -10.8L13.86 11.7" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M25.11 5.2L13.86 11.7" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M-25.11 -13.6L13.86 8.9" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M25.11 2.4L13.86 8.9" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M-25.11 -16.4L13.86 6.1" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M25.11 -0.4L13.86 6.1" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M-25.11 -19.2L13.86 3.3" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+<path d="M25.11 -3.2L13.86 3.3" stroke="#dad5cb" stroke-width="0.24" fill="none"/>
+</svg>
