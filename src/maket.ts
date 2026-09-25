@@ -51,14 +51,17 @@ const toWorld = (px: number, py: number): [number, number] => {
   const v = py / L.k + L.vbY;
   return [(u / COS + 2 * v) / 2, (2 * v - u / COS) / 2];
 };
-const zoneOf = (r: number) => (r <= 5 ? "depth" : r <= 8 ? "south" : r <= 10 ? "road" : "north");
+// Стороны проспекта равноправны: far — за дорогой (ряды 6–8), near — перед дорогой (11–13). Север/юг не навязываем.
+const zoneOf = (r: number) => (r <= 5 ? "depth" : r <= 8 ? "far" : r <= 10 ? "road" : "near");
+const FRONT = new Set(["far", "near"]); // участки вдоль проспекта
 /** Существующие дома 4-го мкр — отдельные спрайты (tools/stage4/board-split.cjs), чтобы сортировались по глубине */
 const EXISTING: [number, number, number, number][] = [
   [8, 0, 6, 2],
   [14, 2, 2, 4],
   [20, 4, 5, 2],
 ];
-const HOME: Record<Kind, string> = { nine: "depth", boul: "north", tower: "south" };
+/** Где это стоит у Покровского (для подсветки третьей подсказки) */
+const POKROVSKY: Record<Kind, [number, number]> = { nine: [0, 6], tower: [6, 3], boul: [11, 3] };
 const SIZE: Record<Kind, Record<string, [number, number]>> = {
   tower: { front: [6, 3], back: [6, 3], east: [3, 6], west: [3, 6] },
   nine: { along: [5, 2], across: [2, 5] },
@@ -78,25 +81,23 @@ const MSG: Record<string, string> = {
   cross_tower: "Пара башен выходит на проспект целиком. Коснитесь, чтобы повернуть.",
   cross_nine: "Дом залезает на соседний участок. Попробуйте повернуть его касанием.",
   cross_boul: "Бульвар тянется вдоль проспекта. Коснитесь, чтобы повернуть.",
-  north_nine: "Северная сторона — прогулочный бульвар. Дома здесь не ставят.",
-  north_tower: "Северная сторона — прогулочный бульвар. Дома здесь не ставят.",
-  south_nine: "Проспект хотели застроить обычными девятиэтажками. Покровский предложил подождать.",
-  south_boul: "Бульвар идёт по северной стороне проспекта.",
-  depth_boul: "Бульвар идёт по северной стороне проспекта.",
-  depth_tower: "Магазины в нижних этажах башен должны выходить на проспект.",
+  front_nine: "Можно и так. Но Покровский проспект девятиэтажками застраивать не стал — предложил подождать.",
+  depth_tower: "Можно. Но магазины в нижних этажах лучше выходят на проспект.",
+  depth_boul: "Можно. Но бульвар обычно тянется вдоль проспекта.",
   locked: "Проект для проспекта ещё ищут. Сначала найдите место хотя бы двум девятиэтажкам.",
   arrived: "Покровский нашёл проект: парные 17-этажные башни с магазинами внизу. Они в лотке.",
   ok_nine: "Девятиэтажка вписалась в микрорайон.",
-  ok_boul: "Бульвар — на северной стороне, для прогулок.",
+  ok_boul: "Бульвар — вдоль проспекта, для прогулок.",
   ok_tower: "Магазины выходят на проспект.",
   back_tower: "Витрины смотрят во двор. Коснитесь башен, чтобы развернуть их к проспекту.",
+  ok_tower_far: "Магазины выходят на проспект.",
   no_room: "Для поворота здесь мало места — перетащите дом.",
   done: "Все 12 домов на макете. Сравним с Покровским?",
 };
 const HINTS = [
-  "Север на макете — ближе к вам. Ближняя сторона проспекта — прогулочный бульвар, дальняя (южная) — башни с магазинами внизу.",
+  "У проспекта две стороны. Покровский отдал одну прогулочному бульвару, другую — башням с магазинами внизу.",
   "Девятиэтажкам — место в глубине микрорайона, между лесом, прудом и старыми домами. Три из пяти встанут только повёрнутыми.",
-  "Пока вы держите дом, его зона подсвечена зелёным.",
+  "Пока вы держите дом, зелёным подсвечено, где такой дом поставил Покровский.",
 ];
 const MSG_BG: Record<string, string> = { info: "#F7F4ED", ok: "#E5EBD9", soft: "#FFF1CF", no: "#FFE6D2" };
 
@@ -209,7 +210,7 @@ export class Maket {
     let rr = r;
     let cc = c;
     // «магнит»: полоса бульвара (север) и полоса башен (юг) ровно в глубину дома — попасть пальцем точно почти невозможно
-    const band = p.type === "boul" && h === 3 ? 11 : p.type === "tower" && h === 3 ? 6 : -1;
+    const band = (p.type === "boul" || p.type === "tower") && h === 3 ? (Math.abs(r - 6) <= Math.abs(r - 11) ? 6 : 11) : -1;
     if (band >= 0 && Math.abs(r - band) <= 2) {
       rr = band;
       cc = Math.max(0, Math.min(L.COLS - w, c));
@@ -239,9 +240,7 @@ export class Maket {
     });
     if (occ) return "busy_" + occ.type; // что именно мешает: дом, башни или бульвар
     if (zones.size > 1) return "cross_" + p.type;
-    const z = [...zones][0];
-    if (z !== HOME[p.type]) return `${z}_${p.type}`;
-    return null;
+    return null; // остальное не запрет — разбираем в итоге (analyze)
   }
 
   // ——— жесты ———
@@ -304,7 +303,8 @@ export class Maket {
     }
     if (p.type === "tower" && (p.o === "front" || p.o === "back")) {
       p.o = p.o === "front" ? "back" : "front";
-      this.say(p.o === "front" ? "ok_tower" : "back_tower", p.o === "front" ? "ok" : "soft");
+      const good = this.facesRoad(p) || this.sideOf(p) === "depth";
+      this.say(good ? "ok_tower" : "back_tower", good ? "ok" : "soft");
       return;
     }
     const [w, h] = SIZE[p.type][p.o];
@@ -339,8 +339,13 @@ export class Maket {
     const nineN = this.pieces.filter((x) => x.type === "nine" && x.c !== null).length;
     const arrive = nineN >= 2 && !this.unlocked;
     const all = this.pieces.every((x) => x.c !== null);
-    let key = p.type === "tower" ? (p.o === "front" ? "ok_tower" : "back_tower") : `ok_${p.type}`;
-    let kind = p.type === "tower" && p.o !== "front" ? "soft" : "ok";
+    const side = this.sideOf(p)!;
+    let key = `ok_${p.type}`;
+    let kind = "ok";
+    if (p.type === "nine" && FRONT.has(side)) [key, kind] = ["front_nine", "soft"];
+    if (p.type === "tower" && side === "depth") [key, kind] = ["depth_tower", "soft"];
+    if (p.type === "tower" && FRONT.has(side) && !this.facesRoad(p)) [key, kind] = ["back_tower", "soft"];
+    if (p.type === "boul" && side === "depth") [key, kind] = ["depth_boul", "soft"];
     if (arrive) [key, kind] = ["arrived", "ok"];
     if (all) [key, kind] = ["done", "ok"];
     this.unlocked = this.unlocked || nineN >= 2;
@@ -355,15 +360,48 @@ export class Maket {
     return { left: x - L.ax, top: y - L.ay, cy: y };
   }
 
-  private backN() {
-    return this.pieces.filter((p) => p.type === "tower" && p.c !== null && p.o !== "front").length;
+  /** Башня смотрит витринами на дорогу? far (за дорогой) — front, near (перед дорогой) — back */
+  private facesRoad(p: Piece) {
+    if (p.r === null) return true;
+    const z = zoneOf(p.r);
+    return (z === "far" && p.o === "front") || (z === "near" && p.o === "back");
+  }
+
+  private sideOf(p: Piece) {
+    return p.r === null ? null : zoneOf(p.r);
+  }
+
+  /** Разбор макета: расхождения с решением Покровского */
+  private analyze(): { ok: string[]; diff: string[] } {
+    const on = this.pieces.filter((p) => p.c !== null);
+    const nines = on.filter((p) => p.type === "nine" && FRONT.has(this.sideOf(p)!));
+    const towersDeep = on.filter((p) => p.type === "tower" && this.sideOf(p) === "depth");
+    const towersBack = on.filter((p) => p.type === "tower" && FRONT.has(this.sideOf(p)!) && !this.facesRoad(p));
+    const boulsAway = on.filter((p) => p.type === "boul" && !FRONT.has(this.sideOf(p)!));
+    const towerSides = new Set(on.filter((p) => p.type === "tower" && FRONT.has(this.sideOf(p)!)).map((p) => this.sideOf(p)));
+    const boulSides = new Set(on.filter((p) => p.type === "boul" && FRONT.has(this.sideOf(p)!)).map((p) => this.sideOf(p)));
+    const mixed = towerSides.size > 1 || [...boulSides].some((x) => towerSides.has(x));
+    const n = (k: number, one: string, few: string, many: string) =>
+      `${k} ${k % 10 === 1 && k % 100 !== 11 ? one : k % 10 >= 2 && k % 10 <= 4 && (k % 100 < 10 || k % 100 >= 20) ? few : many}`;
+    const ok: string[] = [];
+    const diff: string[] = [];
+    if (nines.length) diff.push(`${n(nines.length, "девятиэтажка стоит", "девятиэтажки стоят", "девятиэтажек стоят")} на проспекте. Покровский проспект девятиэтажками застраивать не стал — предложил подождать.`);
+    else ok.push("Девятиэтажки ушли в глубину микрорайона — проспект подождал другой проект.");
+    if (towersDeep.length) diff.push(`${n(towersDeep.length, "пара башен", "пары башен", "пар башен")} в глубине квартала: магазины внизу не выходят на проспект.`);
+    if (towersBack.length) diff.push(`У ${n(towersBack.length, "пары", "пар", "пар")} башен витрины смотрят во двор, а не на проспект.`);
+    if (!towersDeep.length && !towersBack.length) ok.push("Все башни выходят магазинами на проспект.");
+    if (boulsAway.length) diff.push("Бульвар ушёл от проспекта. У Покровского бульвар тянется вдоль проспекта.");
+    if (mixed) diff.push("Башни и бульвар перемешаны. У Покровского одна сторона проспекта — прогулочный бульвар, другая — башни.");
+    else if (!boulsAway.length) ok.push("Одна сторона проспекта — прогулочная, другая — с башнями и магазинами, как у Покровского.");
+    ok.push("Лес и пруд остались: дома вписаны в ландшафт.");
+    return { ok, diff };
   }
 
   private score() {
+    const d = this.analyze().diff.length;
     let s = 3;
-    if (this.rejections >= 3) s--;
-    if (this.rejections >= 7 || this.hints >= 2) s--;
-    if (this.backN() > 0) s--;
+    if (d >= 1) s--;
+    if (d >= 3 || this.hints >= 2 || this.rejections >= 7) s--;
     return Math.max(1, s);
   }
 
@@ -380,10 +418,6 @@ export class Maket {
       const [x, y] = toPx((c + w / 2) * L.G, (r + h / 2) * L.G);
       return `<div class="mk3-sprite" style="left:${x - L.ax}px;top:${y - L.ay}px;z-index:${Math.round(y)};background-image:url('${this.base}svg/stage4v3/existing-${i + 1}.svg')"></div>`;
     }).join("");
-    const side = (col: number, row: number, text: string) => {
-      const [x, y] = toPx(col * L.G, row * L.G);
-      return `<div class="mk3-side" style="left:${x}px;top:${y}px">${text}</div>`;
-    };
     let rej = "";
     if (this.rej) {
       const p = this.pieces.find((x) => x.id === this.rej!.id)!;
@@ -393,7 +427,7 @@ export class Maket {
       rej += `<svg class="mk3-svg"><polygon points="${fpPoly(this.rej.c, this.rej.r, w, h)}" fill="#FFD98A" fill-opacity=".7" stroke="#E4572E" stroke-width="2.5" stroke-dasharray="7 6"/></svg>`;
     }
     const badges = placed
-      .filter((p) => p.type === "tower" && p.o === "back")
+      .filter((p) => p.type === "tower" && FRONT.has(this.sideOf(p)!) && !this.facesRoad(p))
       .map((p) => {
         const a = this.spriteAt(p, p.c!, p.r!);
         return `<div class="mk3-badge" style="left:${a.left + L.ax + 28}px;top:${a.cy - 12}px">↻</div>`;
@@ -410,10 +444,9 @@ export class Maket {
 
     this.stage.innerHTML = `
       <div class="mk3-board"></div>
-      <div class="mk3-compass"><div class="dial"><i></i><span>С</span></div><div>СЕВЕР —<br>К ЗРИТЕЛЮ</div></div>
       <svg class="mk3-svg" data-foot></svg>
       ${existing}${sprites}${rej}${badges}
-      ${side(L.COLS + 0.4, 12.5, "Север · бульвар")}${side(L.COLS + 0.4, 7.5, "Юг · башни")}
+
       <div class="mk3-ghost" data-ghost></div>
       <div class="mk3-tray">
         <div class="mk3-tray-head"><span>Лоток · касание поворачивает</span><span>На макете ${placed.length} из 12</span></div>
@@ -446,8 +479,7 @@ export class Maket {
       polys += `<polygon points="${fpPoly(sn.c, sn.r, sn.w, sn.h)}" fill="#FFFFFF" fill-opacity=".55" stroke="#1E1D1A" stroke-width="2.5" stroke-dasharray="7 6"/>`;
     }
     if (this.hints >= 3) {
-      const zr: Record<string, [number, number]> = { depth: [0, 6], south: [6, 3], north: [11, 3] };
-      const [r0, h] = zr[HOME[p.type]];
+      const [r0, h] = POKROVSKY[p.type];
       polys = `<polygon points="${fpPoly(0, r0, L.COLS, h)}" fill="#9DB080" fill-opacity=".38" stroke="#5E7F45" stroke-width="2.5"/>` + polys;
     }
     foot.innerHTML = polys;
@@ -488,12 +520,7 @@ export class Maket {
       const [c, r, o] = SOLUTION[p.id];
       return { ...p, c, r, o };
     });
-    const backN = this.backN();
-    const notes = [
-      "Девятиэтажки ушли в глубину микрорайона — проспект подождал другой проект.",
-      "Лес и пруд остались: дома вписаны в ландшафт.",
-      backN === 0 ? "Все четыре пары башен выходят магазинами на проспект." : `У ${backN} ${backN === 1 ? "пары" : "пар"} витрины смотрят во двор.`,
-    ];
+    const { ok, diff } = this.analyze();
     return `
       <div class="mk3-result">
         <h3>Ваш макет и макет Покровского</h3>
@@ -507,7 +534,11 @@ export class Maket {
           <span><i style="background:#7F9A62"></i>Бульвар</span>
           <span>Схема Покровского условна: позиции — по OSM</span>
         </div>
-        <div class="box"><p class="mono accent">Пометки</p>${notes.map((n) => `<p>${esc(n)}</p>`).join("")}</div>
+        <div class="box mk3-review">
+          <p class="mono accent">Разбор</p>
+          ${diff.map((n) => `<p class="diff">${esc(n)}</p>`).join("")}
+          ${ok.map((n) => `<p class="ok">${esc(n)}</p>`).join("")}
+        </div>
       </div>`;
   }
 
@@ -520,7 +551,7 @@ export class Maket {
         ${years}
         <h2 class="stage-title">Двигаем коробки</h2>
         <div class="flex-mid">
-          <p class="question">Проспект хотели застроить обычными девятиэтажками. Расставьте 12 домов так, как решил Покровский.</p>
+          <p class="question">Проспект хотели застроить обычными девятиэтажками. Расставьте 12 домов, как решили бы вы, — в конце сравним с Покровским.</p>
           <div class="box mk3-msg" style="background:${MSG_BG[this.msgKind]}">${esc(this.msg)}</div>
           ${this.hints > 0 ? `<div class="box"><p class="mono">Подсказка ${this.hints} из 3</p><p>${esc(HINTS[this.hints - 1])}</p></div>` : ""}
         </div>
@@ -543,7 +574,7 @@ export class Maket {
         <div class="flex-mid">
           <div class="box"><p class="mono accent">Неочевидный факт</p><p>Башни сдали досрочно — к визиту президента США Никсона 25 мая 1972 года. Визит отменили.</p></div>
         </div>
-        ${this.backN() > 0 ? `<button class="btn" data-mk="fix">Развернуть витрины</button>` : ""}
+        ${this.analyze().diff.length ? `<button class="btn" data-mk="fix">Исправить макет</button>` : ""}
         <button class="btn primary" data-mk="next">Дальше</button>`;
     }
     this.panel.querySelectorAll<HTMLElement>("[data-mk]").forEach((b) =>
@@ -556,7 +587,8 @@ export class Maket {
         if (act === "compare") this.phase = "result";
         if (act === "fix") {
           this.phase = "build";
-          this.say("back_tower", "soft");
+          this.msg = "Поправьте макет и сравните ещё раз. Разбор — в итоге.";
+          this.msgKind = "soft";
         }
         if (act === "next") return this.opts.onDone({ stars: this.score(), rejections: this.rejections, hints: this.hints });
         this.render();
