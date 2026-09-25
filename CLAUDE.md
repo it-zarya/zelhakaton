@@ -15,6 +15,7 @@ npm install
 npm run dev        # vite --host: открыть с планшета по http://<IP-ноутбука>:5173
 npm run build      # tsc + vite build → dist/
 npm run map        # пересобрать public/map.svg и src/data/zones.json из OSM
+# Адреса: / — игра, /#/maket — отдельная мини-игра «Двигаем коробки», /#/o/<id> и /#/r/<id> — QR-страницы
 ```
 
 ## Карта документации

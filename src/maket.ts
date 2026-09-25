@@ -143,7 +143,13 @@ export class Maket {
   private unlocked = false;
   private rejT = 0;
   private pending: { id: string; start: [number, number]; moved: boolean } | null = null;
-  private opts: { progress: () => string; onHint: () => void; onDone: (r: MaketResult) => void; years: [string, string] };
+  private opts: {
+    progress: () => string;
+    onHint: () => void;
+    onDone: (r: MaketResult) => void;
+    years: [string, string];
+    doneLabel?: string; // подпись кнопки в итоге («Дальше» в игре, «Собрать заново» в отдельном сервисе)
+  };
   private base = import.meta.env.BASE_URL;
 
   constructor(area: HTMLElement, panel: HTMLElement, opts: Maket["opts"]) {
@@ -574,7 +580,7 @@ export class Maket {
           <div class="box"><p class="mono accent">Интересный факт</p><p>Башни сдали досрочно — к визиту президента США Никсона 25 мая 1972 года. Визит отменили.</p></div>
         </div>
         ${this.analyze().diff.length ? `<button class="btn" data-mk="fix">Исправить макет</button>` : ""}
-        <button class="btn primary" data-mk="next">Дальше</button>`;
+        <button class="btn primary" data-mk="next">${esc(this.opts.doneLabel ?? "Дальше")}</button>`;
     }
     this.panel.querySelectorAll<HTMLElement>("[data-mk]").forEach((b) =>
       b.addEventListener("click", () => {

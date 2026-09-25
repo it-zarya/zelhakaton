@@ -16,14 +16,45 @@ import { Fog } from "./fog";
 import { Game } from "./game";
 import { City3D } from "./city3d";
 import { ColorReveal } from "./reveal";
+import { Maket } from "./maket";
 import { isMobileRoute, renderMobile } from "./mobile";
 import type { Content, ZonesFile } from "./types";
 
 const content = { stages, objects, routes } as Content;
 const app = document.querySelector<HTMLElement>("#app")!;
 
+/** Отдельный сервис: мини-игра «Двигаем коробки» во весь экран (#/maket) */
+function bootMaket() {
+  app.innerHTML = `<section class="map-area"></section><aside class="panel"></aside>`;
+  const area = app.querySelector<HTMLElement>(".map-area")!;
+  const panel = app.querySelector<HTMLElement>(".panel")!;
+  app.dataset.screen = "maket";
+  let maket: Maket | null = null;
+  let idle = 0;
+  const start = () => {
+    maket?.destroy();
+    maket = new Maket(area, panel, {
+      years: ["1970", "1972"],
+      progress: () => "",
+      onHint: () => {},
+      onDone: () => start(), // «Собрать заново»
+      doneLabel: "Собрать заново",
+    });
+  };
+  // 3 минуты без касаний — макет собирается заново для следующего посетителя
+  const kick = () => {
+    clearTimeout(idle);
+    idle = window.setTimeout(start, 180_000);
+  };
+  app.addEventListener("pointerdown", kick, { capture: true });
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+  start();
+  kick();
+}
+
 async function boot() {
   if (isMobileRoute()) return renderMobile(app, content);
+  if (location.hash === "#/maket") return bootMaket();
 
   app.innerHTML = `
     <section class="map-area"><div class="map-frame"><canvas class="fog"></canvas><canvas class="glow"></canvas></div></section>
