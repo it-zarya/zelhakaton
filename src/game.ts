@@ -159,7 +159,7 @@ export class Game {
   startAt(i: number) {
     this.startGame();
     for (const s of this.c.stages.slice(0, i)) {
-      s.zones.forEach((z) => this.open.add(z));
+      [...s.zones, ...(s.alsoOpens ?? [])].forEach((z) => this.open.add(z));
       this.found.push(...s.objectIds.filter((id) => this.objects.has(id)));
     }
     this.map.setOpenZones(this.open);
@@ -311,11 +311,13 @@ export class Game {
     const pt = this.fog.lastPoint ?? { x: zones[0].z.x, y: zones[0].z.y };
     const reach = Math.max(...zones.map(({ z }) => Math.hypot(pt.x - z.x, pt.y - z.y) + z.reach)) * 1.05;
 
+    const all = [...s.zones, ...(s.alsoOpens ?? [])];
     void this.fog.revealFrom(s.zones, pt, reach, 700);
+    if (s.alsoOpens?.length) this.later(750, () => void this.fog.reveal(s.alsoOpens!, 900)); // после дочистки цели (700 мс), чтобы анимации не спорили
     this.later(300, () => {
-      s.zones.forEach((z) => this.open.add(z));
+      all.forEach((z) => this.open.add(z));
       this.map.setOpenZones(this.open);
-      this.map.markFound(s.zones);
+      this.map.markFound(all);
       this.reveal.set(this.open, []);
     });
     const objs = s.objectIds.map((id) => this.objects.get(id)).filter((o): o is MapObject => !!o);
@@ -578,7 +580,7 @@ export class Game {
       this.panel.querySelector("[data-year]")!.textContent = String(y);
       info.innerHTML = "";
       const shown = this.c.stages.filter((s) => parseInt(s.years, 10) <= y);
-      this.map.setOpenZones(shown.flatMap((s) => s.zones));
+      this.map.setOpenZones(shown.flatMap((s) => [...s.zones, ...(s.alsoOpens ?? [])]));
       this.map.setOthers(y >= 2000);
       const objs = shown.flatMap((s) => s.objectIds).map((id) => this.objects.get(id)).filter((o): o is MapObject => !!o);
       this.map.setMarkers(objs, true, () => "landmark", false);
