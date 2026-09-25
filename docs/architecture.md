@@ -54,7 +54,7 @@ src/data/
 index.html              // viewport без зума, #app
 src/
   main.ts               // загрузка, выбор режима (киоск / мобильная QR-страница), resize
-  game.ts               // Game: attract → stage ⇄ miss → found (лист) → genplan → final; экскурсия; idle 45/60 с
+  game.ts               // Game: attract → stage ⇄ miss → found (лист) → maket (этап 4) → genplan → final; idle 45/60 с
   fog.ts                // Fog: canvas-туман, стирание (Pointer Events), reveal/regrow/clearAll, measure()
   city3d.ts             // City3D: Three.js-изометрия из public/city.json + SVG-оверлей (пульсация, генплан, маркеры)
   mobile.ts             // #/o/<id>, #/r/<id> — страницы для телефона

@@ -33,7 +33,7 @@ const ILLUSTRATION: Record<string, string> = {
   egg: "egg-pokrovskogo",
 };
 
-type Screen = "attract" | "stage" | "found" | "genplan" | "maket" | "final" | "excursion";
+type Screen = "attract" | "stage" | "found" | "genplan" | "maket" | "final";
 
 export class Game {
   private screen: Screen = "attract";
@@ -123,11 +123,11 @@ export class Game {
       <p class="eyebrow">Игорь Покровский · главный архитектор Зеленограда 1964–2002</p>
       <h1 class="attract-title">Зеленоград Покровского<span>от проекта до&nbsp;реализации</span></h1>
       <div class="spacer"></div>
-      <button class="btn primary big" data-act="play">Начать</button>
-      <button class="btn" data-act="tour">Просто посмотреть</button>
+      <p class="cta"><b>Постройте город вместе с Покровским.</b> Найдите на карте, где и когда вырастал Зеленоград — от первого дома 1961 года до новых кварталов.</p>
+      <button class="btn primary big" data-act="play">Строить город →</button>
       <p class="mono">${this.c.stages.length} этапов · ~3 минуты</p>`;
     this.panel.querySelector(".attract-title")!.parentElement!.classList.add("attract");
-    this.bind({ play: () => this.startGame(), tour: () => void this.toExcursion() });
+    this.bind({ play: () => this.startGame() });
   }
 
   private reset() {
@@ -573,51 +573,10 @@ export class Game {
     this.bind({ close: () => m.remove() }, m);
   }
 
-  // ——— Экскурсия ———
-
-  private async toExcursion() {
-    this.reset();
-    this.screen = "excursion";
-    this.root.dataset.screen = "excursion";
-    this.fog.enabled = false;
-    await this.fog.clearAll();
-    this.panel.innerHTML = `
-      <p class="mono">Экскурсия</p>
-      <div class="years"><span class="from" data-year>1975</span></div>
-      <input type="range" class="slider" min="1960" max="2020" step="1" value="1975">
-      <p class="question">Двигайте ползунок — город вырастет по годам. Нажмите на пин, чтобы узнать о здании.</p>
-      <div class="info"></div>
-      <div class="spacer"></div>
-      <button class="btn primary" data-act="play">Начать</button>
-      <button class="btn" data-act="back">← На главную</button>`;
-    const slider = this.panel.querySelector<HTMLInputElement>(".slider")!;
-    const info = this.panel.querySelector<HTMLElement>(".info")!;
-    const apply = () => {
-      const y = +slider.value;
-      this.panel.querySelector("[data-year]")!.textContent = String(y);
-      info.innerHTML = "";
-      const shown = this.c.stages.filter((s) => parseInt(s.years, 10) <= y);
-      this.map.setOpenZones(shown.flatMap((s) => [...s.zones, ...(s.alsoOpens ?? [])]));
-      this.map.setOthers(y >= 2000);
-      const objs = shown.flatMap((s) => s.objectIds).map((id) => this.objects.get(id)).filter((o): o is MapObject => !!o);
-      this.map.setMarkers(objs, true, () => "landmark", false);
-    };
-    slider.addEventListener("input", apply);
-    apply();
-    this.bind({ play: () => this.startGame(), back: () => this.toAttract() });
-  }
-
-  /** Тап по пину: в экскурсии — в панели, иначе — лист поверх */
+  /** Тап по пину (финал): карточка листом поверх */
   private showInfo(id: string) {
     const o = this.objects.get(id);
     if (!o) return;
-    if (this.screen === "excursion") {
-      const info = this.panel.querySelector<HTMLElement>(".info");
-      const illu = ILLUSTRATION[o.id];
-      if (info)
-        info.innerHTML = `<div class="box">${illu ? `<img src="${base()}svg/buildings/${illu}.svg" alt="" style="height:calc(120*var(--u));object-fit:contain">` : ""}<p><b>${esc(o.name)}</b></p><p class="mono accent">${esc(o.year)}</p></div>`;
-      return;
-    }
     this.root.querySelector(".sheet")?.remove();
     const sheet = this.sheetEl(o, { head: o.id === "egg" ? "Секретная карточка" : o.address, back: false, next: "Закрыть", closeOnly: true });
     this.root.append(sheet);

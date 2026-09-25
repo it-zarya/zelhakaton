@@ -120,8 +120,7 @@ body.mobile #app {
 }
 
 [data-screen="genplan"] .fog,
-[data-screen="final"] .fog,
-[data-screen="excursion"] .fog {
+[data-screen="final"] .fog {
   opacity: 0;
   pointer-events: none;
 }
@@ -338,6 +337,18 @@ h3 {
   font: 700 calc(38 * var(--u)) / 1.02 var(--f-display);
   letter-spacing: -0.02em;
   margin-top: calc(8 * var(--u));
+}
+
+.cta {
+  margin: 0;
+  font-size: calc(21 * var(--u));
+  line-height: 1.38;
+}
+
+.cta b {
+  display: block;
+  margin-bottom: calc(6 * var(--u));
+  font: 600 calc(22 * var(--u)) / 1.2 var(--f-display);
 }
 
 .attract h1 span {
@@ -825,12 +836,6 @@ h3 {
   font-size: calc(18 * var(--u));
 }
 
-/* Экскурсия */
-.slider {
-  width: 100%;
-  height: calc(64 * var(--u));
-  accent-color: var(--accent);
-}
 
 .years .from.small {
   font-size: calc(96 * var(--u));
