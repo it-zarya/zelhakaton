@@ -53,6 +53,7 @@ export class Game {
   private timers: number[] = [];
   private maket: Maket | null = null;
   private partFound = new Set<string>(); // найденные зоны многоместного этапа
+  private bonusDone = false; // бонус-мини-игра этапа уже пройдена
   private objects: Map<string, MapObject>;
   private c: Content;
   private map: City3D;
@@ -179,6 +180,7 @@ export class Game {
 
   private startStage(i: number) {
     this.partFound.clear();
+    this.bonusDone = false;
     this.stageIdx = i;
     this.hintIdx = 0;
     this.heatLit = -1;
@@ -221,7 +223,6 @@ export class Game {
           <p>${esc(s.hints[this.hintIdx])}</p>
         </div>
       </div>
-      ${HEAT_FEEDBACK ? `<div class="heat"><div class="heat-bar">${"<i></i>".repeat(5)}</div><span class="heat-label">Холодно</span></div>` : ""}
       <button class="btn" data-act="hint" ${this.hintIdx >= 2 ? "disabled" : ""}>Ещё подсказка</button>
       ${this.progress()}`;
     this.heatLit = -1;
@@ -410,6 +411,10 @@ export class Game {
           sheet.remove();
           this.map.pan(0);
           this.map.highlight(null);
+          if (this.stage.bonus === "maket" && !this.bonusDone) {
+            this.bonusDone = true;
+            return this.showMaket(true);
+          }
           if (!isLastStage) this.startStage(this.stageIdx + 1);
           else void this.toFinal();
         },
@@ -479,14 +484,15 @@ export class Game {
 
   // ——— Этап 4: «Двигаем коробки» ———
 
-  private showMaket() {
+  /** bonus — мини-игра после находки этапа (этап 2), иначе — этап-мини-игра целиком */
+  private showMaket(bonus = false) {
     this.reveal.stop();
     this.screen = "maket";
     this.root.dataset.screen = "maket";
     this.kickIdle();
     this.fog.enabled = false;
     const s = this.stage;
-    const [from, to] = s.years.split(/\s*[–—-]\s*/);
+    const [from, to] = s.years.split(/\s*[–—]\s*/);
     this.maket = new Maket(this.mapArea, this.panel, {
       years: [from, to ?? ""],
       progress: () => this.progress(),
@@ -494,6 +500,18 @@ export class Game {
       onDone: () => {
         this.maket?.destroy();
         this.maket = null;
+        if (bonus) {
+          // бонус собран — карточки проспекта, затем следующий этап
+          const objs = (s.bonusObjectIds ?? []).map((id) => this.objects.get(id)).filter((o): o is MapObject => !!o);
+          this.found.push(...objs.map((o) => o.id));
+          this.map.setMarkers(this.foundObjects(), true, (o) => (objs.includes(o) ? "landmark" : "found"));
+          this.pages = objs;
+          this.page = 0;
+          this.screen = "found";
+          this.root.dataset.screen = "found";
+          if (objs.length) return this.showSheet(true);
+          return this.startStage(this.stageIdx + 1);
+        }
         // макет собран — квартал вырастает в городе, дальше как обычная находка
         this.screen = "stage";
         this.root.dataset.screen = "stage";
@@ -662,7 +680,7 @@ export class Game {
 }
 
 function yearsHtml(years: string): string {
-  const [from, to] = years.split(/\s*[–—-]\s*/);
+  const [from, to] = years.split(/\s*[–—]\s*/); // только тире: «1980-е–1990-е» → «1980-е» / «1990-е»
   return `<div class="years"><span class="from">${esc(from)}</span>${to ? `<span class="to">—${esc(to)}</span>` : ""}</div>`;
 }
 

@@ -1295,3 +1295,39 @@ h3 {
 .gal-dots i.on {
   background: var(--paper-3);
 }
+
+/* Панель этапа компактнее: год в строку, меньше кегли; длинный текст — с затуханием снизу */
+.panel {
+  gap: calc(12 * var(--u));
+}
+
+.years {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: calc(10 * var(--u));
+}
+
+.years .from {
+  font-size: calc(76 * var(--u));
+}
+
+.years .to {
+  font-size: calc(30 * var(--u));
+}
+
+.stage-title {
+  font-size: calc(26 * var(--u));
+}
+
+.question,
+.box {
+  font-size: calc(19 * var(--u));
+}
+
+.flex-mid {
+  gap: calc(12 * var(--u));
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 28 * var(--u)), transparent);
+  mask-image: linear-gradient(#000 calc(100% - 28 * var(--u)), transparent);
+  padding-bottom: calc(24 * var(--u));
+}
