@@ -9,8 +9,8 @@ import { qrCanvas, objectUrl, routeUrl } from "./qr";
 import type { Content, MapObject, Route, Stage } from "./types";
 import { esc } from "./util";
 
-const SUCCESS_AT = 0.35; // доля очищенной цели → «нашёл»
-const EACH_AT = 0.15; // и каждая из нескольких целевых зон — хотя бы настолько (два места = найти оба)
+const SUCCESS_AT = 0.6; // доля очищенной цели → «нашёл»
+const EACH_AT = 0.4; // и каждая из нескольких целевых зон — хотя бы настолько (два места = найти оба)
 const WRONG_AT = 0.057; // на отпускании: мимо стёрто > 5,7% карты (≈40 000 px² макета) и цель < 15% → промах
 const HEAT_FEEDBACK = true;
 const HEAT_RANGE = 420; // px макета: дальше этого от края цели — «холодно»
@@ -198,7 +198,12 @@ export class Game {
     this.reveal.set(this.open, s.zones);
     this.reveal.start();
     this.renderStage();
-    if (i === 0) this.note(`<b>Сотрите кальку там, где, по-вашему, строили</b><span>Над пальцем подскажет: холодно или горячо. Мимо — туман вернётся.</span>`, "miss rule");
+    // В начале каждого этапа — приглашение стирать (исчезает при первом касании карты)
+    const rule = i === 0 ? " Над пальцем подскажет: холодно или горячо. Мимо — туман вернётся." : "";
+    this.note(
+      `<img class="swipe" src="${base()}svg/ui/icon-finger-swipe.svg" alt=""><div><b>Этап ${i + 1} · ${esc(s.years)}. Проведите пальцем по кальке</b><span>там, где, по-вашему, строили в эти годы.${rule}</span></div>`,
+      "prompt",
+    );
   }
 
   private renderStage(newHint = false) {

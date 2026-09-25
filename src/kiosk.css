@@ -977,3 +977,37 @@ h3 {
 .color-layer {
   pointer-events: none;
 }
+
+/* Приглашение стирать в начале этапа */
+.map-note.prompt {
+  align-items: center;
+  gap: calc(16 * var(--u));
+  padding: calc(14 * var(--u)) calc(22 * var(--u)) calc(14 * var(--u)) calc(14 * var(--u));
+  background: var(--paper-3);
+  box-shadow: 0 10px 30px rgba(60, 50, 35, 0.18);
+}
+
+.map-note.prompt div {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4 * var(--u));
+}
+
+.map-note.prompt b {
+  font: 600 calc(22 * var(--u)) / 1.2 var(--f-display);
+}
+
+.map-note.prompt span {
+  font: 400 calc(20 * var(--u)) / 1.35 var(--f-text);
+}
+
+.map-note .swipe {
+  flex-shrink: 0;
+  width: calc(80 * var(--u));
+  animation: swipe 1.6s var(--ease-inout) infinite;
+}
+
+@keyframes swipe {
+  0%, 100% { transform: translateX(calc(-8 * var(--u))) rotate(-6deg); }
+  50% { transform: translateX(calc(10 * var(--u))) rotate(4deg); }
+}
