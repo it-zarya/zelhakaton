@@ -28,7 +28,7 @@ export interface Stage {
   alsoOpens?: string[];
   hints: [string, string, string];
   objectIds: string[]; // награды, в порядке показа
-  hiddenFact: string; // «неочевидный факт» этапа
+  hiddenFact: string; // «интересный факт» этапа
   special?: "genplan" | "maket";
 }
 

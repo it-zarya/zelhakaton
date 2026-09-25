@@ -436,7 +436,7 @@ export class Game {
       : illu
         ? `<div class="media"><img class="illu" src="${base()}svg/buildings/${illu}.svg" alt=""></div>`
         : `<div class="media ph"><span class="cap">Фото: ${esc(o.name)} · подберёт команда</span></div>`;
-    const factLabel = o.legend ? "Городская легенда" : "Неочевидный факт";
+    const factLabel = o.legend ? "Городская легенда" : "Интересный факт";
     el.innerHTML = `
       <div class="sheet-head">
         <p class="mono">${esc(opt.head)}</p>
@@ -524,7 +524,7 @@ export class Game {
       <h2 class="stage-title">${esc(s.title)}</h2>
       <div class="flex-mid">
         <p class="question">${esc(s.intro)}</p>
-        <div class="box"><p class="mono accent">Неочевидный факт</p><p>${esc(s.hiddenFact)}</p></div>
+        <div class="box"><p class="mono accent">Интересный факт</p><p>${esc(s.hiddenFact)}</p></div>
       </div>
       <button class="btn primary" data-act="next">Дальше</button>
       ${this.progress()}`;

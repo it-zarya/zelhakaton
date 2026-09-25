@@ -572,7 +572,7 @@ export class Maket {
         <h2 class="stage-title">${titles[s]}</h2>
         <p class="mono">Отказов ${this.rejections} · подсказок ${this.hints}</p>
         <div class="flex-mid">
-          <div class="box"><p class="mono accent">Неочевидный факт</p><p>Башни сдали досрочно — к визиту президента США Никсона 25 мая 1972 года. Визит отменили.</p></div>
+          <div class="box"><p class="mono accent">Интересный факт</p><p>Башни сдали досрочно — к визиту президента США Никсона 25 мая 1972 года. Визит отменили.</p></div>
         </div>
         ${this.analyze().diff.length ? `<button class="btn" data-mk="fix">Исправить макет</button>` : ""}
         <button class="btn primary" data-mk="next">Дальше</button>`;
