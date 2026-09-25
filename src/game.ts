@@ -437,6 +437,7 @@ export class Game {
         ? `<div class="media"><img class="illu" src="${base()}svg/buildings/${illu}.svg" alt=""></div>`
         : `<div class="media ph"><span class="cap">Фото: ${esc(o.name)} · подберёт команда</span></div>`;
     const factLabel = o.legend ? "Городская легенда" : "Интересный факт";
+    const factText = opt.fact || o.fact || ""; // факт этапа (на первой странице) или собственный факт объекта
     el.innerHTML = `
       <div class="sheet-head">
         <p class="mono">${esc(opt.head)}</p>
@@ -452,7 +453,7 @@ export class Game {
           <p class="mono accent">${esc(o.address)} · ${esc(o.year)}</p>
           ${o.authors ? `<p class="authors">${esc(o.authors)}</p>` : ""}
           <p>${esc(o.caption)}</p>
-          ${opt.fact ? `<div class="box"><p class="mono accent">${factLabel}</p><p>${esc(opt.fact)}</p></div>` : o.legend ? `<p class="mono accent">${factLabel}</p>` : ""}
+          ${factText ? `<div class="box"><p class="mono accent">${factLabel}</p><p>${esc(factText)}</p></div>` : o.legend ? `<p class="mono accent">${factLabel}</p>` : ""}
         </div>
       </div>
       <div class="sheet-foot">

@@ -51,6 +51,7 @@ export interface MapObject {
   credit?: string; // автор/источник фото
   sources: string[]; // URL источников фактов
   legend?: boolean; // текст содержит городскую легенду — пометить на экране
+  fact?: string; // «интересный факт» этого объекта (на его странице листа)
 }
 
 export interface Route {
