@@ -111,6 +111,33 @@
     "zone": "mkr-02",
     "lat": 56.0008974,
     "lon": 37.2044061,
+    "photos": [
+      {
+        "src": "photos/poliklinika-152-1.jpg",
+        "caption": "152-я поликлиника, 1963 год",
+        "credit": "Фотоальбом netall.ru"
+      },
+      {
+        "src": "photos/poliklinika-152-2.jpg",
+        "caption": "Первый коллектив поликлиники, 1963 год",
+        "credit": "Фотоальбом netall.ru"
+      },
+      {
+        "src": "photos/poliklinika-152-3.jpg",
+        "caption": "Первый главврач Валентина Григорьевская",
+        "credit": "Фотоальбом netall.ru"
+      },
+      {
+        "src": "photos/poliklinika-152-4.jpg",
+        "caption": "Машины скорой помощи у поликлиники, 1963 год",
+        "credit": "Фотоальбом netall.ru"
+      },
+      {
+        "src": "photos/poliklinika-152-5.jpg",
+        "caption": "Хирургический кабинет",
+        "credit": "Фотоальбом netall.ru"
+      }
+    ],
     "sources": [
       "https://www.zelenograd.ru/news/61473/"
     ],
