@@ -828,106 +828,306 @@ h3 {
   font-size: calc(96 * var(--u));
 }
 
-/* ——— Этап 4 «Двигаем коробки» (design-handoff §1.11) ——— */
+/* ——— Этап 4 «Двигаем коробки» v3 (design/Этап 4 v3) — доска 884×800 в координатах макета ——— */
 
 [data-screen="maket"] .fog {
   opacity: 0;
   pointer-events: none;
 }
 
-.maket {
+.mk3 {
   position: absolute;
   inset: 0;
   z-index: 4;
-  background:
-    linear-gradient(rgba(94, 82, 66, 0.07) 1px, transparent 1px) 0 0 / calc(40 * var(--u)) calc(40 * var(--u)),
-    linear-gradient(90deg, rgba(94, 82, 66, 0.07) 1px, transparent 1px) 0 0 / calc(40 * var(--u)) calc(40 * var(--u)),
-    var(--board);
+  background: #efebe1;
+  overflow: hidden;
   touch-action: none;
   animation: note-in 420ms var(--ease-out);
 }
 
-.maket > * {
+.mk3-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 884px;
+  height: 800px;
+  transform-origin: 0 0;
+  font-family: var(--f-text);
+}
+
+.mk3-board {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 884px;
+  height: 600px;
+  background: url("/svg/stage4v3/board.svg") 0 0 / 884px 600px no-repeat;
+  pointer-events: none;
+}
+
+.mk3-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 884px;
+  height: 600px;
+  pointer-events: none;
+  z-index: 800;
+}
+
+.mk3-compass {
+  position: absolute;
+  left: 30px;
+  top: 26px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 16px/1.2 var(--f-mono);
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+.mk3-compass .dial {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--paper-3);
+}
+
+.mk3-compass .dial i {
+  position: absolute;
+  left: 26px;
+  top: 8px;
+  width: 4px;
+  height: 38px;
+  background: var(--ink);
+  border-radius: 2px;
+  transform: rotate(60deg);
+}
+
+.mk3-compass .dial span {
+  position: absolute;
+  left: 7px;
+  top: 34px;
+  font: 600 16px var(--f-display);
+  color: var(--accent);
+}
+
+.mk3-sprite,
+.mk3-ghost {
+  position: absolute;
+  width: 224px;
+  height: 255px;
+  background: center / 100% 100% no-repeat;
+  pointer-events: none;
+  transition: transform 250ms;
+}
+
+.mk3-sprite.rej {
+  z-index: 950;
+  transform: translateY(-22px);
+  filter: drop-shadow(0 0 6px rgba(228, 87, 46, 0.9)) opacity(0.85);
+}
+
+.mk3-hit {
+  position: absolute;
+  left: 62px;
+  top: 110px;
+  width: 100px;
+  height: 110px;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+.mk3-ghost {
+  display: none;
+  z-index: 1000;
+  transform: translateY(-10px);
+  filter: drop-shadow(8px 18px 12px rgba(94, 82, 66, 0.35));
+  transition: none;
+}
+
+.mk3-badge {
+  position: absolute;
+  z-index: 900;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--warm);
+  border: 2px solid var(--ink);
+  display: grid;
+  place-items: center;
+  font: 700 22px var(--f-display);
+  pointer-events: none;
+}
+
+.mk3-tray {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 600px;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 14px 10px;
+  background: var(--table);
+  border-top: 2px solid var(--ink);
+}
+
+.mk3-tray-head {
+  display: flex;
+  justify-content: space-between;
+  font: 500 20px var(--f-mono);
+  text-transform: uppercase;
+}
+
+.mk3-tray-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+}
+
+.mk3-cell {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper-3);
+  cursor: grab;
+  touch-action: none;
+  transition: background 300ms;
+}
+
+.mk3-cell-img {
+  position: absolute;
+  inset: 0;
+  background: 50% 72% / auto 150% no-repeat;
+  pointer-events: none;
+}
+
+.mk3-cell.gone {
+  border-style: dashed;
+  background: transparent;
+  cursor: default;
+}
+
+.mk3-cell.gone .mk3-cell-img {
+  opacity: 0;
+}
+
+.mk3-cell.locked {
+  border-style: dashed;
+  background: var(--board);
+}
+
+.mk3-cell.locked .mk3-cell-img {
+  opacity: 0.15;
+}
+
+.mk3-cell b {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 600 20px var(--f-display);
+  pointer-events: none;
+}
+
+.mk3-result {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 32px 24px;
+  background: #efebe1;
+}
+
+.mk3-result h3 {
+  font: 700 34px/1.1 var(--f-display);
+}
+
+.mk3-result .mono {
+  font-size: 20px;
+}
+
+.mk3-result .box p {
+  font-size: 20px;
+}
+
+.mk3-plans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.mk3-plans > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mk3-plan {
+  position: relative;
+  width: 390px;
+  height: 182px;
+  background: #efe9dc;
+  border: 2px solid var(--ink);
+}
+
+.mk3-plan i {
   position: absolute;
 }
 
-.mk-felt {
-  background: var(--felt);
-  border-radius: 45% 55% 50% 40%;
-  box-shadow: 0 3px 0 #869c6c;
-}
-
-.mk-pond {
-  background: #a9c6cc;
-  border-radius: 50%;
-}
-
-.mk-block {
-  background: #fbf8f2;
-  border: 1.5px solid #5e5242;
-  box-shadow: calc(6 * var(--u)) calc(6 * var(--u)) 0 rgba(94, 82, 66, 0.25);
-}
-
-.mk-label,
-.mk-avenue span,
-.mk-tray span {
-  margin: 0;
-  font: 500 calc(15 * var(--u)) var(--f-mono);
-  letter-spacing: 0.04em;
+.mk3-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font: 500 16px var(--f-mono);
   text-transform: uppercase;
   color: var(--ink-2);
 }
 
-.mk-avenue {
-  background: #f8f5ee;
-  border-block: 1.5px solid #cfc7b7;
+.mk3-legend span {
   display: flex;
   align-items: center;
-  padding-left: calc(16 * var(--u));
+  gap: 6px;
 }
 
-.mk-slot {
-  border: 3px dashed #5e5242;
-  border-radius: calc(4 * var(--u));
-  transition: opacity 300ms;
+.mk3-legend i {
+  display: inline-block;
+  width: 18px;
+  height: 12px;
 }
 
-.mk-slot.full {
-  opacity: 0;
+.mk3-msg {
+  min-height: calc(92 * var(--u));
+  transition: background 250ms;
 }
 
-.mk-tray {
-  background: var(--table);
-  border-top: 2px solid var(--ink);
-  padding: calc(12 * var(--u)) calc(16 * var(--u));
-}
-
-.mk-box {
-  z-index: 2;
+.mk3-stars {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12%;
-  cursor: grab;
-  touch-action: none;
-  transition: left 350ms var(--ease-out), top 350ms var(--ease-out), transform 150ms;
+  gap: calc(10 * var(--u));
 }
 
-.mk-box i {
-  width: 34%;
-  aspect-ratio: 1;
-  background: #fbf8f2;
-  border: 1.5px solid #5e5242;
-  box-shadow: calc(5 * var(--u)) calc(-5 * var(--u)) 0 #d9d2c2, calc(5 * var(--u)) calc(-5 * var(--u)) 0 1.5px #5e5242;
+.mk3-stars i {
+  width: calc(56 * var(--u));
+  height: calc(56 * var(--u));
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--paper-3);
+  transform: rotate(45deg) scale(0.78);
 }
 
-.mk-box.grab {
-  z-index: 5;
-  transition: none;
-}
-
-.mk-box.placed i {
-  background: #fff;
+.mk3-stars i.on {
+  background: var(--accent);
 }
 
 /* Активный пин (карточка открыта) */

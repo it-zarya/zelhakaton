@@ -463,28 +463,12 @@ export class Game {
     this.root.dataset.screen = "maket";
     this.fog.enabled = false;
     const s = this.stage;
-    this.panel.innerHTML = `
-      <p class="mono">Этап ${this.stageIdx + 1} из ${this.c.stages.length}</p>
-      ${yearsHtml(s.years)}
-      <h2 class="stage-title">Двигаем коробки</h2>
-      <div class="flex-mid">
-        <p class="question">${esc(s.intro)}</p>
-        <div class="box" data-fact hidden><p class="mono accent">Неочевидный факт</p><p>${esc(s.hiddenFact)}</p></div>
-      </div>
-      <p class="mono" data-count>Поставлено 0 из 4</p>
-      <button class="btn primary" data-act="next" disabled>Дальше</button>
-      ${this.progress()}`;
-    this.maket = new Maket(this.mapArea, (n) => {
-      this.panel.querySelector("[data-count]")!.textContent = `Поставлено ${n} из 4`;
-      this.panel.querySelector<HTMLButtonElement>("[data-act=next]")!.disabled = n < 4;
-      const fact = this.panel.querySelector<HTMLElement>("[data-fact]")!;
-      if (n === 4 && fact.hidden) {
-        fact.hidden = false;
-        fact.classList.add("new");
-      }
-    });
-    this.bind({
-      next: () => {
+    const [from, to] = s.years.split(/\s*[–—-]\s*/);
+    this.maket = new Maket(this.mapArea, this.panel, {
+      years: [from, to ?? ""],
+      progress: () => this.progress(),
+      onHint: () => this.hintsUsed++, // подсказки мини-игры — в общий счёт
+      onDone: () => {
         this.maket?.destroy();
         this.maket = null;
         // макет собран — квартал вырастает в городе, дальше как обычная находка

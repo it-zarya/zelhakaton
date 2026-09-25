@@ -24,9 +24,10 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
     <sc-for list="{{ chips }}" as="c" hint-placeholder-count="9">
       <button onClick="{{ c.go }}" style="height:32px;padding:0 12px;border:1.5px solid #1E1D1A;border-radius:16px;background:{{ c.bg }};color:{{ c.fg }};font:500 13px 'IBM Plex Mono',monospace">{{ c.label }}</button>
     </sc-for>
+    <a href="Этап 4 — прототип.dc.html" style="font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.04em;text-decoration:none;margin-left:8px">ЭТАП 4 v2 →</a>
   </div>
 
-  <div style="flex:1;display:flex;justify-content:center;align-items:flex-start;padding:0 16px 16px">
+  <div ref="{{ areaRef }}" style="flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;padding:0 16px 16px">
     <div style="width:{{ stageW }}px;height:{{ stageH }}px;position:relative;box-shadow:0 20px 60px rgba(60,50,35,.25);border-radius:6px;overflow:hidden">
     <div style="width:1280px;height:800px;position:absolute;left:0;top:0;transform-origin:0 0;transform:{{ stageT }};background:#EFEBE1;overflow:hidden">
 
@@ -362,18 +363,22 @@ class Component extends DCLogic {
   fogRef = React.createRef(); glowRef = React.createRef(); revealRef = React.createRef(); fogWrapRef = React.createRef(); trackRef = React.createRef(); boardRef = React.createRef();
   timers = [];
 
+  areaRef = React.createRef();
   componentDidMount() {
+    this.aro = new ResizeObserver(en => { const r = en[0].contentRect; if (r.width !== this.state.aw || r.height !== this.state.ah) this.setState({ aw: r.width, ah: r.height }); });
+    if (this.areaRef.current) this.aro.observe(this.areaRef.current);
     this.onResize = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight });
     window.addEventListener('resize', this.onResize); this.onResize();
     this.ro = new ResizeObserver(this.onResize); this.ro.observe(document.documentElement);
     requestAnimationFrame(this.onResize); setTimeout(this.onResize, 300);
+    this.poll = setInterval(() => { if (window.innerWidth !== this.state.vw || window.innerHeight !== this.state.vh) this.onResize(); }, 250);
     this.makeGrain(); this.drawFog(); this.startBreath();
     this.check = setInterval(() => this.checkHit(), 300);
     this.demoT = setInterval(() => this.demo(), 7000);
     const g = () => { const c = this.glowRef.current; if (c) { const x = c.getContext('2d'); x.globalCompositeOperation = 'destination-out'; x.fillStyle = 'rgba(0,0,0,0.07)'; x.fillRect(0, 0, 884, 800); x.globalCompositeOperation = 'source-over'; } this.raf = requestAnimationFrame(g); };
     g();
   }
-  componentWillUnmount() { window.removeEventListener('resize', this.onResize); this.ro && this.ro.disconnect(); clearInterval(this.check); clearInterval(this.demoT); cancelAnimationFrame(this.raf); this.clearTimers(); }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); this.ro && this.ro.disconnect(); clearInterval(this.poll); this.aro && this.aro.disconnect(); clearInterval(this.check); clearInterval(this.demoT); cancelAnimationFrame(this.raf); this.clearTimers(); }
   clearTimers() { this.timers.forEach(clearTimeout); this.timers = []; }
   later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
 
@@ -506,7 +511,8 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state, sc = s.screen;
-    const scale = Math.max(0.3, Math.min((s.vw - 32) / 1280, (s.vh - 104) / 800, 1.6));
+    const vw = window.innerWidth || s.vw, vh = window.innerHeight || s.vh;
+    const scale = s.aw > 0 ? Math.max(0.2, Math.min(s.aw / 1280, s.ah / 800, 1.6)) : Math.max(0.3, Math.min((vw - 32) / 1280, (vh - 104) / 800, 1.6));
     const hintsN = this.props.hintsUsed ?? 4;
     const plural = n => (n % 10 === 1 && n % 100 !== 11) ? 'подсказка' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'подсказки' : 'подсказок';
     const heatOn = this.props.heatFeedback ?? true;
@@ -521,7 +527,7 @@ class Component extends DCLogic {
     const placedCount = s.placed.filter(v => v !== null).length;
     const route = s.route !== null ? { name: ROUTES[s.route].name, points: ROUTES[s.route].points.map((n, i) => ({ n: i + 1, name: n })) } : { name: '', points: [] };
     return {
-      stageW: Math.round(1280 * scale), stageH: Math.round(800 * scale), stageT: `scale(${scale})`,
+      stageW: Math.round(1280 * scale), stageH: Math.round(800 * scale), stageT: `scale(${scale})`, areaRef: this.areaRef,
       chips: SCREENS.map(([id, label]) => ({ label, go: () => this.go(id), bg: s.view === id ? '#1E1D1A' : '#EFEBE1', fg: s.view === id ? '#FBF8F2' : '#1E1D1A' })),
       isAttract: sc === 'attract', isStage: sc === 'stage', isFound: sc === 'found', isMaket: sc === 'maket', isGen: sc === 'genplan', isFinal: sc === 'final', isTour: sc === 'tour', isMobile: sc === 'mobile',
       panT: s.pan ? 'translateX(-300px)' : 'translateX(0px)',

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Этап 4 v3 · Двигаем коробки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+body{margin:0;background:#D9D2C2;color:#1E1D1A;font-family:"Golos Text",sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+a{color:#D9472B}a:hover{color:#1E1D1A}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column">
+  <div style="flex:none;display:flex;align-items:center;gap:16px;padding:10px 16px;flex-wrap:wrap">
+    <a href="Прототип.dc.html" style="font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.04em;text-decoration:none">← ВСЕ ЭКРАНЫ</a>
+    <a href="Этап 4 — прототип.dc.html" style="font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.04em;text-decoration:none">V2 (ПРОЩЕ)</a>
+    <a href="Этап 4 — спецификация.dc.html#v3" style="font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.04em;text-decoration:none">СПЕЦИФИКАЦИЯ V3 →</a>
+    <button onClick="{{ restart }}" style="height:30px;padding:0 12px;border:1.5px solid #1E1D1A;border-radius:15px;background:#EFEBE1;font:500 13px 'IBM Plex Mono',monospace">СОБРАТЬ ЗАНОВО</button>
+    <button onClick="{{ solve }}" style="height:30px;padding:0 12px;border:1.5px solid #1E1D1A;border-radius:15px;background:#EFEBE1;font:500 13px 'IBM Plex Mono',monospace">ПОКАЗАТЬ РЕШЕНИЕ</button>
+  </div>
+  <div ref="{{ areaRef }}" style="flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;padding:0 16px 16px">
+    <div style="width:{{ stageW }}px;height:{{ stageH }}px;position:relative;box-shadow:0 20px 60px rgba(60,50,35,.25);border-radius:6px;overflow:hidden">
+    <div style="width:1280px;height:800px;position:absolute;left:0;top:0;transform-origin:0 0;transform:{{ stageT }};background:#EFEBE1;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none">
+
+      <div ref="{{ boardRef }}" style="position:absolute;left:0;top:0;width:884px;height:800px;overflow:hidden;background:#EFEBE1">
+        <div style="position:absolute;left:0;top:0;width:884px;height:600px;background:url('svg/stage4v3/board.svg') 0 0 / 884px 600px no-repeat;pointer-events:none"></div>
+        <div style="position:absolute;left:30px;top:26px;display:flex;align-items:center;gap:10px;pointer-events:none">
+          <div style="width:56px;height:56px;border-radius:50%;border:2px solid #1E1D1A;background:#FBF8F2;position:relative">
+            <div style="position:absolute;left:26px;top:8px;width:4px;height:38px;background:#1E1D1A;border-radius:2px;transform:rotate(60deg)"></div>
+            <div style="position:absolute;left:7px;top:34px;font:600 16px Unbounded,sans-serif;color:#D9472B">С</div>
+          </div>
+          <div style="font:500 16px/1.2 'IBM Plex Mono',monospace;color:#57524A">СЕВЕР —<br>К ЗРИТЕЛЮ</div>
+        </div>
+
+        <svg width="884" height="600" style="position:absolute;left:0;top:0;pointer-events:none">
+          <sc-for list="{{ zonesHelp }}" as="z" hint-placeholder-count="0">
+            <polygon points="{{ z.points }}" fill="#9DB080" fill-opacity=".38" stroke="#5E7F45" stroke-width="2.5" stroke-linejoin="round"></polygon>
+          </sc-for>
+          <sc-for list="{{ foot }}" as="f" hint-placeholder-count="0">
+            <polygon points="{{ f.points }}" fill="{{ f.fill }}" fill-opacity="{{ f.fo }}" stroke="{{ f.stroke }}" stroke-width="2.5" stroke-dasharray="7 6" stroke-linejoin="round"></polygon>
+          </sc-for>
+        </svg>
+
+        <sc-for list="{{ sprites }}" as="s" hint-placeholder-count="0">
+          <div onPointerDown="{{ s.down }}" style="position:absolute;left:{{ s.left }}px;top:{{ s.top }}px;width:224px;height:255px;z-index:{{ s.z }};transform:{{ s.t }};filter:{{ s.f }};transition:{{ s.tr }};background:{{ s.bg }} center / 100% 100% no-repeat;pointer-events:none">
+            <div onPointerDown="{{ s.down }}" style="position:absolute;left:{{ s.hx }}px;top:{{ s.hy }}px;width:{{ s.hw }}px;height:{{ s.hh }}px;pointer-events:{{ s.pe }};cursor:grab;touch-action:none"></div>
+          </div>
+        </sc-for>
+        <sc-for list="{{ badges }}" as="b" hint-placeholder-count="0">
+          <div style="position:absolute;left:{{ b.x }}px;top:{{ b.y }}px;width:40px;height:40px;border-radius:50%;background:#FFD98A;border:2px solid #1E1D1A;display:flex;align-items:center;justify-content:center;font:700 22px Unbounded,sans-serif;z-index:900;pointer-events:none">↻</div>
+        </sc-for>
+
+        <div style="position:absolute;left:0;right:0;top:600px;bottom:0;background:#D9D2C2;border-top:2px solid #1E1D1A;padding:8px 14px 10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font:500 20px 'IBM Plex Mono',monospace"><span>ЛОТОК · КАСАНИЕ ПОВОРАЧИВАЕТ</span><span>НА МАКЕТЕ {{ placedN }} ИЗ 12</span></div>
+          <div style="flex:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:6px">
+            <sc-for list="{{ tray }}" as="t" hint-placeholder-count="12">
+              <div onPointerDown="{{ t.down }}" style="position:relative;border-radius:6px;border:2px {{ t.bs }} #1E1D1A;background:{{ t.bg }};cursor:{{ t.cursor }};touch-action:none;transition:background .3s;overflow:hidden">
+                <div style="position:absolute;inset:0;background:{{ t.img }} 50% 72% / auto 150% no-repeat;opacity:{{ t.imgOp }};pointer-events:none"></div>
+                <sc-if value="{{ t.lk }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:600 20px Unbounded,sans-serif">Ищут…</div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ dragOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:{{ drag.left }}px;top:{{ drag.top }}px;width:224px;height:255px;pointer-events:none;z-index:1000;filter:drop-shadow(8px 18px 12px rgba(94,82,66,.35));transform:translateY(-10px);background:{{ drag.bg }} center / 100% 100% no-repeat"></div>
+        </sc-if>
+
+        <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:#EFEBE1;z-index:2000;padding:32px 24px;box-sizing:border-box;display:flex;flex-direction:column;gap:18px">
+            <div style="font:700 34px/1.1 Unbounded,sans-serif">Ваш макет и макет Покровского</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font:500 20px 'IBM Plex Mono',monospace">ВАШ</div>
+                <div style="position:relative;width:390px;height:182px;background:#EFE9DC;border:2px solid #1E1D1A">
+                  <sc-for list="{{ planMine }}" as="r" hint-placeholder-count="0"><div style="position:absolute;left:{{ r.x }}px;top:{{ r.y }}px;width:{{ r.w }}px;height:{{ r.h }}px;background:{{ r.bg }};box-shadow:{{ r.sh }}"></div></sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">ПОКРОВСКИЙ · 1970–1972</div>
+                <div style="position:relative;width:390px;height:182px;background:#EFE9DC;border:2px solid #1E1D1A">
+                  <sc-for list="{{ planP }}" as="r" hint-placeholder-count="0"><div style="position:absolute;left:{{ r.x }}px;top:{{ r.y }}px;width:{{ r.w }}px;height:{{ r.h }}px;background:{{ r.bg }};box-shadow:{{ r.sh }}"></div></sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap;font:500 16px 'IBM Plex Mono',monospace;color:#57524A">
+              <span style="display:flex;gap:6px;align-items:center"><span style="width:18px;height:12px;background:#FBF8F2;box-shadow:inset 0 0 0 1.5px #1E1D1A,inset 0 -3px 0 #E4572E"></span>БАШНИ, МАГАЗИНЫ</span>
+              <span style="display:flex;gap:6px;align-items:center"><span style="width:18px;height:12px;background:#D5D0C6;box-shadow:inset 0 0 0 1.5px #1E1D1A"></span>9 ЭТАЖЕЙ</span>
+              <span style="display:flex;gap:6px;align-items:center"><span style="width:18px;height:12px;background:#7F9A62"></span>БУЛЬВАР</span>
+              <span>СХЕМА ПОКРОВСКОГО УСЛОВНА: ПОЗИЦИИ — ПО OSM</span>
+            </div>
+            <div style="display:flex;gap:20px;align-items:flex-start;background:#F7F4ED;border:2px solid #1E1D1A;border-radius:6px;padding:14px 20px">
+              <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B;flex:none">ПОМЕТКИ</div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:20px;line-height:1.35">
+                <sc-for list="{{ notes }}" as="n" hint-placeholder-count="3"><div>{{ n.t }}</div></sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="position:absolute;left:884px;top:0;width:396px;height:800px;box-sizing:border-box;border-left:2px solid #1E1D1A;padding:28px;display:flex;flex-direction:column;gap:14px;background:#EFEBE1">
+        <div style="display:flex;flex-direction:column;gap:2px;color:#D9472B"><div style="font:700 96px/0.9 Unbounded,sans-serif;letter-spacing:-.05em">1970</div><div style="font:600 32px/1 Unbounded,sans-serif;letter-spacing:-.02em">—1972</div></div>
+
+        <sc-if value="{{ isBuild }}" hint-placeholder-val="{{ true }}">
+          <div style="font:700 30px/1.1 Unbounded,sans-serif">Двигаем коробки</div>
+          <div style="font-size:20px;line-height:1.32;text-wrap:pretty">Проспект хотели застроить обычными девятиэтажками. Расставьте 12 домов так, как решил Покровский.</div>
+          <div style="background:{{ msgBg }};border:2px solid #1E1D1A;border-radius:6px;padding:12px 16px;font-size:20px;line-height:1.32;min-height:92px;box-sizing:border-box;transition:background .25s">{{ msg }}</div>
+          <sc-if value="{{ hasHint }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#F7F4ED;border:2px solid #1E1D1A;border-radius:6px;padding:12px 16px;display:flex;flex-direction:column;gap:6px">
+              <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">ПОДСКАЗКА {{ hints }} ИЗ 3</div>
+              <div style="font-size:20px;line-height:1.36;text-wrap:pretty">{{ hintText }}</div>
+            </div>
+          </sc-if>
+          <div style="flex:1"></div>
+          <sc-if value="{{ allPlaced }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ compare }}" style="height:72px;border:0;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 20px Unbounded,sans-serif">Сравнить с Покровским</button>
+          </sc-if>
+          <button onClick="{{ moreHint }}" style="height:64px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;font:600 20px Unbounded,sans-serif;opacity:{{ hintBtnOp }}">{{ hintBtnLabel }}</button>
+        </sc-if>
+
+        <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+          <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">АРХИТЕКТУРНОЕ ЧУТЬЁ</div>
+          <div style="display:flex;gap:10px">
+            <sc-for list="{{ stars }}" as="s" hint-placeholder-count="3">
+              <div style="width:56px;height:56px;border:2px solid #1E1D1A;border-radius:4px;background:{{ s.bg }};transform:rotate(45deg) scale(.78)"></div>
+            </sc-for>
+          </div>
+          <div style="font:700 26px/1.15 Unbounded,sans-serif;text-wrap:pretty">{{ scoreTitle }}</div>
+          <div style="font:500 20px 'IBM Plex Mono',monospace;color:#57524A">ОТКАЗОВ {{ rej }} · ПОДСКАЗОК {{ hints }}</div>
+          <div style="background:#F7F4ED;border:2px solid #1E1D1A;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+            <div style="font:500 20px 'IBM Plex Mono',monospace;color:#D9472B">НЕОЧЕВИДНЫЙ ФАКТ</div>
+            <div style="font-size:20px;line-height:1.38">Башни сдали досрочно — к визиту президента США Никсона 25 мая 1972 года. Визит отменили.</div>
+          </div>
+          <div style="flex:1"></div>
+          <sc-if value="{{ canFix }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ backToBuild }}" style="height:64px;border:2px solid #1E1D1A;border-radius:6px;background:#FBF8F2;font:600 20px Unbounded,sans-serif">Развернуть витрины</button>
+          </sc-if>
+          <a href="Прототип.dc.html" style="height:64px;border-radius:6px;background:#1E1D1A;color:#FBF8F2;font:600 20px Unbounded,sans-serif;display:flex;align-items:center;justify-content:center;text-decoration:none">Дальше</a>
+        </sc-if>
+
+        <div style="display:flex;gap:4px;justify-content:space-between">
+          <sc-for list="{{ progress }}" as="p" hint-placeholder-count="9">
+            <div style="width:34px;height:40px;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:{{ p.op }}"><div style="width:32px;height:32px;background:{{ p.bg }} center / contain no-repeat"></div><div style="width:22px;height:4px;border-radius:2px;background:{{ p.bar }}"></div></div>
+          </sc-for>
+        </div>
+      </div>
+
+    </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;towersArriveLater&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Механика&quot;},&quot;strictOrientation&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Механика&quot;}}">
+const L = { G: 8, COLS: 30, ROWS: 14, k: 2.2385, vbX: -138.5641, vbY: -47.1184, sw: 224, sh: 255, ax: 112, ay: 184,
+  grid: ["FFFFFF..HHHHHH......WWWWWFFFFF","FFFFFF..HHHHHH......WWWWWFFFFF","FFFFFF........HH....WWWWWFFFFF","FFFFFF........HH.........FFFFF","........FFFF..HH....HHHHHFFFFF","........FFFF..HH....HHHHHFFFFF","FFFF..........................","FFFF..........................","FFFF..........................","RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR","RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR","..............................","..............................",".............................."] };
+const C = Math.cos(Math.PI / 6);
+const toPx = (x, y, z = 0) => [((x - y) * C - L.vbX) * L.k, ((x + y) / 2 - z - L.vbY) * L.k];
+const toWorld = (px, py) => { const u = px / L.k + L.vbX, v = py / L.k + L.vbY; return [(u / C + 2 * v) / 2, (2 * v - u / C) / 2]; };
+const zoneOf = r => r <= 5 ? 'depth' : r <= 8 ? 'south' : r <= 10 ? 'road' : 'north';
+const HOME = { nine: 'depth', boul: 'north', tower: 'south' };
+const SIZE = { tower: { front: [6, 3], back: [6, 3], east: [3, 6], west: [3, 6] }, nine: { along: [5, 2], across: [2, 5] }, boul: { along: [8, 3], across: [3, 8] } };
+const CYCLE = { tower: ['front', 'east', 'back', 'west'], nine: ['along', 'across'], boul: ['along', 'across'] };
+const SRC = p => p.type === 'tower' ? `svg/stage4v3/towers-${p.o}.svg` : p.type === 'nine' ? `svg/stage4v3/nine-${p.o}.svg` : `svg/stage4v3/boulevard-${p.o}.svg`;
+const MSG = {
+  start: 'Возьмите дом из лотка и перетащите на макет. Касание поворачивает дом — в лотке и на макете.',
+  road: 'Проспект — магистраль. На проезжей части не строят.',
+  forest: 'Лес — часть города. Дома вписывают в ландшафт, а не ставят поверх него.',
+  water: 'Пруд оставляем: дома вписывают в ландшафт.',
+  house: 'Здесь уже стоят дома 4-го микрорайона.',
+  busy: 'Здесь уже стоит дом.',
+  cross_tower: 'Пара башен выходит на проспект целиком. Коснитесь, чтобы повернуть.',
+  cross_nine: 'Дом залезает на соседний участок. Попробуйте повернуть его касанием.',
+  cross_boul: 'Бульвар тянется вдоль проспекта. Коснитесь, чтобы повернуть.',
+  north_nine: 'Северная сторона — прогулочный бульвар. Дома здесь не ставят.',
+  north_tower: 'Северная сторона — прогулочный бульвар. Дома здесь не ставят.',
+  south_nine: 'Проспект хотели застроить обычными девятиэтажками. Покровский предложил подождать.',
+  south_boul: 'Бульвар идёт по северной стороне проспекта.',
+  depth_boul: 'Бульвар идёт по северной стороне проспекта.',
+  depth_tower: 'Магазины в нижних этажах башен должны выходить на проспект.',
+  locked: 'Проект для проспекта ещё ищут. Сначала найдите место хотя бы двум девятиэтажкам.',
+  arrived: 'Покровский нашёл проект: парные 17-этажные башни с магазинами внизу. Они в лотке.',
+  ok_nine: 'Девятиэтажка вписалась в микрорайон.',
+  ok_boul: 'Бульвар — на северной стороне, для прогулок.',
+  ok_tower: 'Магазины выходят на проспект.',
+  back_tower: 'Витрины смотрят во двор. Коснитесь башен, чтобы развернуть их к проспекту.',
+  no_room: 'Для поворота здесь мало места — перетащите дом.',
+  done: 'Все 12 домов на макете. Сравним с Покровским?',
+};
+const HINTS = [
+  'Проспект — магистраль. Северная сторона — прогулочный бульвар, южная — башни с магазинами внизу.',
+  'Девятиэтажкам — место в глубине микрорайона, между лесом, прудом и старыми домами. Три из пяти встанут только повёрнутыми.',
+  'Пока вы держите дом, его зона подсвечена зелёным.',
+];
+const INIT = () => [
+  ['n1', 'nine', 'along'], ['n2', 'nine', 'along'], ['n3', 'nine', 'across'], ['n4', 'nine', 'along'], ['n5', 'nine', 'along'],
+  ['b1', 'boul', 'across'], ['b2', 'boul', 'along'], ['b3', 'boul', 'across'],
+  ['t1', 'tower', 'east'], ['t2', 'tower', 'back'], ['t3', 'tower', 'west'], ['t4', 'tower', 'back'],
+].map(([id, type, o]) => ({ id, type, o, c: null, r: null }));
+const SOLUTION = { n1: [0, 4, 'along'], n2: [6, 0, 'across'], n3: [8, 2, 'along'], n4: [16, 0, 'across'], n5: [18, 0, 'across'], b1: [1, 11, 'along'], b2: [11, 11, 'along'], b3: [21, 11, 'along'], t1: [5, 6, 'front'], t2: [11, 6, 'front'], t3: [17, 6, 'front'], t4: [23, 6, 'front'] };
+const fpPoly = (c, r, w, h) => [[c, r], [c + w, r], [c + w, r + h], [c, r + h]].map(([x, y]) => toPx(x * L.G, y * L.G).map(v => v.toFixed(1)).join(',')).join(' ');
+
+class Component extends DCLogic {
+  state = { vw: 1200, vh: 800, pieces: INIT(), drag: null, rej: null, msg: MSG.start, msgKind: 'info', rejections: 0, hints: 0, phase: 'build', unlocked: false };
+  boardRef = React.createRef(); areaRef = React.createRef();
+  componentDidMount() {
+    this.aro = new ResizeObserver(en => { const r = en[0].contentRect; if (r.width !== this.state.aw || r.height !== this.state.ah) this.setState({ aw: r.width, ah: r.height }); });
+    if (this.areaRef.current) this.aro.observe(this.areaRef.current);
+    this.onResize = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight });
+    window.addEventListener('resize', this.onResize); this.onResize();
+    this.poll = setInterval(() => { if (window.innerWidth !== this.state.vw || window.innerHeight !== this.state.vh) this.onResize(); }, 250);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); clearInterval(this.poll); this.aro && this.aro.disconnect(); this.endListen(); clearTimeout(this.rejT); }
+
+  get locked() { return (this.props.towersArriveLater ?? true) && !this.state.unlocked; }
+  pt(e) { const r = this.boardRef.current.getBoundingClientRect(); const k = r.width / 884; return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; }
+  say(key, kind = 'info') { this.setState({ msg: MSG[key], msgKind: kind }); }
+  snap(p, pt) {
+    const [w, h] = SIZE[p.type][p.o]; const [x, y] = toWorld(pt[0], pt[1] + 34);
+    const c = Math.round(x / L.G - w / 2), r = Math.round(y / L.G - h / 2);
+    const inside = c >= 0 && r >= 0 && c + w <= L.COLS && r + h <= L.ROWS && pt[1] < 600;
+    return { c, r, w, h, inside };
+  }
+  check(p, c, r, o, pieces) {
+    const [w, h] = SIZE[p.type][o]; const kinds = new Set(), zones = new Set();
+    for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) { const g = L.grid[y][x]; if (g !== '.') kinds.add(g); zones.add(zoneOf(y)); }
+    if (kinds.has('R') || zones.has('road')) return 'road';
+    if (kinds.has('W')) return 'water';
+    if (kinds.has('H')) return 'house';
+    if (kinds.has('F')) return 'forest';
+    const occ = pieces.some(q => q.id !== p.id && q.c !== null && (() => { const [qw, qh] = SIZE[q.type][q.o]; return c < q.c + qw && q.c < c + w && r < q.r + qh && q.r < r + h; })());
+    if (occ) return 'busy';
+    if (zones.size > 1) return 'cross_' + p.type;
+    const z = [...zones][0];
+    if (z !== HOME[p.type]) return `${z}_${p.type}`;
+    if ((this.props.strictOrientation ?? false) && p.type === 'tower' && o !== 'front') return 'back_tower';
+    return null;
+  }
+
+  begin(e, id) {
+    if (this.state.phase !== 'build' || this.state.rej) return;
+    const p = this.state.pieces.find(q => q.id === id);
+    if (p.type === 'tower' && this.locked && p.c === null) { this.say('locked'); return; }
+    e.preventDefault(); e.stopPropagation();
+    const start = this.pt(e); this.pending = { id, start, moved: false };
+    this.mv = ev => {
+      const q = this.pt(ev); const pd = this.pending; if (!pd) return;
+      if (!pd.moved && Math.hypot(q[0] - pd.start[0], q[1] - pd.start[1]) > 10) { pd.moved = true; this.setState(s => ({ pieces: s.pieces.map(x => x.id === id ? { ...x, c: null, r: null } : x) })); }
+      if (pd.moved) this.setState({ drag: { id, x: q[0], y: q[1] } });
+    };
+    this.up = ev => { const pd = this.pending; this.endListen(); this.pending = null; if (!pd) return; if (!pd.moved) this.tap(id); else this.drop(id, this.pt(ev)); };
+    window.addEventListener('pointermove', this.mv); window.addEventListener('pointerup', this.up); window.addEventListener('pointercancel', this.up);
+  }
+  endListen() { if (this.mv) { window.removeEventListener('pointermove', this.mv); window.removeEventListener('pointerup', this.up); window.removeEventListener('pointercancel', this.up); } this.mv = null; }
+
+  tap(id) {
+    const s = this.state; const p = s.pieces.find(q => q.id === id); const cyc = CYCLE[p.type];
+    if (p.c === null) { this.setState({ pieces: s.pieces.map(x => x.id === id ? { ...x, o: cyc[(cyc.indexOf(p.o) + 1) % cyc.length] } : x) }); return; }
+    if (p.type === 'tower' && (p.o === 'front' || p.o === 'back')) {
+      const o = p.o === 'front' ? 'back' : 'front';
+      this.setState({ pieces: s.pieces.map(x => x.id === id ? { ...x, o } : x) }); this.say(o === 'front' ? 'ok_tower' : 'back_tower', o === 'front' ? 'ok' : 'soft'); return;
+    }
+    const [w, h] = SIZE[p.type][p.o]; const o = cyc[(cyc.indexOf(p.o) + 1) % cyc.length]; const [w2, h2] = SIZE[p.type][o];
+    const c = Math.round(p.c + w / 2 - w2 / 2), r = Math.round(p.r + h / 2 - h2 / 2);
+    if (c < 0 || r < 0 || c + w2 > L.COLS || r + h2 > L.ROWS || this.check(p, c, r, o, s.pieces)) { this.say('no_room', 'soft'); return; }
+    this.setState({ pieces: s.pieces.map(x => x.id === id ? { ...x, o, c, r } : x) });
+  }
+
+  drop(id, pt) {
+    const s = this.state; const p = s.pieces.find(q => q.id === id); const sn = this.snap(p, pt);
+    if (!sn.inside) return this.setState({ drag: null });
+    const err = this.check(p, sn.c, sn.r, p.o, s.pieces);
+    if (err === 'busy') { this.setState({ drag: null }); return this.say('busy'); }
+    if (err) {
+      this.setState(st => ({ drag: null, rej: { id, c: sn.c, r: sn.r }, rejections: st.rejections + 1, msg: MSG[err], msgKind: 'no' }));
+      clearTimeout(this.rejT); this.rejT = setTimeout(() => this.setState({ rej: null }), 1100); return;
+    }
+    const pieces = s.pieces.map(x => x.id === id ? { ...x, c: sn.c, r: sn.r } : x);
+    const nineN = pieces.filter(x => x.type === 'nine' && x.c !== null).length;
+    const arrive = nineN >= 2 && !s.unlocked; const all = pieces.every(x => x.c !== null);
+    let key = p.type === 'tower' ? (p.o === 'front' ? 'ok_tower' : 'back_tower') : `ok_${p.type}`, kind = p.type === 'tower' && p.o !== 'front' ? 'soft' : 'ok';
+    if (arrive) { key = 'arrived'; kind = 'ok'; } if (all) { key = 'done'; kind = 'ok'; }
+    this.setState({ pieces, drag: null, unlocked: s.unlocked || nineN >= 2, msg: MSG[key], msgKind: kind });
+  }
+
+  restart = () => { clearTimeout(this.rejT); this.setState({ pieces: INIT(), drag: null, rej: null, msg: MSG.start, msgKind: 'info', rejections: 0, hints: 0, phase: 'build', unlocked: false }); };
+  solve = () => { this.setState(s => ({ pieces: s.pieces.map(p => { const [c, r, o] = SOLUTION[p.id]; return { ...p, c, r, o }; }), unlocked: true, phase: 'build', msg: MSG.done, msgKind: 'ok' })); };
+
+  plan(pieces) {
+    const S = 13, out = [];
+    L.grid.forEach((row, r) => { for (let c = 0; c < L.COLS; c++) { const g = row[c]; if (g === '.') continue; out.push({ x: c * S, y: r * S, w: S, h: S, bg: { F: '#9DB080', W: '#A9C6CC', H: '#C9C2B4', R: '#F8F5EE' }[g], sh: 'none' }); } });
+    pieces.filter(p => p.c !== null).forEach(p => {
+      const [w, h] = SIZE[p.type][p.o]; const b = { x: p.c * S + 1, y: p.r * S + 1, w: w * S - 2, h: h * S - 2 };
+      if (p.type === 'nine') out.push({ ...b, bg: '#D5D0C6', sh: 'inset 0 0 0 1.5px #1E1D1A' });
+      if (p.type === 'boul') out.push({ ...b, bg: '#7F9A62', sh: 'none' });
+      if (p.type === 'tower') { const side = { front: 'inset 0 -4px 0 #E4572E', back: 'inset 0 4px 0 #E4572E', east: 'inset -4px 0 0 #E4572E', west: 'inset 4px 0 0 #E4572E' }[p.o]; out.push({ ...b, bg: '#FBF8F2', sh: `inset 0 0 0 1.5px #1E1D1A, ${side}` }); }
+    });
+    return out;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const vw = window.innerWidth || s.vw, vh = window.innerHeight || s.vh;
+    const scale = s.aw > 0 ? Math.max(0.2, Math.min(s.aw / 1280, s.ah / 800, 1.6)) : Math.max(0.3, Math.min((vw - 32) / 1280, (vh - 64) / 800, 1.6));
+    const dragP = s.drag && s.pieces.find(p => p.id === s.drag.id);
+    const sn = dragP ? this.snap(dragP, [s.drag.x, s.drag.y]) : null;
+    const spriteAt = (p, c, r) => { const [w, h] = SIZE[p.type][p.o]; const [x, y] = toPx((c + w / 2) * L.G, (r + h / 2) * L.G); return { left: x - L.ax, top: y - L.ay, cy: y }; };
+    const sprites = s.pieces.filter(p => p.c !== null).map(p => {
+      const a = spriteAt(p, p.c, p.r);
+      return { bg: `url("${SRC(p)}")`, left: a.left, top: a.top, z: Math.round(a.cy), t: 'translateY(0px)', f: 'none', tr: 'transform .25s', down: e => this.begin(e, p.id), hx: 62, hy: 110, hw: 100, hh: 110, pe: s.phase === 'build' ? 'auto' : 'none' };
+    });
+    if (s.rej) { const p = s.pieces.find(x => x.id === s.rej.id); const a = spriteAt(p, s.rej.c, s.rej.r); sprites.push({ bg: `url("${SRC(p)}")`, left: a.left, top: a.top, z: 950, t: 'translateY(-22px)', f: 'drop-shadow(0 0 6px rgba(228,87,46,.9)) opacity(.85)', tr: 'none', down: null, hx: 0, hy: 0, hw: 0, hh: 0, pe: 'none' }); }
+    const foot = [];
+    if (sn && sn.inside) foot.push({ points: fpPoly(sn.c, sn.r, sn.w, sn.h), fill: '#FFFFFF', fo: 0.55, stroke: '#1E1D1A' });
+    if (s.rej) { const p = s.pieces.find(x => x.id === s.rej.id); const [w, h] = SIZE[p.type][p.o]; foot.push({ points: fpPoly(s.rej.c, s.rej.r, w, h), fill: '#FFD98A', fo: 0.7, stroke: '#E4572E' }); }
+    const zr = { depth: [0, 6], south: [6, 3], north: [11, 3] };
+    const zonesHelp = (s.hints >= 3 && dragP) ? [zr[HOME[dragP.type]]].map(([r0, h]) => ({ points: fpPoly(0, r0, L.COLS, h) })) : [];
+    let drag = { bg: 'none', left: 0, top: 0 };
+    if (dragP) { if (sn.inside) { const a = spriteAt(dragP, sn.c, sn.r); drag = { bg: `url("${SRC(dragP)}")`, left: a.left, top: a.top }; } else drag = { bg: `url("${SRC(dragP)}")`, left: s.drag.x - L.ax, top: s.drag.y + 34 - L.ay }; }
+    const badges = s.pieces.filter(p => p.c !== null && p.type === 'tower' && p.o === 'back').map(p => { const a = spriteAt(p, p.c, p.r); return { x: a.left + L.ax + 28, y: a.cy - 12 }; });
+    const locked = this.locked;
+    const tray = s.pieces.map(p => {
+      const gone = p.c !== null || (dragP && dragP.id === p.id) || (s.rej && s.rej.id === p.id);
+      const lk = p.type === 'tower' && locked;
+      return { img: `url("${SRC(p)}")`, lk, bs: gone || lk ? 'dashed' : 'solid', bg: gone ? 'transparent' : lk ? '#E6DFD0' : '#FBF8F2', imgOp: gone ? 0 : lk ? 0.15 : 1, cursor: gone ? 'default' : 'grab', down: e => { if (!gone) this.begin(e, p.id); } };
+    });
+    const placedN = s.pieces.filter(p => p.c !== null).length;
+    const backN = s.pieces.filter(p => p.type === 'tower' && p.c !== null && p.o !== 'front').length;
+    const r = s.rejections, h = s.hints;
+    let score = 3; if (r >= 3) score--; if (r >= 7 || h >= 2) score--; if (backN > 0) score--; score = Math.max(1, score);
+    const titles = { 3: 'Чутьё главного архитектора', 2: 'Почти как на макете Покровского', 1: 'Проспект собран — сравните с Покровским' };
+    const solved = INIT().map(p => { const [c, rr, o] = SOLUTION[p.id]; return { ...p, c, r: rr, o }; });
+    const notes = [
+      { t: 'Девятиэтажки ушли в глубину микрорайона — проспект подождал другой проект.' },
+      { t: 'Лес и пруд остались: дома вписаны в ландшафт.' },
+      { t: backN === 0 ? 'Все четыре пары башен выходят магазинами на проспект.' : `У ${backN} ${backN === 1 ? 'пары' : 'пар'} витрины смотрят во двор.` },
+    ];
+    return {
+      stageW: Math.round(1280 * scale), stageH: Math.round(800 * scale), stageT: `scale(${scale})`, boardRef: this.boardRef, areaRef: this.areaRef,
+      sprites, foot, zonesHelp, badges, tray, placedN, dragOn: !!dragP, drag,
+      isBuild: s.phase === 'build', isResult: s.phase === 'result',
+      msg: s.msg, msgBg: { info: '#F7F4ED', ok: '#E5EBD9', soft: '#FFF1CF', no: '#FFE6D2' }[s.msgKind],
+      hasHint: h > 0, hints: h, hintText: HINTS[Math.max(0, h - 1)], rej: r,
+      moreHint: () => this.setState(st => ({ hints: Math.min(3, st.hints + 1) })), hintBtnOp: h >= 3 ? 0.4 : 1, hintBtnLabel: h === 0 ? 'Подсказка' : 'Ещё подсказка',
+      allPlaced: placedN === 12, compare: () => this.setState({ phase: 'result' }),
+      backToBuild: () => this.setState({ phase: 'build', msg: MSG.back_tower, msgKind: 'soft' }), canFix: backN > 0,
+      planMine: this.plan(s.pieces), planP: this.plan(solved), notes,
+      stars: [0, 1, 2].map(i => ({ bg: i < score ? '#D9472B' : '#FBF8F2' })), scoreTitle: titles[score],
+      restart: this.restart, solve: this.solve,
+      progress: Array.from({ length: 9 }, (_, i) => ({ bg: `url("svg/stages/stage-${i + 1}.svg")`, op: i <= 3 ? 1 : 0.32, bar: i < 3 ? '#1E1D1A' : i === 3 ? '#D9472B' : 'transparent' })),
+    };
+  }
+}
+</script>
+</body>
+</html>

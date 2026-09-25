@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Этап 4 · Двигаем коробки — спецификация</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+body{margin:0;background:#EFEBE1;color:#1E1D1A;font-family:"Golos Text",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#D9472B;text-decoration-thickness:2px;text-underline-offset:3px}a:hover{color:#1E1D1A}
+</style>
+</helmet>
+<div style="max-width:1160px;margin:0 auto;padding:48px 32px 96px;display:flex;flex-direction:column;gap:72px">
+
+<header style="display:flex;flex-direction:column;gap:18px">
+  <div style="font:500 14px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#57524A">ЭТАП 4 · 1970–1972 · V2 · 25.09.2026</div>
+  <h1 style="margin:0;font:700 clamp(40px,7vw,84px)/0.95 Unbounded,sans-serif;letter-spacing:-.02em">Двигаем коробки</h1>
+  <p style="margin:0;max-width:760px;font-size:21px;line-height:1.45;text-wrap:pretty">Три типа домов, три зоны макета и одна ловушка, взятая из истории: девятиэтажки приходят первыми, и их хочется поставить на проспект. Башни появляются только после того, как посетитель «подождал» — нашёл девятиэтажкам другое место.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+    <a href="Этап 4 — прототип.dc.html" style="display:flex;align-items:center;min-height:56px;padding:0 24px;background:#1E1D1A;color:#FBF8F2;text-decoration:none;border-radius:6px;font:600 18px Unbounded,sans-serif">Открыть прототип →</a>
+    <a href="Система.dc.html" style="font:500 14px 'IBM Plex Mono',monospace">← Система</a>
+  </div>
+</header>
+
+<section id="v3" style="display:flex;flex-direction:column;gap:24px;background:#FBF8F2;border:3px solid #1E1D1A;border-radius:8px;padding:28px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><h2 style="margin:0;font:700 36px Unbounded,sans-serif">V3 · сложнее</h2><a href="Этап 4 v3 — прототип.dc.html" style="display:flex;align-items:center;min-height:56px;padding:0 24px;background:#1E1D1A;color:#FBF8F2;text-decoration:none;border-radius:6px;font:600 18px Unbounded,sans-serif">Прототип v3 →</a></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:28px;align-items:start;font-size:17px;line-height:1.5">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><b>Слотов нет.</b> Макет — сетка 30×14 клеток по 8 м (видна едва-едва, как на коврике для резки). Дом прилипает к сетке в любом месте; под ним только нейтральный контур, без подсказки «можно / нельзя». Зоны не подписаны: их нужно понять из подсказок и реплик.</div>
+      <div><b>12 элементов:</b> 5 девятиэтажек, 3 участка бульвара, 4 пары башен. Касание поворачивает любой дом: девятиэтажка и бульвар — на 90°, башни — на 4 стороны (витрины на север, восток, юг, запад).</div>
+      <div><b>Упаковка по ландшафту.</b> В глубине микрорайона помещается ровно 5 девятиэтажек (проверено перебором). Три из них встают только повёрнутыми, в щели между лесом, прудом и старыми домами. Это и есть «двигал коробки, чтобы вписались в ландшафт» (факт 6).</div>
+      <div><b>Препятствия</b> — лес, пруд, существующие дома, проезжая часть: на них не садится ничего, с отдельной репликой. Лес подходит к проспекту с запада — на юге помещается 4 пары башен плюс 2 клетки запаса, так что расстановку нужно продумать.</div>
+    </div>
+    <pre style="margin:0;background:#1E1D1A;color:#F1EDE4;border-radius:8px;padding:20px 22px;font:500 14px/1.6 'IBM Plex Mono',monospace;overflow-x:auto;white-space:pre">zone(row): 0–5 depth · 6–8 south · 9–10 road · 11–13 north
+SIZE: tower 6×3 | 3×6,  nine 5×2 | 2×5,  boul 8×3 | 3×8
+
+check(piece, c, r, orient):
+  cells = footprint(c, r, SIZE[type][orient])
+  if any cell is road   → 'road'
+  if any cell is water  → 'water'
+  if any cell is house  → 'house'
+  if any cell is forest → 'forest'
+  if overlaps placed    → 'busy'   (не отказ)
+  zones = { zone(row) for cells }
+  if |zones| > 1        → 'cross_' + type   // повернуть
+  if zone != HOME[type] → zone + '_' + type
+  tower & orient != front → sits, badge ↻ (мягко)
+
+unlock towers: ≥ 2 nine placed
+score: 3; −1 if rej ≥ 3; −1 if rej ≥ 7 or hints ≥ 2;
+       −1 if any tower faces the yard; min 1</pre>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(140px,.3fr) minmax(0,1fr);border-top:2px solid #1E1D1A;font-size:16px;line-height:1.45">
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono'">road</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Проспект — магистраль. На проезжей части не строят.</div>
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono'">forest</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Лес — часть города. Дома вписывают в ландшафт, а не ставят поверх него.</div>
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono'">water</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Пруд оставляем: дома вписывают в ландшафт.</div>
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono'">house</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Здесь уже стоят дома 4-го микрорайона.</div>
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono'">cross_*</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Пара башен выходит на проспект целиком · Дом залезает на соседний участок · Бульвар тянется вдоль проспекта — коснитесь, чтобы повернуть.</div>
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono'">no_room</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Для поворота здесь мало места — перетащите дом.</div>
+    <div style="padding:8px 12px 8px 0;border-bottom:1px solid #CFC7B7;font:500 13px 'IBM Plex Mono';color:#D9472B">hint 2</div><div style="padding:8px 0;border-bottom:1px solid #CFC7B7">Девятиэтажкам — место в глубине микрорайона, между лесом, прудом и старыми домами. Три из пяти встанут только повёрнутыми. <span style="color:#D9472B">[R4 — сверить]</span></div>
+    <div style="padding:8px 12px 8px 0;font:500 13px 'IBM Plex Mono';color:#D9472B">hint 3</div><div style="padding:8px 0">Пока вы держите дом, его зона подсвечена зелёным.</div>
+  </div>
+  <div style="font-size:16px;line-height:1.5;color:#57524A">Файлы: <code>svg/stage4v3/</code> — доска, башни в 4 ракурсах, девятиэтажка и бульвар в 2, <code>layout.json</code> (сетка препятствий, проекция, якорь спрайта). Генератор — <code>tools/stage4v3.js</code>: меняете прямоугольники OBS → перегенерируете доску, перебор снова проверит вместимость. Время у стенда ≈ 70–120 с — дольше, чем просили в v2. Если много, уберите 2 девятиэтажки (останется 3, все без поворота) — выйдет ≈ 60 с. Сложность реализации поверх v2: сетка + снэп + проверка ≈ 1,5 ч, 4 ракурса и повороты на макете ≈ 1 ч.</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:28px">
+  <h2 style="margin:0;font:700 36px Unbounded,sans-serif">1 · Механика</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:32px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:14px;font-size:18px;line-height:1.5">
+      <div><b>Цель.</b> Собрать Центральный проспект так, как решил Покровский: 8 элементов в 8 клеток макета.</div>
+      <div><b>Макет.</b> Изометрия, север — к зрителю. Три зоны:</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;padding-left:12px">
+        <b>Север × 2</b><div>длинные клетки вдоль проспекта</div>
+        <b>Юг × 4</b><div>участки вдоль проспекта</div>
+        <b>Глубина × 2</b><div>за южными участками, среди существующих домов 4-го мкр</div>
+      </div>
+      <div><b>Лоток.</b> 2 девятиэтажки, 2 бульвара, 4 пары 17-этажных башен на стилобате с магазинами. Башни сначала закрыты: «Ищут…».</div>
+      <div><b>Жесты.</b> Перетаскивание — поставить или переставить. Касание пары башен (в лотке или на макете) — развернуть на 180°: витрины «к проспекту» или «во двор».</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:600 20px Unbounded,sans-serif">Правила и откуда они</div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.4fr) auto minmax(0,.8fr);border-top:2px solid #1E1D1A;font-size:16px;line-height:1.4">
+        <div style="padding:10px 10px 10px 0;border-bottom:1px solid #CFC7B7"><b>R1</b> На севере — только бульвар</div><div style="padding:10px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">факт 1</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">жёсткое: не садится</div>
+        <div style="padding:10px 10px 10px 0;border-bottom:1px solid #CFC7B7"><b>R2</b> На юге — только башни с магазинами</div><div style="padding:10px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">факты 1, 3</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">жёсткое</div>
+        <div style="padding:10px 10px 10px 0;border-bottom:1px solid #CFC7B7"><b>R3</b> Девятиэтажки — не на проспект</div><div style="padding:10px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">факт 2</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">жёсткое</div>
+        <div style="padding:10px 10px 10px 0;border-bottom:1px solid #CFC7B7"><b>R4</b> Девятиэтажки — в глубине микрорайона</div><div style="padding:10px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono';color:#D9472B">сверить</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">жёсткое</div>
+        <div style="padding:10px 10px 10px 0;border-bottom:1px solid #CFC7B7"><b>R5</b> Башни открываются после двух девятиэтажек</div><div style="padding:10px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">факт 2</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">порядок</div>
+        <div style="padding:10px 10px 10px 0"><b>R6</b> Витрины — к проспекту</div><div style="padding:10px;font-family:'IBM Plex Mono'">факт 1</div><div style="padding:10px 0">мягкое: садится, помечено ↻</div>
+      </div>
+      <div style="font-size:15px;line-height:1.45;color:#57524A">R4 взято из <code>objects.json</code> (towers-central: «поставить их в глубине 4-го микрорайона»). Этого нет в списке из 7 фактов — <b>требует проверки</b>. Если не подтвердится, глубину переименовать в «Отложено» и оставить как лоток-парковку, текст ok_nine поменять. Факт 7 (Меерсон) не используется.</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px">
+    <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:8px;font-size:17px;line-height:1.45"><div style="font:500 13px 'IBM Plex Mono';color:#D9472B">ПОЧЕМУ НЕ С ПЕРВОГО ЖЕСТА</div>Первыми в лотке — девятиэтажки. Естественный ход — поставить их на пустой проспект. Правило R3 это мягко отклоняет, и игрок впервые задумывается, куда ещё их деть. Второе «чуть подумать» — развернуть башни: 3 из 4 лежат в лотке витринами во двор.</div>
+    <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:8px;font-size:17px;line-height:1.45"><div style="font:500 13px 'IBM Plex Mono';color:#D9472B">КАК ЗАКАНЧИВАЕТСЯ</div>8 из 8 → «Сравнить с Покровским». Слева план игрока, справа схема Покровского, пометки об отличиях, «архитектурное чутьё» 1–3 и факт про Никсона. Если витрины смотрят во двор — «Развернуть витрины» возвращает на макет. «Дальше» → 3D-рост 4-го мкр и карточка башен.</div>
+    <div style="background:#FBF8F2;border:2px solid #1E1D1A;border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:8px;font-size:17px;line-height:1.45"><div style="font:500 13px 'IBM Plex Mono';color:#D9472B">ВРЕМЯ</div>8 перетаскиваний по ~4 с + 1–3 отказа + 3 разворота + чтение реплик ≈ 45–80 с. Без единой ошибки и подсказок — около 35 с.</div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <h2 style="margin:0;font:700 36px Unbounded,sans-serif">2 · Логика проверки</h2>
+  <pre style="margin:0;background:#1E1D1A;color:#F1EDE4;border-radius:8px;padding:24px 28px;font:500 15px/1.6 'IBM Plex Mono',monospace;overflow-x:auto;white-space:pre">HOME = { nine: 'depth', boul: 'north', tower: 'south' }
+
+onDragStart(piece):
+  if piece.type == 'tower' and not unlocked and piece.cell == null:
+    say('locked'); cancel                    // R5, не считается отказом
+
+onDrop(piece, point):
+  cell = polygonHit(point + (0, 30)) ?? nearestCenter(point, ≤ 70px)
+  if cell == null:            return toTray(piece)
+  if cell.occupied:           say('busy'); return toTray(piece)   // не отказ
+
+  zoneOk   = HOME[piece.type] == cell.zone                         // R1–R4
+  orientOk = piece.type != 'tower' or piece.orient == 'front'      // R6
+  if not zoneOk or (STRICT_ORIENT and not orientOk):
+    rejections += 1
+    showRejected(piece, cell)      // подъём −22px, тёплый контур, клетка #FFD98A
+    say(zone_type_key)             // см. тексты
+    after 1100ms: toTray(piece)
+    return
+
+  place(piece, cell)
+  if count(nine placed) == 2 and not unlocked:
+    unlocked = true; say('arrived')          // башни появляются в лотке
+  elif all 8 placed:            say('done'); show button 'Сравнить'
+  else say(orientOk ? ok_[type] : 'back_tower')
+
+onTap(piece):                                 // pointerup, сдвиг < 10px
+  if piece.type == 'tower': piece.orient = flip(piece.orient)
+
+hint(n):  hints += 1 (общий счётчик игры), n ≤ 3
+  n == 3 → во время drag клетки HOME[type] зелёные, прочие приглушены
+
+score():
+  s = 3
+  if rejections ≥ 2:                 s -= 1
+  if rejections ≥ 5 or hintsHere ≥ 2: s -= 1
+  if towersBackFacing > 0:           s -= 1
+  return max(1, s)</pre>
+  <div style="font-size:16px;color:#57524A">Координаты клеток и якорь спрайта — <a href="svg/stage4/layout.json">svg/stage4/layout.json</a> (полигоны в px доски 884×600, центр клетки, якорь элемента ax 160 / ay 203 при размере спрайта 319×295).</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <h2 style="margin:0;font:700 36px Unbounded,sans-serif">3 · Элементы</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:14px">
+    <figure style="margin:0;background:#E6DFD0;border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px"><img src="svg/stage4/piece-towers-pair-front.svg" alt="" style="width:100%"><figcaption style="font-size:15px"><b>Пара башен · витрины к проспекту</b><br><code style="font-size:12px">piece-towers-pair-front.svg</code></figcaption></figure>
+    <figure style="margin:0;background:#E6DFD0;border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px"><img src="svg/stage4/piece-towers-pair-back.svg" alt="" style="width:100%"><figcaption style="font-size:15px"><b>Пара башен · витрины во двор</b><br><code style="font-size:12px">piece-towers-pair-back.svg</code></figcaption></figure>
+    <figure style="margin:0;background:#E6DFD0;border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px"><img src="svg/stage4/piece-nine-storey.svg" alt="" style="width:100%"><figcaption style="font-size:15px"><b>Девятиэтажка («соблазн»)</b><br><code style="font-size:12px">piece-nine-storey.svg</code></figcaption></figure>
+    <figure style="margin:0;background:#E6DFD0;border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px"><img src="svg/stage4/piece-boulevard.svg" alt="" style="width:100%"><figcaption style="font-size:15px"><b>Бульвар</b><br><code style="font-size:12px">piece-boulevard.svg</code></figcaption></figure>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end">
+    <figure style="margin:0;display:flex;flex-direction:column;gap:6px;align-items:center"><img src="svg/stage4/slot-empty.svg" alt="" style="height:90px"><figcaption style="font:500 13px 'IBM Plex Mono'">slot-empty</figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:6px;align-items:center"><img src="svg/stage4/slot-drop-hover.svg" alt="" style="height:90px"><figcaption style="font:500 13px 'IBM Plex Mono'">slot-drop-hover</figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:6px;align-items:center"><img src="svg/stage4/slot-can.svg" alt="" style="height:90px"><figcaption style="font:500 13px 'IBM Plex Mono'">slot-can (подсказка 3)</figcaption></figure>
+    <figure style="margin:0;display:flex;flex-direction:column;gap:6px;align-items:center"><img src="svg/stage4/slot-cannot.svg" alt="" style="height:90px"><figcaption style="font:500 13px 'IBM Plex Mono'">slot-cannot (отказ)</figcaption></figure>
+  </div>
+  <figure style="margin:0;display:flex;flex-direction:column;gap:8px"><img src="svg/stage4/board.svg" alt="" style="width:100%;max-width:884px;background:#EFEBE1;border:1px solid #CFC7B7"><figcaption style="font-size:15px"><b>Доска</b> <code style="font-size:12px">board.svg</code> — 884×600, та же проекция, что у элементов; клетки уже нанесены тонкой линией. Позиции домов 4-го мкр и леса — условные, при желании заменить рендером из OSM с той же камерой.</figcaption></figure>
+</section>
+
+<section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:start">
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font:700 36px Unbounded,sans-serif">4 · Как у Покровского</h2>
+    <img src="svg/stage4/scheme-pokrovsky.svg" alt="" style="width:100%;max-width:400px;border:2px solid #1E1D1A">
+    <div style="font-size:16px;line-height:1.5;color:#57524A">План сверху, не в масштабе: четыре пары башен на южной стороне с магазинами к проспекту, бульвар на севере, девятиэтажки в глубине (R4 — сверить). Реальные позиции пар снять с OSM и перерисовать — сейчас они равномерные.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <h2 style="margin:0;font:700 36px Unbounded,sans-serif">6 · Сложность</h2>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;border-top:2px solid #1E1D1A;font-size:16px;line-height:1.4">
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Доска + спрайты по layout.json, drag, попадание в полигон</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">1 ч</div>
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Зоны R1–R4, отказ с анимацией и репликой</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">1 ч</div>
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Закрытые башни (R5)</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">20 мин</div>
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Разворот тапом (tap vs drag, 2 спрайта)</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">40 мин</div>
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Лестница подсказок + подсветка клеток</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">30 мин</div>
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Итог: сравнение, оценка, факт</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">1 ч</div>
+      <div style="padding:9px 0;border-bottom:1px solid #CFC7B7">Дольше: доска из OSM-рендера вместо board.svg и реальные позиции пар</div><div style="padding:9px 0 9px 12px;border-bottom:1px solid #CFC7B7;font-family:'IBM Plex Mono'">2+ ч</div>
+      <div style="padding:9px 0;font-weight:600">Если нет времени: убрать разворот и сравнение-план</div><div style="padding:9px 0 9px 12px;font-family:'IBM Plex Mono';font-weight:600">≈ 3 ч</div>
+    </div>
+  </div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:20px">
+  <h2 style="margin:0;font:700 36px Unbounded,sans-serif">5 · Тексты</h2>
+  <div style="font-size:15px;color:#57524A">Голос справки. Покровский — только в третьем лице. Ключи совпадают с кодом прототипа.</div>
+  <div style="display:grid;grid-template-columns:minmax(140px,.35fr) minmax(0,1fr);border-top:2px solid #1E1D1A;font-size:17px;line-height:1.45">
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">task</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Проспект хотели застроить обычными девятиэтажками. Расставьте дома так, как решил Покровский.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">start</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Возьмите дом из лотка и перетащите его на макет.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono';color:#D9472B">hint 1</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Проспект — магистраль. На северной стороне задуман прогулочный бульвар, на южной — магазины.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono';color:#D9472B">hint 2</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Девятиэтажкам нашлось место в глубине микрорайона, подальше от проспекта. <span style="color:#D9472B">[R4 — сверить]</span></div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono';color:#D9472B">hint 3</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Башни — на южную сторону, витрины к проспекту. Пока вы держите дом, подходящие места подсвечены.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">north_*</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Северная сторона — прогулочный бульвар. Дома здесь не ставят.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">south_nine</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Проспект хотели застроить обычными девятиэтажками. Покровский предложил подождать.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">*_boul</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Бульвар идёт вдоль проспекта, по его северной стороне.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">depth_tower</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Магазины в нижних этажах башен должны выходить на проспект.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">busy</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Здесь уже стоит дом.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">locked</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Проект для проспекта ещё ищут. Сначала найдите место девятиэтажкам.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">arrived</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Покровский нашёл проект: парные 17-этажные башни с магазинами внизу.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">ok_nine</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Девятиэтажка встала в глубине микрорайона. Проспект подождёт.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">ok_boul</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Бульвар — на северной стороне, для прогулок.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">ok_tower</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Магазины выходят на проспект.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">back_tower</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Витрины смотрят во двор. Коснитесь башен, чтобы развернуть их к проспекту.</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">done</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Макет собран. Сравним с Покровским?</div>
+    <div style="padding:10px 12px 10px 0;border-bottom:1px solid #CFC7B7;font:500 14px 'IBM Plex Mono'">score 3 / 2 / 1</div><div style="padding:10px 0;border-bottom:1px solid #CFC7B7">Чутьё главного архитектора · Почти как на макете Покровского · Проспект собран — сравните с Покровским</div>
+    <div style="padding:10px 12px 10px 0;font:500 14px 'IBM Plex Mono'">fact</div><div style="padding:10px 0">Башни сдали досрочно — к визиту президента США Никсона 25 мая 1972 года. Визит отменили.</div>
+  </div>
+</section>
+</div>
+</x-dc>
+</body>
+</html>
