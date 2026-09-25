@@ -952,3 +952,13 @@ h3 {
 .map-note.rule {
   background: var(--paper-3);
 }
+
+/* Листание страниц листа — без повторного «выезда» */
+.sheet.still {
+  animation: none;
+}
+
+/* Пока открыт лист находки, панель этапа под ним пустая (не просвечивает год) */
+[data-screen="found"] .panel > * {
+  visibility: hidden;
+}

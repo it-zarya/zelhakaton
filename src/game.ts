@@ -313,11 +313,12 @@ export class Game {
       this.page = 0;
       this.screen = "found";
       this.root.dataset.screen = "found";
-      this.showSheet();
+      this.showSheet(true);
     });
   }
 
-  private showSheet() {
+  /** first — выезд с анимацией (только при появлении); листание страниц — без неё */
+  private showSheet(first = false) {
     this.root.querySelector(".sheet")?.remove();
     const o = this.pages[this.page];
     this.map.highlight(o.id);
@@ -333,6 +334,7 @@ export class Game {
       back: this.page > 0,
       next,
     });
+    if (!first) sheet.classList.add("still");
     this.root.append(sheet);
     this.bind(
       {
