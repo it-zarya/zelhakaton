@@ -73,6 +73,15 @@ tools/osm/              // query/buildings.overpassql, raw/buildings.json, build
 tools/content/          // build_content.py → src/data/{stages,objects,routes}.json
 ```
 
+## Админка контента
+
+`admin.html` → `src/admin.ts` (отдельная точка входа, не импортирует контент — сохранение не перезагружает её).
+API — `vite-admin-plugin.ts` (`apply: "serve"`, в сборку не попадает): `GET/PUT /__admin/content`, `POST /__admin/photo?name=…`.
+Защита своими проверками (встроенные CORS/allowedHosts Vite выполняются после наших middleware): только loopback,
+изменяющие запросы — с заголовком `X-Admin: 1`, лимиты размера, имя фото `^[a-z0-9-]+\.jpg$` + сигнатура JPEG,
+проверка структуры JSON, атомарная запись. Фото уменьшаются в браузере до 1000 px (JPEG 0.82).
+Источник правды — `src/data/{stages,objects,routes}.json`; `tools/content/build_content.py` отключён (`--force` перезапишет правки).
+
 ## Пороги игры (`src/game.ts`)
 
 | Константа | Значение | Смысл |

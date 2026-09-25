@@ -1,3 +1,8 @@
+import sys
+# С 2026-09-25 источник правды — src/data/*.json, их правят через админку (#/admin).
+# Этот генератор перезапишет JSON и сотрёт правки из админки. Запуск только осознанно: --force
+if "--force" not in sys.argv:
+    sys.exit("build_content.py отключён: контент правится в админке (#/admin). Запуск с --force перезапишет src/data/*.json.")
 import json, re
 OUT = str(__import__("pathlib").Path(__file__).resolve().parents[2] / "src/data") + "/"
 
