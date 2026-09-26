@@ -268,3 +268,31 @@ body.admin {
 .adm-fail {
   padding: 40px;
 }
+
+.adm-link {
+  display: inline-block;
+  min-width: 320px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: #1e1d1a;
+  text-decoration: underline;
+  text-decoration-color: #cfc7b7;
+  cursor: pointer;
+}
+
+.adm-link:hover {
+  color: #d9472b;
+}
+
+.adm-back {
+  margin-bottom: 12px;
+  padding: 6px 12px;
+  border: 1.5px solid #1e1d1a;
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}

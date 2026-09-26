@@ -12,6 +12,7 @@ const ZONES = (zonesFile as { zones: { id: string; label: string }[] }).zones;
 
 let data: Content;
 let sel: { kind: "stage"; i: number } | { kind: "object"; id: string } | null = null;
+let backStage: number | null = null; // из какого этапа открыли объект — для кнопки «← к этапу»
 let dirty = false;
 let root: HTMLElement;
 
@@ -72,8 +73,8 @@ function stageForm(i: number) {
   const list = s.objectIds
     .map((id, k) => {
       const o = data.objects.find((x) => x.id === id);
-      return `<li><span>${esc(o?.name ?? id + " (нет такого объекта)")}</span>
-        <button data-act="obj-up" data-k="${k}">↑</button><button data-act="obj-down" data-k="${k}">↓</button><button data-act="obj-del" data-k="${k}">✕</button></li>`;
+      return `<li><button class="adm-link" data-open="${esc(id)}">${esc(o?.name ?? id + " (нет такого объекта)")}</button>
+        <button data-act="obj-edit" data-open="${esc(id)}">✎ изменить</button><button data-act="obj-up" data-k="${k}">↑</button><button data-act="obj-down" data-k="${k}">↓</button><button data-act="obj-del" data-k="${k}">✕</button></li>`;
     })
     .join("");
   const free = data.objects.filter((o) => !s.objectIds.includes(o.id));
@@ -110,6 +111,7 @@ function objectForm(id: string) {
     .join("");
   const usedIn = data.stages.map((s, i) => (s.objectIds.includes(o.id) ? i + 1 : 0)).filter(Boolean);
   return `
+    ${backStage !== null ? `<button class="adm-back" data-act="back-stage">← к этапу ${backStage + 1}</button>` : ""}
     <h1>${esc(o.name)} <small>${usedIn.length ? `этап ${usedIn.join(", ")}` : "не входит в этапы"}</small></h1>
     <div class="adm-row">${field("Название", "name", o.name)}${field("Год", "year", o.year)}</div>
     <div class="adm-row">${field("Адрес", "address", o.address)}${field("Авторы", "authors", o.authors ?? "")}</div>
@@ -132,14 +134,28 @@ function objectForm(id: string) {
 // ——— события ———
 
 function bind() {
-  root.querySelectorAll<HTMLElement>("[data-stage]").forEach((b) => b.addEventListener("click", () => ((sel = { kind: "stage", i: +b.dataset.stage! }), render())));
-  root.querySelectorAll<HTMLElement>("[data-object]").forEach((b) => b.addEventListener("click", () => ((sel = { kind: "object", id: b.dataset.object! }), render())));
+  root.querySelectorAll<HTMLElement>("[data-stage]").forEach((b) => b.addEventListener("click", () => ((sel = { kind: "stage", i: +b.dataset.stage! }), (backStage = null), render())));
+  root.querySelectorAll<HTMLElement>("[data-object]").forEach((b) => b.addEventListener("click", () => ((sel = { kind: "object", id: b.dataset.object! }), (backStage = null), render())));
+  root.querySelectorAll<HTMLElement>("[data-open]").forEach((b) =>
+    b.addEventListener("click", () => {
+      backStage = sel?.kind === "stage" ? sel.i : null;
+      sel = { kind: "object", id: b.dataset.open! };
+      render();
+      root.querySelector(".adm-form")?.scrollTo(0, 0);
+    }),
+  );
   const form = root.querySelector<HTMLElement>(".adm-form")!;
   form.addEventListener("input", (e) => onInput(e.target as HTMLInputElement));
   form.addEventListener("change", (e) => onInput(e.target as HTMLInputElement));
   root.querySelectorAll<HTMLElement>("[data-act]").forEach((b) => {
     const act = b.dataset.act!;
-    if (act === "obj-add" || act === "upload") return; // обрабатываются в change
+    if (act === "obj-add" || act === "upload" || act === "obj-edit") return; // obj-edit — через data-open
+    if (act === "back-stage")
+      return void b.addEventListener("click", () => {
+        sel = { kind: "stage", i: backStage ?? 0 };
+        backStage = null;
+        render();
+      });
     b.addEventListener("click", () => onAct(act, b));
   });
   root.querySelector<HTMLSelectElement>('[data-act="obj-add"]')?.addEventListener("change", (e) => {
