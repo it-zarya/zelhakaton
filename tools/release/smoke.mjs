@@ -4,15 +4,18 @@ import { chromium } from "playwright";
 
 const U = (process.argv[2] ?? "http://localhost:4173/").replace(/\/?$/, "/");
 const host = new URL(U).host;
+// Разрешённые внешние хосты: Яндекс Метрика (счётчик it-zarya.ru, index.html). Всё остальное — только со своего сервера.
+const ALLOWED = /(^|\.)(yandex\.ru|yandex\.net)$/;
+const allowed = (url) => { try { return ALLOWED.test(new URL(url).host); } catch { return false; } };
 const errs = [];
 const b = await chromium.launch({ channel: "chrome" });
 
 async function page(path, viewport, fn) {
   const p = await b.newPage({ viewport, hasTouch: true });
   p.on("pageerror", (e) => errs.push(`${path}: JS ${e.message}`));
-  p.on("console", (m) => m.type() === "error" && !/favicon/.test(m.location().url) && errs.push(`${path}: console ${m.text()}`));
-  p.on("response", (r) => r.status() >= 400 && !/favicon/.test(r.url()) && errs.push(`${path}: ${r.status()} ${r.url()}`));
-  p.on("request", (r) => new URL(r.url()).host !== host && !r.url().startsWith("data:") && errs.push(`${path}: внешний запрос ${r.url()}`));
+  p.on("console", (m) => m.type() === "error" && !/favicon/.test(m.location().url) && !allowed(m.location().url) && errs.push(`${path}: console ${m.text()}`));
+  p.on("response", (r) => r.status() >= 400 && !/favicon/.test(r.url()) && !allowed(r.url()) && errs.push(`${path}: ${r.status()} ${r.url()}`));
+  p.on("request", (r) => new URL(r.url()).host !== host && !r.url().startsWith("data:") && !allowed(r.url()) && errs.push(`${path}: внешний запрос ${r.url().slice(0, 120)}`));
   await p.goto(U + path, { waitUntil: "networkidle" });
   await p.waitForTimeout(1500);
   await fn?.(p);
