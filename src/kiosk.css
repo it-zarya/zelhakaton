@@ -1427,3 +1427,28 @@ h3 {
 [data-screen="found"] .map-area {
   background: #cbcac7;
 }
+
+/* Подсказки: все открытые остаются на панели; fitHints() уменьшает --fit, чтобы влезли без прокрутки */
+.flex-mid {
+  --fit: 1;
+  gap: calc(12 * var(--u) * var(--fit));
+}
+
+.flex-mid .box.hint {
+  gap: calc(8 * var(--u) * var(--fit));
+  padding: calc(14 * var(--u) * var(--fit)) calc(16 * var(--u) * var(--fit));
+  font-size: calc(21 * var(--u) * var(--fit));
+}
+
+.flex-mid .box.hint .mono {
+  font-size: calc(18 * var(--u) * var(--fit));
+}
+
+/* прошлые подсказки чуть тише, свежая — полным цветом */
+.flex-mid .box.hint:not(:last-child) {
+  opacity: 0.72;
+}
+
+.flex-mid > .box.hint {
+  flex-shrink: 0; /* иначе flex сжимает коробки и режет текст вместо честного переполнения */
+}

@@ -14,7 +14,7 @@ import objects from "./data/objects.json";
 import routes from "./data/routes.json";
 import ui from "./data/ui.json";
 import { Fog } from "./fog";
-import { Game, fitAttractTitle, fitSheet } from "./game";
+import { Game, fitAttractTitle, fitHints, fitSheet } from "./game";
 import { City3D } from "./city3d";
 import { ColorReveal } from "./reveal";
 import { Maket } from "./maket";
@@ -97,6 +97,7 @@ async function boot() {
       fog.resize(); // туман перерисуется с учётом открытых зон
       fitAttractTitle(panel);
       document.querySelectorAll<HTMLElement>(".sheet").forEach(fitSheet);
+      fitHints(panel);
     }, 150);
   });
 }

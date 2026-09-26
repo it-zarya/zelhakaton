@@ -219,14 +219,20 @@ export class Game {
       <h2 class="stage-title">${esc(s.title)}</h2>
       ${s.zones.length > 1 ? `<p class="mono accent" data-parts>Найдено ${this.partFound.size} из ${s.zones.length} мест</p>` : ""}
       <div class="flex-mid">
-        <div class="box ${newHint ? "new" : ""}">
-          <p class="mono">Подсказка ${this.hintIdx + 1} из 3</p>
-          <p>${esc(s.hints[this.hintIdx])}</p>
-        </div>
+        ${s.hints
+          .slice(0, this.hintIdx + 1) // открытые подсказки остаются на экране, новая — снизу
+          .map(
+            (h, k) => `<div class="box hint ${newHint && k === this.hintIdx ? "new" : ""}">
+          <p class="mono">Подсказка ${k + 1} из 3</p>
+          <p>${esc(h)}</p>
+        </div>`,
+          )
+          .join("")}
       </div>
       <button class="btn" data-act="hint" ${this.hintIdx >= 2 ? "disabled" : ""}>Ещё подсказка</button>
       ${this.progress()}`;
     this.heatLit = -1;
+    fitHints(this.panel);
     this.bind({ hint: () => this.nextHint() });
   }
 
@@ -716,10 +722,20 @@ export function fitAttractTitle(panel: HTMLElement) {
   if (sub) fit(sub, [sub.textContent ?? ""]);
 }
 
+/** Все открытые подсказки — без прокрутки: уменьшаем шрифт (--fit), пока не влезут */
+export function fitHints(panel: HTMLElement) {
+  const mid = panel.querySelector<HTMLElement>(".flex-mid");
+  if (!mid || !mid.querySelector(".box.hint")) return;
+  fitBox(mid);
+}
+
 /** Текст карточки — без прокрутки: уменьшаем шрифт (--fit), пока всё не поместится */
 export function fitSheet(sheet: HTMLElement) {
   const t = sheet.querySelector<HTMLElement>(".sheet-text");
-  if (!t) return;
+  if (t) fitBox(t);
+}
+
+function fitBox(t: HTMLElement) {
   const run = () => {
     let lo = 0.6, hi = 1;
     t.style.setProperty("--fit", "1");
