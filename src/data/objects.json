@@ -741,7 +741,19 @@
       "https://www.netall.ru/history/1974/shtyki/",
       "https://www.zelenograd.ru/story/istoriya-dt/"
     ],
-    "photo": null
+    "photo": null,
+    "photos": [
+      {
+        "src": "photos/museum-fleyta-0.jpg",
+        "caption": "Дом-«Флейта»: здесь экспозиция музея",
+        "credit": ""
+      },
+      {
+        "src": "photos/museum-fleyta-1.jpg",
+        "caption": "Зал экспозиции во «Флейте»",
+        "credit": ""
+      }
+    ]
   },
   {
     "id": "egg",
