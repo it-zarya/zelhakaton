@@ -7,7 +7,20 @@ updated: 2026-09-26
 
 ← [[index]] · связано: [[workflow]], [[architecture]], [[decisions/0005-deploy-rsync|ADR 0005]]
 
-Прод: **https://zelenograd.it-zarya.ru** — nginx на сервере `138.124.93.52`, раздаёт статику из папки сайта. Репозиторий: https://github.com/it-zarya/zelhakaton (ветка `main`).
+Прод: **https://zelenograd.it-zarya.ru**
+
+| | |
+|---|---|
+| Сервер | `45.9.120.124` (aeza, **общий**: там же другие сервисы it-zarya) |
+| SSH | `ssh alex@45.9.120.124`, вход по ключу |
+| Папка сайта | `/opt/www/zelenograd` (владелец `alex`) |
+| Веб-сервер | nginx в Docker-контейнере `nginx`; папка смонтирована read-only как `/usr/share/nginx/html/zelenograd` |
+| Конфиг nginx | `/opt/www/nginx.conf` (общий на все сайты) |
+| TLS | Let's Encrypt через certbot, `/opt/www/certbot` |
+
+DNS домена при проверке 2026-09-26 отдавал `138.124.93.52` — вероятно, прокси перед сервером.
+
+На сервере трогаем **только** `/opt/www/zelenograd`: контейнер nginx и его конфиг общие с другими сайтами. Репозиторий: https://github.com/it-zarya/zelhakaton (ветка `main`).
 
 ## Способ: сборка и проверка на ноутбуке → rsync (ADR 0005)
 
@@ -24,19 +37,19 @@ npm run release
 
 Проверить прод отдельно: `npm run smoke -- https://zelenograd.it-zarya.ru`.
 
-## Настройка (один раз на машине)
+## Настройка
 
-`.env.deploy` в корне (в git не попадает, `.env*` в `.gitignore`):
+По умолчанию `release.sh` катит в `alex@45.9.120.124:/opt/www/zelenograd/`. Переопределить — `DEPLOY_TARGET` в `.env.deploy` (в git не попадает, `.env*` в `.gitignore`).
 
-```bash
-DEPLOY_TARGET=<user>@138.124.93.52:/<папка сайта>/
-```
-
-SSH-доступ к серверу — только из Bitwarden (см. глобальные правила). Пользователь и путь к папке сайта — **не выяснены**, см. «Открытые вопросы» в [[index]].
+Нужен SSH-ключ, пущенный на сервер под `alex`. Ключи и пароли — только в Bitwarden (см. глобальные правила), в репозиторий не кладём.
 
 ## Откат
 
 `git checkout prod-<тег>` → `npm run release` → вернуться на `master`.
+
+## Правки из админки
+
+Админка работает только локально и пишет в `src/data/*.json` и `public/photos/`. В прод правки попадают только так: проверить на http://localhost:5173 → закоммитить → `git push` → `npm run release`.
 
 ## Правила
 
