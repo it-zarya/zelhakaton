@@ -533,11 +533,11 @@ export class Game {
     this.fog.enabled = false;
     // город целиком на время этапа
     this.map.setOpenZones(this.map.zonePaths.keys());
-    this.map.showPlan(true);
+    this.map.showPlan(true, this.open); // найденное на этапах 1–5 = построено до 1971
     const hatch = document.createElement("div");
     hatch.className = "hatch";
     this.mapArea.append(hatch);
-    this.note("Скан генплана 1971 · линии поверх карты", "scan");
+    this.note(`Генплан 1971 · <span class="built-key"></span> уже построено · контуры — план`, "scan");
     const s = this.stage;
     const o = s.objectIds.map((id) => this.objects.get(id)).find(Boolean);
     if (o) this.found.push(o.id);

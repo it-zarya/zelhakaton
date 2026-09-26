@@ -175,9 +175,12 @@ export class City3D {
     this.pulseLayer.replaceChildren();
   }
 
-  showPlan(on: boolean) {
+  /** built — зоны, уже построенные к моменту генплана: подсвечиваются заливкой и красным контуром */
+  showPlan(on: boolean, built: Iterable<string> = []) {
     if (!on) return void this.planLayer.replaceChildren();
+    const done = [...built].map((id) => this.zonePaths.get(id)).filter((d): d is string => !!d);
     this.planLayer.replaceChildren(
+      ...done.map((d) => svgPath(d, "zone-built")),
       ...[...this.zonePaths.values()].map((d, i) => {
         const p = svgPath(d, "plan-line");
         p.setAttribute("pathLength", "1");

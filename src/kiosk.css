@@ -1400,3 +1400,25 @@ h3 {
   gap: calc(8 * var(--u) * var(--fit));
   padding: calc(14 * var(--u) * var(--fit)) calc(16 * var(--u) * var(--fit));
 }
+
+/* Генплан: построенное до 1971 — тёплая заливка и красный контур, остальное — только линии плана */
+.zone-built {
+  fill: var(--accent);
+  fill-opacity: 0.28;
+  stroke: var(--accent);
+  stroke-width: 3.5;
+  animation: built-in 900ms var(--ease-out);
+}
+
+@keyframes built-in {
+  from { fill-opacity: 0; stroke-opacity: 0; }
+}
+
+.built-key {
+  display: inline-block;
+  width: 1.2em;
+  height: 0.8em;
+  vertical-align: -0.05em;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  border: 2px solid var(--accent);
+}
