@@ -12,6 +12,7 @@ import zones from "./data/zones.json";
 import stages from "./data/stages.json";
 import objects from "./data/objects.json";
 import routes from "./data/routes.json";
+import ui from "./data/ui.json";
 import { Fog } from "./fog";
 import { Game } from "./game";
 import { City3D } from "./city3d";
@@ -20,7 +21,7 @@ import { Maket } from "./maket";
 import { isMobileRoute, renderMobile } from "./mobile";
 import type { Content, ZonesFile } from "./types";
 
-const content = { stages, objects, routes } as Content;
+const content = { stages, objects, routes, ui } as Content;
 const app = document.querySelector<HTMLElement>("#app")!;
 
 /** Отдельный сервис: мини-игра «Двигаем коробки» во весь экран (#/maket) */

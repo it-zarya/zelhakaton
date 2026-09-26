@@ -120,14 +120,17 @@ export class Game {
     this.map.setOthers(true);
     this.fog.enabled = true;
     this.fog.startDemo(5000, 10000);
-    this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">Проведите пальцем по карте`);
+    const t = this.c.ui!.attract;
+    // годы вида «1964–2002» не разрываем
+    const nowrapYears = (x: string) => esc(x).replace(/(\d{4}[–—-]\d{4})/g, '<span style="white-space:nowrap">$1</span>');
+    this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">${esc(t.mapNote)}`);
     this.panel.innerHTML = `
-      <p class="eyebrow">Игорь Покровский · главный архитектор Зеленограда <span style="white-space:nowrap">1964–2002</span></p>
-      <h1 class="attract-title">Зеленоград Покровского<span>от проекта до&nbsp;реализации</span></h1>
+      <p class="eyebrow">${nowrapYears(t.eyebrow)}</p>
+      <h1 class="attract-title">${esc(t.title)}${t.subtitle ? `<span>${esc(t.subtitle)}</span>` : ""}</h1>
       <div class="spacer"></div>
-      <p class="cta"><b>Постройте город вместе с Покровским.</b> Найдите на карте, где и когда вырастал Зеленоград — от первого дома 1961 года до новых кварталов.</p>
-      <button class="btn primary big" data-act="play">Строить город →</button>
-      <p class="mono">${this.c.stages.length} этапов · ~3 минуты</p>`;
+      <p class="cta">${t.ctaTitle ? `<b>${esc(t.ctaTitle)}</b> ` : ""}${esc(t.ctaText)}</p>
+      <button class="btn primary big" data-act="play">${esc(t.button)}</button>
+      <p class="mono">${esc(t.note.replace("{n}", String(this.c.stages.length)))}</p>`;
     this.panel.querySelector(".attract-title")!.parentElement!.classList.add("attract");
     this.bind({ play: () => this.startGame() });
   }

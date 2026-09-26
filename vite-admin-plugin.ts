@@ -14,7 +14,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const DATA = path.join(ROOT, "src/data");
 const PHOTOS = path.join(ROOT, "public/photos");
-const FILES = ["stages", "objects", "routes"] as const;
+const FILES = ["stages", "objects", "routes", "ui"] as const;
 const MAX_JSON = 5 * 1024 * 1024;
 const MAX_PHOTO = 15 * 1024 * 1024;
 
@@ -56,6 +56,8 @@ async function writeAtomic(file: string, data: string | Buffer) {
 function validate(c: unknown): string | null {
   const x = c as Record<string, unknown>;
   if (!x || !Array.isArray(x.stages) || !Array.isArray(x.objects) || !Array.isArray(x.routes)) return "нужны массивы stages, objects, routes";
+  const a = (x.ui as { attract?: Record<string, unknown> } | undefined)?.attract;
+  if (!a || typeof a.title !== "string" || typeof a.button !== "string") return "нужны тексты первого экрана (ui.attract)";
   const ids = new Set<string>();
   for (const o of x.objects as Record<string, unknown>[]) {
     if (typeof o.id !== "string" || !/^[a-z0-9-]+$/.test(o.id)) return `неверный id объекта: ${String(o.id)}`;

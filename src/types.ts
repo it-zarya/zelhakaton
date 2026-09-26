@@ -67,8 +67,23 @@ export interface Route {
   stops: { objectId: string; note?: string; walk?: string }[];
 }
 
+/** Тексты экранов (правятся в админке) */
+export interface UiTexts {
+  attract: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    ctaTitle: string;
+    ctaText: string;
+    button: string;
+    note: string; // {n} — число этапов
+    mapNote: string;
+  };
+}
+
 export interface Content {
   stages: Stage[];
   objects: MapObject[];
   routes: Route[];
+  ui?: UiTexts;
 }

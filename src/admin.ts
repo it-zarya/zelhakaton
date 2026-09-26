@@ -11,7 +11,7 @@ type Photo = NonNullable<MapObject["photos"]>[number];
 const ZONES = (zonesFile as { zones: { id: string; label: string }[] }).zones;
 
 let data: Content;
-let sel: { kind: "stage"; i: number } | { kind: "object"; id: string } | null = null;
+let sel: { kind: "stage"; i: number } | { kind: "object"; id: string } | { kind: "ui" } | null = null;
 let backStage: number | null = null; // из какого этапа открыли объект — для кнопки «← к этапу»
 let dirty = false;
 let root: HTMLElement;
@@ -35,6 +35,8 @@ export async function bootAdmin(el: HTMLElement) {
 function render() {
   root.innerHTML = `
     <aside class="adm-side">
+      <h2>Экраны</h2>
+      <button class="adm-item ${sel?.kind === "ui" ? "on" : ""}" data-ui>Первый экран (заставка)</button>
       <h2>Этапы</h2>
       ${data.stages.map((s, i) => `<button class="adm-item ${isSel("stage", i) ? "on" : ""}" data-stage="${i}"><b>${i + 1}</b> ${esc(s.years)} · ${esc(s.title)}</button>`).join("")}
       <button class="adm-add" data-act="add-stage">+ этап</button>
@@ -47,7 +49,7 @@ function render() {
         <span class="adm-status">${dirty ? "Есть несохранённые правки" : "Всё сохранено"}</span>
         <button class="adm-btn primary" data-act="save" ${dirty ? "" : "disabled"}>Сохранить</button>
       </header>
-      <div class="adm-form">${sel?.kind === "stage" ? stageForm(sel.i) : sel?.kind === "object" ? objectForm(sel.id) : ""}</div>
+      <div class="adm-form">${sel?.kind === "stage" ? stageForm(sel.i) : sel?.kind === "object" ? objectForm(sel.id) : sel?.kind === "ui" ? uiForm() : ""}</div>
     </main>`;
   bind();
 }
@@ -67,6 +69,20 @@ const zonePick = (name: string, chosen: string[]) => `
   <div class="adm-zones" data-zones="${name}">
     ${ZONES.map((z) => `<label class="${chosen.includes(z.id) ? "on" : ""}"><input type="checkbox" value="${z.id}" ${chosen.includes(z.id) ? "checked" : ""}>${esc(z.label)}</label>`).join("")}
   </div>`;
+
+function uiForm() {
+  const t = data.ui!.attract;
+  return `
+    <h1>Первый экран <a href="/" target="game">открыть в игре ↗</a></h1>
+    ${field("Надпись сверху", "ui-eyebrow", t.eyebrow)}
+    ${field("Заголовок", "ui-title", t.title)}
+    ${field("Подзаголовок (красным)", "ui-subtitle", t.subtitle)}
+    ${field("Призыв — жирная строка", "ui-ctaTitle", t.ctaTitle)}
+    ${field("Призыв — текст", "ui-ctaText", t.ctaText, { area: true, rows: 3 })}
+    ${field("Надпись на кнопке", "ui-button", t.button)}
+    ${field("Строка под кнопкой", "ui-note", t.note, { hint: "{n} заменяется на число этапов" })}
+    ${field("Плашка на карте", "ui-mapNote", t.mapNote)}`;
+}
 
 function stageForm(i: number) {
   const s = data.stages[i];
@@ -135,6 +151,7 @@ function objectForm(id: string) {
 
 function bind() {
   root.querySelectorAll<HTMLElement>("[data-stage]").forEach((b) => b.addEventListener("click", () => ((sel = { kind: "stage", i: +b.dataset.stage! }), (backStage = null), render())));
+  root.querySelector<HTMLElement>("[data-ui]")?.addEventListener("click", () => ((sel = { kind: "ui" }), render()));
   root.querySelectorAll<HTMLElement>("[data-object]").forEach((b) => b.addEventListener("click", () => ((sel = { kind: "object", id: b.dataset.object! }), (backStage = null), render())));
   root.querySelectorAll<HTMLElement>("[data-open]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -170,6 +187,11 @@ function bind() {
 
 function onInput(t: HTMLInputElement) {
   if (!sel || !t.name && !t.closest("[data-zones]")) return;
+  if (sel.kind === "ui") {
+    const key = t.name.replace(/^ui-/, "") as keyof NonNullable<Content["ui"]>["attract"];
+    data.ui!.attract[key] = t.value;
+    return markDirty();
+  }
   const zoneBox = t.closest<HTMLElement>("[data-zones]");
   if (sel.kind === "stage") {
     const s = data.stages[sel.i];
