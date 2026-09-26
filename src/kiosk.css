@@ -1422,3 +1422,8 @@ h3 {
   background: color-mix(in srgb, var(--accent) 28%, transparent);
   border: 2px solid var(--accent);
 }
+
+/* Лист находки: карта сдвинута влево, справа от неё над/под листом — ровный серый в тон ч/б карты */
+[data-screen="found"] .map-area {
+  background: #cbcac7;
+}

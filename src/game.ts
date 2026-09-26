@@ -361,13 +361,6 @@ export class Game {
     this.found.push(...objs.map((o) => o.id));
     const current = new Set(objs.map((o) => o.id));
     this.later(2300, () => this.map.setMarkers(this.foundObjects(), true, (o) => (current.has(o.id) ? "landmark" : "found")));
-    this.later(3200, () => {
-      // сдвинуть карту так, чтобы зона оказалась в свободной полосе слева от листа
-      const u = unit();
-      const cx = zones.reduce((a, { z }) => a + z.x, 0) / zones.length;
-      const mapW = this.mapArea.clientWidth;
-      this.map.pan(Math.min(Math.max(0, cx - 218 * u), 0.34 * mapW));
-    });
     this.later(3300, () => {
       this.pages = objs;
       this.page = 0;
@@ -376,6 +369,17 @@ export class Game {
       this.showSheet(true);
       this.kickIdle(); // таймер «для чтения» — с момента появления карточки
     });
+  }
+
+  /** Сдвинуть карту так, чтобы объект карточки оказался в свободной полосе слева от листа.
+   *  Только влево и не дальше, чем прячет лист: край карты не должен вылезать. */
+  private panTo(o: MapObject, sheet: HTMLElement) {
+    const area = this.mapArea.getBoundingClientRect();
+    const left = (sheet.offsetParent?.getBoundingClientRect().left ?? 0) + sheet.offsetLeft; // offsetLeft — без учёта анимации выезда
+    const free = Math.max(0, left - area.left);
+    const [x] = this.map.screenOf(o);
+    const maxDx = Math.max(0, area.width - free); // на столько карта может уехать, пока правый край под листом
+    this.map.pan(Math.min(Math.max(0, x - free * 0.6), maxDx)); // двигаем минимально: объект в правой части полосы
   }
 
   /** first — выезд с анимацией (только при появлении); листание страниц — без неё */
@@ -398,6 +402,7 @@ export class Game {
     if (!first) sheet.classList.add("still");
     this.root.append(sheet);
     fitSheet(sheet);
+    this.panTo(o, sheet);
     this.bind(
       {
         back: () => {
