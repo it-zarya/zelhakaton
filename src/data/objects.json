@@ -713,7 +713,14 @@
       "https://www.netall.ru/society/news/1584473.html",
       "https://krukovo-vedomosti.ru/news/moscow/moskvichi-podderzhali-prisvoenie-imeni-arkhitektora-igorya-pokrovskogo-skveru-v-zelenograde"
     ],
-    "photo": null
+    "photo": null,
+    "photos": [
+      {
+        "src": "photos/arkhitektor-0.jpg",
+        "caption": "Скульптура «Архитектор»",
+        "credit": "netall.ru"
+      }
+    ]
   },
   {
     "id": "museum-fleyta",
