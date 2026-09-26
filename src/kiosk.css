@@ -1375,3 +1375,28 @@ h3 {
 .attract .mono:last-child {
   font-size: calc(22 * var(--u));
 }
+
+/* Карточка без прокрутки: fitSheet() уменьшает --fit, пока текст не влезет */
+.sheet-text {
+  --fit: 1;
+  overflow: hidden;
+  gap: calc(12 * var(--u) * var(--fit));
+}
+
+.sheet-text h3 {
+  font-size: calc(32 * var(--u) * var(--fit));
+}
+
+.sheet-text p,
+.sheet-text .box {
+  font-size: calc(20 * var(--u) * var(--fit));
+}
+
+.sheet-text p.mono {
+  font-size: calc(20 * var(--u) * var(--fit));
+}
+
+.sheet-text .box {
+  gap: calc(8 * var(--u) * var(--fit));
+  padding: calc(14 * var(--u) * var(--fit)) calc(16 * var(--u) * var(--fit));
+}

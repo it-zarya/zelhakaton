@@ -14,7 +14,7 @@ import objects from "./data/objects.json";
 import routes from "./data/routes.json";
 import ui from "./data/ui.json";
 import { Fog } from "./fog";
-import { Game, fitAttractTitle } from "./game";
+import { Game, fitAttractTitle, fitSheet } from "./game";
 import { City3D } from "./city3d";
 import { ColorReveal } from "./reveal";
 import { Maket } from "./maket";
@@ -80,6 +80,7 @@ async function boot() {
   // Отладка: ?nofog — город без тумана; ?stage=N — сразу на этап N
   const q = new URLSearchParams(location.search);
   if (q.has("nofog")) canvas.style.display = "none";
+  if (import.meta.env.DEV) (window as unknown as { __game: Game }).__game = game; // только dev: проверки из браузера
   if (q.has("stage")) game.startAt(Math.max(0, Math.min(content.stages.length - 1, Number(q.get("stage")) - 1)));
 
   // Киоск: без контекстного меню, без зума жестами
@@ -95,6 +96,7 @@ async function boot() {
       reveal.setPaths(map.zonePaths);
       fog.resize(); // туман перерисуется с учётом открытых зон
       fitAttractTitle(panel);
+      document.querySelectorAll<HTMLElement>(".sheet").forEach(fitSheet);
     }, 150);
   });
 }

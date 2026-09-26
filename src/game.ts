@@ -396,6 +396,7 @@ export class Game {
     });
     if (!first) sheet.classList.add("still");
     this.root.append(sheet);
+    fitSheet(sheet);
     this.bind(
       {
         back: () => {
@@ -621,6 +622,7 @@ export class Game {
     this.root.querySelector(".sheet")?.remove();
     const sheet = this.sheetEl(o, { head: o.id === "egg" ? "Секретная карточка" : o.address, back: false, next: "Закрыть", closeOnly: true });
     this.root.append(sheet);
+    fitSheet(sheet);
     this.bind({ next: () => sheet.remove() }, sheet);
   }
 
@@ -706,6 +708,26 @@ export function fitAttractTitle(panel: HTMLElement) {
   const titleText = [...h1.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? "").join(" ");
   fit(h1, titleText.split(/\s+/).filter(Boolean));
   if (sub) fit(sub, [sub.textContent ?? ""]);
+}
+
+/** Текст карточки — без прокрутки: уменьшаем шрифт (--fit), пока всё не поместится */
+export function fitSheet(sheet: HTMLElement) {
+  const t = sheet.querySelector<HTMLElement>(".sheet-text");
+  if (!t) return;
+  const run = () => {
+    let lo = 0.6, hi = 1;
+    t.style.setProperty("--fit", "1");
+    if (t.scrollHeight <= t.clientHeight) return;
+    for (let i = 0; i < 8; i++) {
+      const mid = (lo + hi) / 2;
+      t.style.setProperty("--fit", String(mid));
+      if (t.scrollHeight <= t.clientHeight) lo = mid;
+      else hi = mid;
+    }
+    t.style.setProperty("--fit", (lo * 0.98).toFixed(3)); // запас на округление строк
+  };
+  run();
+  void document.fonts.ready.then(run);
 }
 
 function yearsHtml(years: string): string {
