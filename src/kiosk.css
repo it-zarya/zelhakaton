@@ -1341,3 +1341,8 @@ h3 {
 .box {
   font-size: calc(21 * var(--u));
 }
+
+/* Заставка: призыв сразу под заголовком */
+.attract .cta {
+  margin-top: calc(20 * var(--u));
+}

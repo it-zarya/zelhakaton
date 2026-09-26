@@ -127,8 +127,8 @@ export class Game {
     this.panel.innerHTML = `
       <p class="eyebrow">${nowrapYears(t.eyebrow)}</p>
       <h1 class="attract-title">${esc(t.title)}${t.subtitle ? `<span>${esc(t.subtitle)}</span>` : ""}</h1>
-      <div class="spacer"></div>
       <p class="cta">${t.ctaTitle ? `<b>${esc(t.ctaTitle)}</b> ` : ""}${esc(t.ctaText)}</p>
+      <div class="spacer"></div>
       <button class="btn primary big" data-act="play">${esc(t.button)}</button>
       <p class="mono">${esc(t.note.replace("{n}", String(this.c.stages.length)))}</p>`;
     this.panel.querySelector(".attract-title")!.parentElement!.classList.add("attract");
