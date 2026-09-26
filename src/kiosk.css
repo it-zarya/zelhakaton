@@ -1346,3 +1346,32 @@ h3 {
 .attract .cta {
   margin-top: calc(20 * var(--u));
 }
+
+/* Заставка крупнее: меньше пустоты (заголовок подгоняется под ширину в fitAttractTitle) */
+.attract .eyebrow {
+  font-size: calc(22 * var(--u));
+}
+
+.attract h1 {
+  line-height: 0.98;
+}
+
+.attract h1 span {
+  margin-top: calc(22 * var(--u));
+}
+
+.attract .cta {
+  margin-top: calc(44 * var(--u));
+  font-size: calc(30 * var(--u));
+  line-height: 1.36;
+}
+
+.attract .cta b {
+  margin-bottom: calc(14 * var(--u));
+  font-size: calc(38 * var(--u));
+  line-height: 1.15;
+}
+
+.attract .mono:last-child {
+  font-size: calc(22 * var(--u));
+}

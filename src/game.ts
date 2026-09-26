@@ -130,6 +130,7 @@ export class Game {
       <button class="btn primary big" data-act="play">${esc(t.button)}</button>
       <p class="mono">${esc(t.note.replace("{n}", String(this.c.stages.length)))}</p>`;
     this.panel.querySelector(".attract-title")!.parentElement!.classList.add("attract");
+    document.fonts.ready.then(() => requestAnimationFrame(() => fitAttractTitle(this.panel)));
     this.bind({ play: () => this.startGame() });
   }
 
@@ -674,6 +675,37 @@ export class Game {
     }, IDLE_WARN_MS * k);
     this.idleReset = window.setTimeout(() => this.toAttract(), IDLE_MS * k);
   }
+}
+
+/** Заголовок заставки во всю ширину панели: самое длинное слово — от края до края, подзаголовок — в одну строку */
+export function fitAttractTitle(panel: HTMLElement) {
+  const h1 = panel.querySelector<HTMLElement>(".attract-title");
+  if (!h1) return;
+  const width = h1.clientWidth;
+  // Меряем пробником внутри самого элемента: он наследует шрифт, letter-spacing и т.п.
+  const widest = (el: HTMLElement, words: string[]) => {
+    const probe = document.createElement("span");
+    probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font:inherit;letter-spacing:inherit;margin:0;display:inline";
+    el.append(probe);
+    const w = Math.max(...words.map((t) => ((probe.textContent = t), probe.getBoundingClientRect().width)));
+    probe.remove();
+    return w;
+  };
+  const fit = (el: HTMLElement, words: string[]) => {
+    el.style.fontSize = "";
+    for (let i = 0; i < 4; i++) {
+      const cur = parseFloat(getComputedStyle(el).fontSize);
+      const w = widest(el, words);
+      if (!w) return;
+      const next = Math.floor(cur * (width / w) * 0.97);
+      if (Math.abs(next - cur) < 1) return;
+      el.style.fontSize = `${next}px`;
+    }
+  };
+  const sub = h1.querySelector<HTMLElement>("span");
+  const titleText = [...h1.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? "").join(" ");
+  fit(h1, titleText.split(/\s+/).filter(Boolean));
+  if (sub) fit(sub, [sub.textContent ?? ""]);
 }
 
 function yearsHtml(years: string): string {
