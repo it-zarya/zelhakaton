@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 760" width="760" height="760" font-family="IBM Plex Mono, monospace" id="route-2">
+
+<rect width="760" height="760" fill="#F7F4ED"></rect>
+<path d="M40.0 0V760M0 40.0H760M125.0 0V760M0 125.0H760M210.0 0V760M0 210.0H760M295.0 0V760M0 295.0H760M380.0 0V760M0 380.0H760M465.0 0V760M0 465.0H760M550.0 0V760M0 550.0H760M635.0 0V760M0 635.0H760M720.0 0V760M0 720.0H760" stroke="#CFC7B7" stroke-width="1" opacity=".45" fill="none"></path>
+<g id="base">
+<path d="M-275.5 -255.2L42 -444.5L571.1 -387.7L719.3 -179.5L391.2 -134.1L-21.5 -198.4Z" fill="#9DB080" opacity=".42"></path>
+<path d="M-63.9 766.8L296 736.5L497 861.4L528.8 1126.3L169 1239.9L-127.4 1088.5Z" fill="#9DB080" opacity=".42"></path>
+<path d="M-635.3 199L-296.7 28.7L-148.5 293.6L-296.7 539.7L-593 464Z" fill="#9DB080" opacity=".42"></path>
+<path d="M952.1 104.4L1216.7 274.7L1142.6 691.1L888.6 596.4Z" fill="#9DB080" opacity=".42"></path>
+<path d="M-804.7 1410.2L-275.5 1523.8L-487.2 1750.9L-1016.3 1675.2Z" fill="#9DB080" opacity=".42"></path>
+<ellipse cx="116.1" cy="475.3" rx="112.2" ry="40.8" transform="rotate(-35 116.1 475.3)" fill="#C9D6D3"></ellipse>
+<path d="M20.8 -103.8L338.3 -28.1L359.5 199" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-0.4 236.8L179.6 191.4L274.8 123.3" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M338.3 274.7L677 464L931 501.8" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M719.3 9.7L740.5 388.3L804 804.6" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-212 426.1L296 501.8" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M42 842.5L296 993.9L571.1 1145.3" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-1016.3 918.2L-698.8 1145.3L-804.7 1372.4" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-1185.7 1031.7L-974 1296.7" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M359.5 -255.2L105.5 -5.4L-63.9 312.5L-254.4 698.6L-506.2 1005.2L-868.2 1111.2L-1270.3 1334.5" stroke="#57524A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-212 85.4L248.1 134.8L677 274.7L1058 388.3" stroke="#57524A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-487.2 596.4L42 641.9L467.4 626.7L994.5 728.9" stroke="#57524A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M152 -47L248.1 134.8L467.4 626.7L581.7 880.3" stroke="#57524A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M2581.9 1183.1L236.7 -304.4L-762.3 -936.5L-1651.3 -1580" stroke="#57524A" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M2581.9 1183.1L236.7 -304.4L-762.3 -936.5L-1651.3 -1580" stroke="#F7F4ED" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-1968.8 -595.9L-889.3 539.7L-506.2 1005.2L147.8 1372.4L1100.3 1826.6L2158.6 2205.1" stroke="#1E1D1A" stroke-width="2.5" fill="none" stroke-dasharray="16 6 3 6"></path>
+</g>
+<text class="r-base" x="445.5" y="577.5" dy="-9" text-anchor="middle" transform="rotate(66.0 445.5 577.5)">ЦЕНТРАЛЬНЫЙ ПР-Т</text>
+<text class="r-base" x="116.1" y="480.3" text-anchor="middle">ПРУД</text>
+<path d="M282.8 212.6L423.6 528.3" stroke="#FFD98A" stroke-width="18" stroke-linecap="round" fill="none"></path>
+<g id="route">
+<path class="r-rt" d="M248.1 134.8L282.8 212.6" stroke="#D9472B" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path class="r-rt" d="M282.8 212.6L467 625.2" stroke="#D9472B" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path class="r-rt" d="M467 625.2L511.9 622.9L494.9 535.9L453.7 533.4" stroke="#D9472B" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+</g>
+<g id="stop-1" transform="translate(248.1 134.8)"><g class="r-mk"><path d="M9 -9V-34" stroke="#1E1D1A" stroke-width="2.5"></path><path d="M9 -34H25L21 -28L25 -22H9Z" fill="#1E1D1A"></path><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">1</text><text class="r-lbl" x="-24" y="6" text-anchor="end">«ЭЛЕКТРОН»</text></g></g>
+<g id="stop-2" transform="translate(282.8 212.6)"><g class="r-mk"><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">2</text><text class="r-lbl" x="-24" y="6" text-anchor="end">БАШНИ ПРОСПЕКТА</text></g></g>
+<g id="stop-3" transform="translate(467 625.2)"><g class="r-mk"><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">3</text><text class="r-lbl" x="-24" y="6" text-anchor="end">КЦ «ЗЕЛЕНОГРАД»</text></g></g>
+<g id="stop-4" transform="translate(453.7 533.4)"><g class="r-mk"><rect x="7" y="-27" width="16" height="16" fill="#1E1D1A" stroke="#F7F4ED" stroke-width="2"></rect><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">4</text><text class="r-lbl" x="24" y="6" text-anchor="start">«ФЛЕЙТА»</text></g></g>
+<g transform="translate(720 44)"><g class="r-ui"><circle r="20" fill="#F7F4ED" stroke="#1E1D1A" stroke-width="2"></circle><path d="M0 -13L6 7L0 3L-6 7Z" fill="#1E1D1A"></path><text y="-26" text-anchor="middle" style="font-size:14px;font-weight:600" fill="#1E1D1A">С</text></g></g>
+<g transform="translate(24 716)"><g class="r-ui"><path d="M0 0V8H170.0V0" stroke="#1E1D1A" stroke-width="2" fill="none"></path><text x="85.0" y="-6" text-anchor="middle" style="font-size:13px;font-weight:500;letter-spacing:.06em" fill="#1E1D1A">500 М</text></g></g>
+<g transform="translate(748 748)"><g class="r-ui"><text text-anchor="end" style="font-size:11px;letter-spacing:.04em" fill="#57524A">Карта © участники OpenStreetMap</text></g></g>
+</svg>

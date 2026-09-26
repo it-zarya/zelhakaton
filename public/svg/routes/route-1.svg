@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 760" width="760" height="760" font-family="IBM Plex Mono, monospace" id="route-1">
+
+<rect width="760" height="760" fill="#F7F4ED"></rect>
+<path d="M126.7 0V760M0 126.7H760M253.3 0V760M0 253.3H760M380.0 0V760M0 380.0H760M506.7 0V760M0 506.7H760M633.3 0V760M0 633.3H760" stroke="#CFC7B7" stroke-width="1" opacity=".45" fill="none"></path>
+<g id="base">
+<path d="M-346.6 -139L126.5 -421L915 -336.4L1135.8 -26.2L646.9 41.5L31.9 -54.4Z" fill="#9DB080" opacity=".42"></path>
+<path d="M-31.2 1383.9L505 1338.8L804.6 1524.9L851.9 1919.7L315.7 2088.9L-125.8 1863.3Z" fill="#9DB080" opacity=".42"></path>
+<path d="M-882.8 537.8L-378.2 284L-157.4 678.8L-378.2 1045.5L-819.7 932.7Z" fill="#9DB080" opacity=".42"></path>
+<path d="M1482.7 396.8L1877 650.6L1766.6 1271.1L1388.1 1130.1Z" fill="#9DB080" opacity=".42"></path>
+<path d="M-1135.1 2342.7L-346.6 2511.9L-662 2850.3L-1450.5 2737.5Z" fill="#9DB080" opacity=".42"></path>
+<ellipse cx="236.9" cy="949.6" rx="167.2" ry="60.8" transform="rotate(-35 236.9 949.6)" fill="#C9D6D3"></ellipse>
+<path d="M94.9 86.6L568 199.4L599.6 537.8" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M63.4 594.2L331.5 526.6L473.4 425" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M568 650.6L1072.7 932.7L1451.2 989.1" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M1135.8 255.8L1167.3 819.9L1261.9 1440.3" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-252 876.3L505 989.1" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M126.5 1496.7L505 1722.3L915 1947.9" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-1450.5 1609.5L-977.4 1947.9L-1135.1 2286.3" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-1702.8 1778.7L-1387.4 2173.5" stroke="#CFC7B7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M599.6 -139L221.1 233.3L-31.2 707L-315.1 1282.3L-690.4 1739.2L-1229.7 1897.1L-1829 2229.9" stroke="#57524A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-252 368.6L433.7 442.2L1072.7 650.6L1640.4 819.9" stroke="#57524A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-662 1130.1L126.5 1197.7L760.4 1175.2L1545.8 1327.5" stroke="#57524A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M290.5 171.2L433.7 442.2L760.4 1175.2L930.8 1553.1" stroke="#57524A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M3911.3 2004.3L416.6 -212.3L-1072 -1154.2L-2396.7 -2113.1" stroke="#57524A" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></path><path d="M3911.3 2004.3L416.6 -212.3L-1072 -1154.2L-2396.7 -2113.1" stroke="#F7F4ED" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M-2869.8 -646.6L-1261.3 1045.5L-690.4 1739.2L284.2 2286.3L1703.5 2963.1L3280.5 3527.2" stroke="#1E1D1A" stroke-width="2.5" fill="none" stroke-dasharray="16 6 3 6"></path>
+</g>
+<text class="r-base" x="531.7" y="662.1" dy="-9" text-anchor="middle" transform="rotate(66.0 531.7 662.1)">ЦЕНТРАЛЬНЫЙ ПР-Т</text>
+<g id="route">
+<path class="r-rt" d="M276.6 230.8L385.1 216.3L494.6 255.4" stroke="#D9472B" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path class="r-rt" d="M494.6 255.4L460.8 391.2L331.5 526.6L265.4 543.7" stroke="#D9472B" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+</g>
+<g id="stop-1" transform="translate(276.6 230.8)"><g class="r-mk"><path d="M9 -9V-34" stroke="#1E1D1A" stroke-width="2.5"></path><path d="M9 -34H25L21 -28L25 -22H9Z" fill="#1E1D1A"></path><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">1</text><text class="r-lbl" x="-24" y="6" text-anchor="end">КОРП. 118</text></g></g>
+<g id="stop-2" transform="translate(494.6 255.4)"><g class="r-mk"><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">2</text><text class="r-lbl" x="24" y="6" text-anchor="start">ШКОЛА № 842</text></g></g>
+<g id="stop-3" transform="translate(265.4 543.7)"><g class="r-mk"><rect x="7" y="-27" width="16" height="16" fill="#1E1D1A" stroke="#F7F4ED" stroke-width="2"></rect><circle r="14" fill="#D9472B" stroke="#F7F4ED" stroke-width="3"></circle><text class="r-num" y="5.2" text-anchor="middle">3</text><text class="r-lbl" x="-24" y="6" text-anchor="end">ПОЛИКЛИНИКА № 152</text></g></g>
+<g transform="translate(720 44)"><g class="r-ui"><circle r="20" fill="#F7F4ED" stroke="#1E1D1A" stroke-width="2"></circle><path d="M0 -13L6 7L0 3L-6 7Z" fill="#1E1D1A"></path><text y="-26" text-anchor="middle" style="font-size:14px;font-weight:600" fill="#1E1D1A">С</text></g></g>
+<g transform="translate(24 716)"><g class="r-ui"><path d="M0 0V8H253.3V0" stroke="#1E1D1A" stroke-width="2" fill="none"></path><text x="126.7" y="-6" text-anchor="middle" style="font-size:13px;font-weight:500;letter-spacing:.06em" fill="#1E1D1A">500 М</text></g></g>
+<g transform="translate(748 748)"><g class="r-ui"><text text-anchor="end" style="font-size:11px;letter-spacing:.04em" fill="#57524A">Карта © участники OpenStreetMap</text></g></g>
+</svg>

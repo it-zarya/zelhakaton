@@ -92,3 +92,15 @@ body.mobile {
   font: 500 12px var(--font-mono);
   color: var(--muted);
 }
+
+/* Карта маршрута на телефоне */
+.m-route-map {
+  margin: -20px -16px 16px;
+  aspect-ratio: 1;
+  background: var(--paper-2);
+  border-bottom: 2px solid var(--ink);
+}
+
+.m-route-map:empty {
+  display: none;
+}

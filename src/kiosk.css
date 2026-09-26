@@ -1452,3 +1452,86 @@ h3 {
 .flex-mid > .box.hint {
   flex-shrink: 0; /* иначе flex сжимает коробки и режет текст вместо честного переполнения */
 }
+
+/* Окно маршрута: карта (SVG из Claude Design) + остановки + QR */
+.modal-card.route-card {
+  width: min(calc(1180 * var(--u)), 94vw);
+  grid-template-columns: calc(520 * var(--u)) 1fr calc(220 * var(--u));
+  align-items: start;
+}
+
+.route-map {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  background: var(--paper-2);
+}
+
+.route-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Стили классов SVG-карт (в экспорт Claude Design они не попали; источник — design/tools/routes.js) */
+.route-svg text {
+  font-family: var(--f-mono);
+}
+
+.route-svg .r-rt {
+  stroke-width: 4px;
+}
+
+.route-svg .r-lbl {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--paper-2);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
+.route-svg .r-base {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--paper-2);
+  stroke-width: 4px;
+}
+
+.route-svg .r-num {
+  font-size: 15px;
+  font-weight: 600;
+  fill: #fff;
+}
+
+/* телефон: карта ужата вдвое — маркеры, подписи и линия крупнее */
+.route-svg.phone .r-mk {
+  transform: scale(1.4); /* больше — длинные подписи («ПОЛИКЛИНИКА № 152») вылезают за край */
+}
+
+.route-svg.phone .r-lbl {
+  font-size: 14px; /* вместе с scale(1.4) ≈ 10 px на экране телефона; крупнее — подписи у краёв обрезаются */
+}
+
+.route-svg.phone .r-base {
+  font-size: 25px;
+  stroke-width: 6px;
+}
+
+.route-svg.phone .r-rt {
+  stroke-width: 7.5px;
+}
+
+.route-svg.phone .r-ui {
+  transform: scale(1.7);
+}
+
+.route-svg.phone g[transform^="translate(24 "] > .r-ui {
+  display: none; /* масштабная линейка: при увеличении врала бы о расстоянии */
+}

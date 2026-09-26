@@ -6,6 +6,7 @@ import type { Fog } from "./fog";
 import { Maket } from "./maket";
 import type { ColorReveal } from "./reveal";
 import { qrCanvas, objectUrl, routeUrl } from "./qr";
+import { mountRouteMap } from "./routemap";
 import type { Content, MapObject, Route, Stage } from "./types";
 import { esc } from "./util";
 
@@ -609,10 +610,12 @@ export class Game {
     const m = document.createElement("div");
     m.className = "modal";
     m.innerHTML = `
-      <div class="modal-card">
+      <div class="modal-card route-card">
+        <div class="route-map" data-route-map></div>
         <div>
           <p class="mono accent">Маршрут</p>
           <h3>${esc(r.title)}</h3>
+          <p class="mono">${esc(r.duration)} · ${esc(r.distance)}</p>
           <ol>${r.stops.map((s, i) => `<li><i>${i + 1}</i>${esc(this.objects.get(s.objectId)?.name ?? s.objectId)}</li>`).join("")}</ol>
         </div>
         <div class="modal-side">
@@ -624,6 +627,7 @@ export class Game {
     m.addEventListener("click", (e) => e.target === m && m.remove());
     this.root.append(m);
     void qrCanvas(routeUrl(r.id), 300).then((c) => m.querySelector("[data-qr]")?.replaceChildren(c));
+    void mountRouteMap(m.querySelector("[data-route-map]"), r.id);
     this.bind({ close: () => m.remove() }, m);
   }
 

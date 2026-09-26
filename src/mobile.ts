@@ -2,6 +2,7 @@
 
 import type { Content, MapObject } from "./types";
 import { esc, paragraphs } from "./util";
+import { mountRouteMap } from "./routemap";
 
 export function isMobileRoute(): boolean {
   return /^#\/(o|r)\//.test(location.hash);
@@ -23,6 +24,7 @@ export function renderMobile(root: HTMLElement, c: Content) {
       const pts = stops.filter((s) => s.o!.lat != null).map((s) => `${s.o!.lat},${s.o!.lon}`);
       const ymaps = pts.length > 1 ? `https://yandex.ru/maps/?rtext=${pts.join("~")}&rtt=pd` : "";
       html = `
+        <div class="m-route-map" data-route-map></div>
         <header class="m-head">
           <p class="eyebrow">Прогулка по городу Покровского</p>
           <h1>${esc(r.title)}</h1>
@@ -48,6 +50,7 @@ export function renderMobile(root: HTMLElement, c: Content) {
 
   root.innerHTML = `<main class="m-page">${html}
     <footer class="m-foot">Выставка «Игорь Покровский. Архитектор Зеленограда»<br>Карта © участники OpenStreetMap</footer></main>`;
+  if (kind === "r") void mountRouteMap(root.querySelector("[data-route-map]"), id, true);
 }
 
 function objectHtml(o: MapObject, full: boolean): string {
