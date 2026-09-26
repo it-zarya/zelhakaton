@@ -15,6 +15,7 @@ updated: 2026-09-26
 | Дизайн | [[design]] | концепция «калька генплана», токены, источники картинок |
 | Задание для Claude Design | [[design-brief]] | текст для вставки в Claude Design |
 | Задание: этап 4 сложнее | [[design-brief-stage4]] | мини-игра «Двигаем коробки» v2 для Claude Design |
+| Задание: карты маршрутов | [[design-brief-routes]] | промпт для Claude Design: 5 маршрутов картами |
 | Handoff из Claude Design | [[design-handoff]] | механики, экраны, анимации, материалы из прототипа |
 | Промпты картинок | [[image-prompts]] | GPT-image / Шедеврум / Kandinsky |
 | Контент | [[content]] | исходники, противоречия и решения |
