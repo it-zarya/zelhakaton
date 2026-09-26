@@ -14,6 +14,7 @@
 npm install
 npm run dev        # vite --host: открыть с планшета по http://<IP-ноутбука>:5173
 npm run build      # tsc + vite build → dist/
+npm run release    # выкатка в прод: сборка → проверка локально → rsync (docs/deploy.md)
 npm run map        # пересобрать public/map.svg и src/data/zones.json из OSM
 # Адреса: / — игра, /#/maket — мини-игра «Двигаем коробки», /#/o/<id> и /#/r/<id> — QR-страницы
 # Админка контента (только npm run dev, только с этого компьютера): http://localhost:5173/admin.html
@@ -32,6 +33,7 @@ npm run map        # пересобрать public/map.svg и src/data/zones.jso
 | Контент, противоречия | `docs/content.md` | **перед переносом текста на экран** |
 | Проверенные факты, география | `docs/factcheck.md` | тексты, подсказки, зоны карты |
 | OSM-полигоны, права на фото, аналоги | `docs/research.md` | карта, фото, питч |
+| Выкатка в прод, откат | `docs/deploy.md` | **перед выкаткой** |
 | План дня, DoD | `docs/workflow.md` | начало работы, приоритизация |
 | Грабли | `docs/pitfalls.md` | тач, canvas, киоск ведут себя странно |
 | Решения (ADR) | `docs/decisions/index.md` | меняешь архитектуру или механику |
