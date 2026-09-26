@@ -340,6 +340,7 @@ export class Game {
 
   private async success() {
     this.busy = true;
+    this.note(null); // убрать «Одно место найдено…» и прочие плашки над картой
     this.fog.enabled = false;
     this.map.clearPulse();
     const s = this.stage;
