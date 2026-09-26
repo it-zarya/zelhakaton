@@ -314,7 +314,19 @@
       "https://zelenograd-news.ru/news/society/v_9_m_mikrorayone_nachalsya_snos_starykh_pyatietazhek",
       "https://www.zelenograd.ru/news/50252/"
     ],
-    "photo": null
+    "photo": null,
+    "photos": [
+      {
+        "src": "photos/korp-925-927-0.jpg",
+        "caption": "Зима во дворе 9-го микрорайона",
+        "credit": "pastvu.com/436886 · Ustinov"
+      },
+      {
+        "src": "photos/korp-925-927-1.jpg",
+        "caption": "Дома 9-го микрорайона зимой",
+        "credit": "PastVu"
+      }
+    ]
   },
   {
     "id": "ats-3",
