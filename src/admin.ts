@@ -81,7 +81,7 @@ function uiForm() {
     ${field("Призыв — текст", "ui-ctaText", t.ctaText, { area: true, rows: 3 })}
     ${field("Надпись на кнопке", "ui-button", t.button)}
     ${field("Строка под кнопкой", "ui-note", t.note, { hint: "{n} заменяется на число этапов" })}
-    ${field("Плашка на карте", "ui-mapNote", t.mapNote)}`;
+`;
 }
 
 function stageForm(i: number) {

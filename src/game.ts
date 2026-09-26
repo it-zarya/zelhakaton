@@ -118,12 +118,10 @@ export class Game {
     this.root.dataset.screen = "attract";
     this.map.setOpenZones(this.map.zonePaths.keys()); // под туманом — весь город
     this.map.setOthers(true);
-    this.fog.enabled = true;
-    this.fog.startDemo(5000, 10000);
+    this.fog.enabled = false; // на заставке карту не стираем — игра начинается кнопкой
     const t = this.c.ui!.attract;
     // годы вида «1964–2002» не разрываем
     const nowrapYears = (x: string) => esc(x).replace(/(\d{4}[–—-]\d{4})/g, '<span style="white-space:nowrap">$1</span>');
-    this.note(`<img src="${base()}svg/ui/icon-finger-swipe.svg" alt="">${esc(t.mapNote)}`);
     this.panel.innerHTML = `
       <p class="eyebrow">${nowrapYears(t.eyebrow)}</p>
       <h1 class="attract-title">${esc(t.title)}${t.subtitle ? `<span>${esc(t.subtitle)}</span>` : ""}</h1>
