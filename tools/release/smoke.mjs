@@ -12,6 +12,8 @@ const b = await chromium.launch({ channel: "chrome" });
 
 async function page(path, viewport, fn) {
   const p = await b.newPage({ viewport, hasTouch: true });
+  // Метрику не грузим: она шлёт запросы без пауз (networkidle не наступает) и засчитала бы прогон как визит.
+  await p.route((url) => allowed(url.href), (r) => r.abort());
   p.on("pageerror", (e) => errs.push(`${path}: JS ${e.message}`));
   p.on("console", (m) => m.type() === "error" && !/favicon/.test(m.location().url) && !allowed(m.location().url) && errs.push(`${path}: console ${m.text()}`));
   p.on("response", (r) => r.status() >= 400 && !/favicon/.test(r.url()) && !allowed(r.url()) && errs.push(`${path}: ${r.status()} ${r.url()}`));

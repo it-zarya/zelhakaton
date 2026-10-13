@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 [ -f .env.deploy ] && source .env.deploy
-DEPLOY_TARGET="${DEPLOY_TARGET:-alex@45.9.120.124:/opt/www/zelenograd/}" # см. docs/deploy.md
+DEPLOY_TARGET="${DEPLOY_TARGET:-alex@94.228.166.30:/opt/www/zelenograd/}" # см. docs/deploy.md
 export VITE_PUBLIC_URL="${VITE_PUBLIC_URL:-https://zelenograd.it-zarya.ru}"
 
 if [ -n "$(git status --porcelain -- src public)" ]; then

@@ -23,3 +23,6 @@ updated: 2026-09-25
 | Размыто на Retina | canvas без учёта `devicePixelRatio` | размер буфера = CSS-размер × DPR | ожидаемо |
 | Шрифты или картинки не грузятся на площадке | нет Wi-Fi, ассеты с CDN | всё локально в `public/` | ожидаемо |
 | QR на экране не открывается на телефоне | ссылка на `localhost` / IP планшета | QR только на публичный хостинг | ожидаемо |
+| `npm run smoke` падает с `page.goto: Timeout … networkidle` | Яндекс Метрика шлёт запросы без пауз, `networkidle` не наступает | в `smoke.mjs` запросы к Яндексу режутся `page.route` → abort (заодно прогон не считается визитом) | исправлено 2026-10-13 |
+| На w_rus nginx после reload работает со старым конфигом | `/opt/www/nginx.conf` смонтирован в контейнер **отдельным файлом**; `sed -i` и редакторы создают новый файл, а контейнер держит старый | править на месте (`cat >>`, `tee` без переименования) или после правки `docker compose up -d --force-recreate nginx`; проверять `docker exec nginx grep … /etc/nginx/conf.d/default.conf` | ожидаемо |
+| `ssh w_rus 'bash -s' < script.sh` выполнил только начало | `docker compose run` внутри скрипта съел stdin с остатком скрипта | `docker compose run -T … </dev/null` | ожидаемо |
