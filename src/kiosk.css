@@ -1535,3 +1535,129 @@ h3 {
 .route-svg.phone g[transform^="translate(24 "] > .r-ui {
   display: none; /* масштабная линейка: при увеличении врала бы о расстоянии */
 }
+
+/* Навигация этапа: «← Этап N» и «Заново» над годом */
+.stage-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(10 * var(--u));
+}
+
+.stage-nav .btn:last-child {
+  margin-left: auto;
+}
+
+.btn.small {
+  min-height: calc(48 * var(--u));
+  padding: 0 calc(14 * var(--u));
+  font-size: calc(17 * var(--u));
+}
+
+.btn.armed {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper-3);
+}
+
+/* Шапка листа находки: этап и годы + название этапа */
+.sheet-stage {
+  min-width: 0;
+}
+
+.sheet-sub {
+  margin: calc(2 * var(--u)) 0 0;
+  font: 600 calc(20 * var(--u)) / 1.2 var(--f-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Финал: яйцо и эскизы */
+.secrets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(10 * var(--u));
+}
+
+.secret img.thumb {
+  object-fit: cover;
+  opacity: 1;
+  border: 1px solid var(--ink);
+}
+
+/* Режим ожидания: эскизы поверх карты */
+.slideshow {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: var(--paper);
+  animation: fade-in 1200ms var(--ease-out);
+}
+
+.slides {
+  position: absolute;
+  inset: calc(24 * var(--u)) calc(24 * var(--u)) calc(84 * var(--u));
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 1500ms var(--ease-out), transform 9500ms linear;
+}
+
+.slide.on {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.slide-cap {
+  position: absolute;
+  left: calc(24 * var(--u));
+  right: calc(24 * var(--u));
+  bottom: calc(20 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(2 * var(--u));
+  font-size: calc(19 * var(--u));
+}
+
+.slide-cap span {
+  font: 500 calc(15 * var(--u)) var(--f-mono);
+  color: var(--ink-2);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+/* Эскизы в карточке: белый лист целиком, подпись под рисунком, а не поверх */
+.media.gallery.paper {
+  height: calc(440 * var(--u));
+  background: #fff;
+  place-items: start center;
+}
+
+.media.gallery.paper img.photo {
+  height: calc(100% - 64 * var(--u));
+  padding: calc(28 * var(--u)) calc(6 * var(--u)) calc(4 * var(--u));
+  filter: none;
+}
+
+.media.gallery.paper .gal-cap {
+  min-height: calc(64 * var(--u));
+  padding-top: calc(8 * var(--u));
+  background: var(--ink);
+}
+
+.media.gallery.paper .gal-dots i {
+  border-color: var(--ink);
+}
+
+.media.gallery.paper .gal-dots i.on {
+  background: var(--ink);
+}

@@ -68,7 +68,7 @@ function objectHtml(o: MapObject, full: boolean): string {
             : ""
       }
       ${full ? `<h1>${esc(o.qrTitle)}</h1><p class="eyebrow">${esc(o.name)}</p>` : `<h2>${esc(o.qrTitle)}</h2>`}
-      <p class="meta">${esc(o.address)} · ${esc(o.year)}</p>
+      <p class="meta">${esc([o.address, o.year].filter(Boolean).join(" · "))}</p>
       ${o.authors ? `<p class="authors">${esc(o.authors)}</p>` : ""}
       ${o.legend ? `<p class="legend">Содержит городскую легенду</p>` : ""}
       <div class="m-text">${paragraphs(o.qrText)}</div>

@@ -7,6 +7,7 @@ import { Maket } from "./maket";
 import type { ColorReveal } from "./reveal";
 import { qrCanvas, objectUrl, routeUrl } from "./qr";
 import { mountRouteMap } from "./routemap";
+import { Slideshow } from "./slideshow";
 import type { Content, MapObject, Route, Stage } from "./types";
 import { esc } from "./util";
 
@@ -19,6 +20,8 @@ const IDLE_WARN_MS = 90_000; // «Вы ещё здесь?»
 const IDLE_MS = 120_000; // сброс на заставку
 const READING_X = 2; // на карточке, финале и в мини-игре читают дольше — таймеры вдвое длиннее
 const HEAT_COLORS = ["#FFE7A8", "#FFD98A", "#F7B267", "#EE8A4E", "#E4572E"];
+const SKETCHES = "eskizy"; // объект-галерея эскизов: финал и режим ожидания
+const ATTRACT_SLIDES_MS = 20_000; // заставка без касаний столько — пошли эскизы
 
 /** Иллюстрации зданий из design/svg/buildings */
 const ILLUSTRATION: Record<string, string> = {
@@ -55,6 +58,9 @@ export class Game {
   private maket: Maket | null = null;
   private partFound = new Set<string>(); // найденные зоны многоместного этапа
   private bonusDone = false; // бонус-мини-игра этапа уже пройдена
+  /** Состояние на старте каждого этапа — для «← Прошлый этап» */
+  private snaps: { open: string[]; found: string[]; hintsUsed: number }[] = [];
+  private slideshow: Slideshow | null = null;
   private objects: Map<string, MapObject>;
   private c: Content;
   private map: City3D;
@@ -133,26 +139,39 @@ export class Game {
     this.panel.querySelector(".attract-title")!.parentElement!.classList.add("attract");
     document.fonts.ready.then(() => requestAnimationFrame(() => fitAttractTitle(this.panel)));
     this.bind({ play: () => this.startGame() });
+    // режим ожидания: без касаний поверх карты листаются эскизы
+    const sketches = this.objects.get(SKETCHES)?.photos ?? [];
+    if (sketches.length) this.slideshow = new Slideshow(this.mapArea, sketches, ATTRACT_SLIDES_MS);
   }
 
-  private reset() {
+  /** Убрать с экрана всё временное: таймеры, листы, плашки, мини-игру, генплан */
+  private clearScene() {
     this.timers.forEach(clearTimeout);
     this.timers = [];
     this.fog.stopDemo();
+    this.slideshow?.destroy();
+    this.slideshow = null;
     this.maket?.destroy();
     this.maket = null;
     this.reveal.stop();
     this.root.querySelectorAll(".sheet, .modal").forEach((el) => el.remove());
     this.note(null);
+    this.chip(0, 0, null);
     this.mapArea.querySelector(".hatch")?.remove();
+    this.busy = false;
+    this.map.pan(0);
+    this.map.highlight(null);
+    this.map.clearPulse();
+    this.map.showPlan(false);
+  }
+
+  private reset() {
+    this.clearScene();
     this.stageIdx = this.hintIdx = this.hintsUsed = 0;
     this.open.clear();
     this.found = [];
-    this.busy = false;
-    this.map.pan(0);
-    this.map.clearPulse();
+    this.snaps = [];
     this.map.clearFound();
-    this.map.showPlan(false);
     this.map.setMarkers([], false);
     this.fog.setOpen([]);
     this.fog.setTarget([]);
@@ -163,7 +182,8 @@ export class Game {
   /** Отладка/демо: сразу на этап i (0..8), предыдущие считаются пройденными */
   startAt(i: number) {
     this.startGame();
-    for (const s of this.c.stages.slice(0, i)) {
+    for (const [k, s] of this.c.stages.slice(0, i).entries()) {
+      this.snaps[k] = { open: [...this.open], found: [...this.found], hintsUsed: 0 };
       [...s.zones, ...(s.alsoOpens ?? [])].forEach((z) => this.open.add(z));
       this.found.push(...s.objectIds.filter((id) => this.objects.has(id)));
     }
@@ -182,6 +202,7 @@ export class Game {
   // ——— Этап ———
 
   private startStage(i: number) {
+    this.snaps[i] = { open: [...this.open], found: [...this.found], hintsUsed: this.hintsUsed };
     this.partFound.clear();
     this.bonusDone = false;
     this.stageIdx = i;
@@ -213,9 +234,53 @@ export class Game {
     );
   }
 
+  /** «← Прошлый этап»: вернуть город и счёт к началу предыдущего этапа и пройти его заново */
+  private prevStage() {
+    const i = this.stageIdx - 1;
+    const snap = this.snaps[i];
+    if (!snap) return;
+    this.clearScene();
+    this.open = new Set(snap.open);
+    this.found = [...snap.found];
+    this.hintsUsed = snap.hintsUsed;
+    this.map.clearFound();
+    this.map.markFound(snap.open);
+    this.map.setOpenZones(this.open);
+    this.startStage(i);
+  }
+
+  /** Кнопки над годом этапа: назад и «Заново» (сброс — со второго касания, чтобы случайно не стереть чужую игру) */
+  private navHtml() {
+    const i = this.stageIdx;
+    return `<div class="stage-nav">
+      ${i > 0 ? `<button class="btn small" data-act="prev">← Этап ${i}</button>` : ""}
+      <button class="btn small" data-act="restart">Заново</button>
+    </div>`;
+  }
+
+  private bindNav() {
+    const btn = this.panel.querySelector<HTMLButtonElement>('[data-act="restart"]');
+    let armed = 0;
+    btn?.addEventListener("click", () => {
+      if (armed) {
+        clearTimeout(armed);
+        return this.startGame();
+      }
+      btn.classList.add("armed");
+      btn.textContent = "Точно заново?";
+      armed = window.setTimeout(() => {
+        armed = 0;
+        btn.classList.remove("armed");
+        btn.textContent = "Заново";
+      }, 3000);
+    });
+    this.bind({ prev: () => this.prevStage() });
+  }
+
   private renderStage(newHint = false) {
     const s = this.stage;
     this.panel.innerHTML = `
+      ${this.navHtml()}
       ${yearsHtml(s.years)}
       <h2 class="stage-title">${esc(s.title)}</h2>
       ${s.zones.length > 1 ? `<p class="mono accent" data-parts>Найдено ${this.partFound.size} из ${s.zones.length} мест</p>` : ""}
@@ -235,6 +300,7 @@ export class Game {
     this.heatLit = -1;
     fitHints(this.panel);
     this.bind({ hint: () => this.nextHint() });
+    this.bindNav();
   }
 
   private nextHint() {
@@ -400,7 +466,8 @@ export class Game {
     const next = !last ? "Дальше →" : isLastStage ? "К финалу →" : `К этапу ${this.stageIdx + 2} →`;
     const fact = this.page === 0 ? this.stage.hiddenFact : "";
     const sheet = this.sheetEl(o, {
-      head: `Этап ${this.stageIdx + 1} · ${this.page + 1} из ${n}`,
+      head: `Этап ${this.stageIdx + 1} · ${this.stage.years}${n > 1 ? ` · ${this.page + 1} из ${n}` : ""}`,
+      sub: this.stage.title,
       dots: n,
       fact,
       back: this.page > 0,
@@ -440,14 +507,14 @@ export class Game {
 
   private sheetEl(
     o: MapObject,
-    opt: { head: string; dots?: number; fact?: string; back: boolean; next: string; closeOnly?: boolean },
+    opt: { head: string; sub?: string; dots?: number; fact?: string; back: boolean; next: string; closeOnly?: boolean },
   ): HTMLElement {
     const el = document.createElement("section");
     el.className = "sheet";
     const illu = ILLUSTRATION[o.id];
     const gal = o.photos ?? [];
     const media = gal.length
-      ? `<div class="media gallery" data-gallery>
+      ? `<div class="media gallery${o.id === SKETCHES ? " paper" : ""}" data-gallery>
           <img class="photo" src="${base()}${esc(gal[0].src)}" alt="">
           <div class="gal-cap"><b>${esc(gal[0].caption)}</b><span>${esc(gal[0].credit)}</span></div>
           ${gal.length > 1 ? `<div class="gal-dots">${gal.map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>` : ""}
@@ -461,7 +528,7 @@ export class Game {
     const factText = opt.fact || o.fact || ""; // факт этапа (на первой странице) или собственный факт объекта
     el.innerHTML = `
       <div class="sheet-head">
-        <p class="mono">${esc(opt.head)}</p>
+        <div class="sheet-stage"><p class="mono">${esc(opt.head)}</p>${opt.sub ? `<p class="sheet-sub">${esc(opt.sub)}</p>` : ""}</div>
         ${opt.dots && opt.dots > 1 ? `<div class="dots">${Array.from({ length: opt.dots }, (_, i) => `<i class="${i === this.page ? "on" : ""}"></i>`).join("")}</div>` : ""}
       </div>
       <div class="sheet-body">
@@ -471,7 +538,7 @@ export class Game {
         </div>
         <div class="sheet-text">
           <h3>${esc(o.name)}</h3>
-          <p class="mono accent">${esc(o.address)} · ${esc(o.year)}</p>
+          <p class="mono accent">${esc([o.address, o.year].filter(Boolean).join(" · "))}</p>
           ${o.authors ? `<p class="authors">${esc(o.authors)}</p>` : ""}
           <p>${esc(o.caption)}</p>
           ${factText ? `<div class="box"><p class="mono accent">${factLabel}</p><p>${esc(factText)}</p></div>` : o.legend ? `<p class="mono accent">${factLabel}</p>` : ""}
@@ -554,6 +621,7 @@ export class Game {
     const o = s.objectIds.map((id) => this.objects.get(id)).find(Boolean);
     if (o) this.found.push(o.id);
     this.panel.innerHTML = `
+      ${this.navHtml()}
       ${yearsHtml(s.years)}
       <h2 class="stage-title">${esc(s.title)}</h2>
       <div class="flex-mid">
@@ -570,32 +638,37 @@ export class Game {
         this.startStage(this.stageIdx + 1);
       },
     });
+    this.bindNav();
   }
 
   // ——— Финал ———
 
   private async toFinal() {
     this.reveal.stop();
+    this.note(null);
     this.screen = "final";
     this.root.dataset.screen = "final";
     this.fog.enabled = false;
     await this.fog.clearAll();
     this.map.setOpenZones(this.map.zonePaths.keys());
     this.map.setOthers(true);
-    const perfect = this.hintsUsed === 0;
     const seen = new Set(this.found);
-    const pins = this.c.objects.filter((o) => o.id !== "egg" || perfect);
+    const pins = this.c.objects.filter((o) => o.id !== SKETCHES); // эскизы — без места на карте
     this.map.setMarkers(pins, true, (o) => (o.id === "egg" ? "secret" : seen.has(o.id) ? "found" : "landmark"));
     const n = this.hintsUsed;
     const egg = this.objects.get("egg");
+    const sketches = this.objects.get(SKETCHES);
     this.panel.innerHTML = `
       <h2 class="final-title">Город найден</h2>
-      <div class="score"><b>${n}</b><span>${n === 0 ? "подсказок — вы открыли секрет" : `${plural(n, "подсказка", "подсказки", "подсказок").split(" ")[1]} за ${this.c.stages.length} этапов`}</span></div>
+      <div class="score"><b>${n}</b><span>${n === 0 ? `подсказок за ${this.c.stages.length} этапов — ни одной!` : `${plural(n, "подсказка", "подсказки", "подсказок").split(" ")[1]} за ${this.c.stages.length} этапов`}</span></div>
       <p class="mono">Возьмите маршрут с собой</p>
       <div class="routes">
         ${this.c.routes.map((r) => `<button class="route" data-route="${esc(r.id)}"><b>${esc(r.title)}</b><span>${r.stops.length} ${plural(r.stops.length, "точка", "точки", "точек").split(" ")[1]} →</span></button>`).join("")}
       </div>
-      ${egg ? `<button class="secret ${perfect ? "open" : ""}" data-act="egg"><img src="${base()}svg/buildings/egg-pokrovskogo.svg" alt=""><span>${perfect ? "Секретная карточка «Яйцо Покровского» открыта" : "Сыграйте без подсказок — откроется секретная карточка"}</span></button>` : ""}
+      <div class="secrets">
+        ${egg ? `<button class="secret open" data-act="egg"><img src="${base()}svg/buildings/egg-pokrovskogo.svg" alt=""><span>«Яйцо Покровского»</span></button>` : ""}
+        ${sketches?.photos?.length ? `<button class="secret open" data-act="sketches"><img class="thumb" src="${base()}${esc(sketches.photos[0].src)}" alt=""><span>${esc(sketches.name)}</span></button>` : ""}
+      </div>
       <div class="spacer"></div>
       <button class="btn primary" data-act="again">Начать заново</button>`;
     this.panel.classList.add("final");
@@ -603,7 +676,7 @@ export class Game {
     this.panel.querySelectorAll<HTMLButtonElement>("[data-route]").forEach((b) =>
       b.addEventListener("click", () => this.routeModal(this.c.routes.find((r) => r.id === b.dataset.route)!)),
     );
-    this.bind({ again: () => this.toAttract(), egg: () => perfect && this.showInfo("egg") });
+    this.bind({ again: () => this.toAttract(), egg: () => this.showInfo("egg"), sketches: () => this.showInfo(SKETCHES) });
   }
 
   private routeModal(r: Route) {
@@ -636,7 +709,7 @@ export class Game {
     const o = this.objects.get(id);
     if (!o) return;
     this.root.querySelector(".sheet")?.remove();
-    const sheet = this.sheetEl(o, { head: o.id === "egg" ? "Секретная карточка" : o.address, back: false, next: "Закрыть", closeOnly: true });
+    const sheet = this.sheetEl(o, { head: o.id === "egg" ? "Секретная карточка" : o.id === SKETCHES ? "Город на бумаге" : o.address, back: false, next: "Закрыть", closeOnly: true });
     this.root.append(sheet);
     fitSheet(sheet);
     this.bind({ next: () => sheet.remove() }, sheet);
