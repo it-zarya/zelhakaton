@@ -48,7 +48,9 @@ npm run release
 
 По умолчанию `release.sh` катит в `alex@94.228.166.30:/opt/www/zelenograd/`. Переопределить — `DEPLOY_TARGET` в `.env.deploy` (в git не попадает, `.env*` в `.gitignore`).
 
-Нужен SSH-ключ, пущенный на сервер под `alex`. Ключи и пароли — только в Bitwarden (см. глобальные правила), в репозиторий не кладём.
+Нужен SSH-ключ, пущенный на сервер под `alex`.
+
+`release.sh` начинается с `git push` в `it-zarya/zelhakaton`: пушить может только GitHub-аккаунт **`it-zarya`**. Под `warenikov` — 403. Перед выкаткой `gh auth switch -u it-zarya`, после — обратно `gh auth switch -u warenikov`. Ключи и пароли — только в Bitwarden (см. глобальные правила), в репозиторий не кладём.
 
 ## Откат
 
